@@ -90,6 +90,8 @@ const state = {
   totalReruns: 0,       // total duplicate CI runs across all commits
   wastedCITime: 0,      // ms — CI time lost to restarts + failures
   successCITime: 0,     // ms — CI time spent on successful merges
+  wallClockTime: 0,     // ms — total simulated time elapsed
+  sequentialCITime: 0,  // ms — sum of all CI durations ever assigned (sequential baseline)
   isRunning: false,
   isPaused: false,
   stepWaiting: false,   // true when step mode has paused before evaluation
@@ -168,6 +170,7 @@ function startCI(commit) {
   commit.ciElapsed = 0;
   commit.ciDuration = rand(minMs, maxMs);
   commit.ciOutcome = Math.random() * 100 < config.successRate ? 'success' : 'fail';
+  state.sequentialCITime += commit.ciDuration; // track what sequential would cost
   commit.ciRuns++;
   if (commit.ciRuns > 1) {
     state.totalReruns++;
@@ -198,6 +201,9 @@ function update(dt) {
 
   // If step mode is waiting for user or animating, freeze everything
   if (state.stepWaiting || state.animating) return;
+
+  // Track wall clock time
+  state.wallClockTime += dt;
 
   const activeSize = Math.min(config.batchSize, state.queue.length);
 
@@ -577,6 +583,7 @@ function loop(timestamp) {
     render.queueDirty = false;
   }
   updateProgressBars();
+  updateTimeStats();
 
   animFrameId = requestAnimationFrame(loop);
 }
@@ -629,6 +636,8 @@ function doReset() {
   state.totalReruns = 0;
   state.wastedCITime = 0;
   state.successCITime = 0;
+  state.wallClockTime = 0;
+  state.sequentialCITime = 0;
 
   // Reset render bookkeeping
   render.mergedCount = 0;
@@ -819,6 +828,12 @@ function formatCITime(ms) {
   return m + 'm ' + rem + 's';
 }
 
+function updateTimeStats() {
+  document.getElementById('stat-wall-clock').textContent = formatCITime(state.wallClockTime);
+  const saved = state.sequentialCITime - state.wallClockTime;
+  document.getElementById('stat-time-saved').textContent = saved > 0 ? formatCITime(saved) : '0 s';
+}
+
 function updateStats() {
   document.getElementById('stat-queue').textContent = state.queue.length;
   document.getElementById('stat-merged').textContent = state.merged.length;
@@ -841,6 +856,9 @@ function updateStats() {
   } else {
     ratioEl.textContent = '—';
   }
+
+  // Wall clock & time saved
+  updateTimeStats();
 
   // Percentages for merged vs rejected
   const settled = state.merged.length + state.rejected.length;

@@ -399,9 +399,11 @@ html, body {
 .stat-merged    { color: var(--green-bright); }
 .stat-rejected  { color: var(--red); }
 .stat-reruns    { color: var(--yellow); }
-.stat-ci-useful { color: var(--green-bright); font-size: 14px; }
-.stat-ci-wasted { color: var(--red); font-size: 14px; }
-.stat-ci-ratio  { color: var(--yellow); font-size: 14px; }
+.stat-ci-useful  { color: var(--green-bright); font-size: 14px; }
+.stat-ci-wasted  { color: var(--red); font-size: 14px; }
+.stat-ci-ratio   { color: var(--yellow); font-size: 14px; }
+.stat-wall-clock { color: var(--text-secondary); font-size: 14px; }
+.stat-time-saved { color: var(--purple); font-size: 14px; }
 
 .stat-divider {
   width: 1px;
