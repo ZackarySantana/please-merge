@@ -91,6 +91,7 @@ const state = {
   isRunning: false,
   isPaused: false,
   stepWaiting: false,   // true when step mode has paused before evaluation
+  animating: false,     // true during step-mode transition animation
 };
 
 // Render bookkeeping (to do incremental DOM updates)
@@ -187,8 +188,8 @@ function update(dt) {
     return;
   }
 
-  // If step mode is waiting for user, freeze everything
-  if (state.stepWaiting) return;
+  // If step mode is waiting for user or animating, freeze everything
+  if (state.stepWaiting || state.animating) return;
 
   const activeSize = Math.min(config.batchSize, state.queue.length);
 
@@ -281,6 +282,49 @@ function evaluateQueue() {
   }
 }
 
+// Process only ONE action: all consecutive successes OR a single failure (not both)
+function evaluateQueueStep() {
+  let moved = false;
+
+  // First: try to merge all consecutive successes from the head
+  while (state.queue.length > 0) {
+    const c = state.commits.get(state.queue[0]);
+    if (c.ciStatus === 'success') {
+      state.queue.shift();
+      state.merged.push(c.id);
+      moved = true;
+      continue;
+    }
+    break; // stop at first non-success — don't process a failure here
+  }
+
+  // If no successes were processed, try a single failure
+  if (!moved && state.queue.length > 0) {
+    const c = state.commits.get(state.queue[0]);
+    if (c.ciStatus === 'fail') {
+      state.queue.shift();
+      state.rejected.push(c.id);
+      moved = true;
+      restartActiveWindow();
+    }
+  }
+
+  if (moved) {
+    render.queueDirty = true;
+    renderMergedIncremental();
+    renderRejectedIncremental();
+    updateStats();
+    if (state.merged.length > render.mergedCount) {
+      flashHeader('.lane-header--merged');
+    }
+    if (state.rejected.length > render.rejectedCount) {
+      flashHeader('.lane-header--rejected');
+    }
+    render.mergedCount = state.merged.length;
+    render.rejectedCount = state.rejected.length;
+  }
+}
+
 // ── Step Mode ──────────────────────────────────
 
 function previewEvaluation() {
@@ -351,11 +395,149 @@ function hideStepBanner() {
 }
 
 function doStepContinue() {
-  if (!state.stepWaiting) return;
-  state.stepWaiting = false;
+  if (!state.stepWaiting || state.animating) return;
   hideStepBanner();
-  lastTimestamp = 0; // avoid time jump
-  evaluateQueue();
+
+  const preview = previewEvaluation();
+  if (preview.action === 'none') {
+    state.stepWaiting = false;
+    lastTimestamp = 0;
+    return;
+  }
+
+  state.animating = true;
+  animateStepTransition(preview, () => {
+    // Execute only this one action (merges OR reject, not both)
+    evaluateQueueStep();
+    // Force immediate re-render of queue
+    renderQueue();
+    render.queueDirty = false;
+    // Animate the queue settling into its new positions
+    animateQueueReflow(() => {
+      state.animating = false;
+
+      // Check if the new head is also ready — if so, pause again
+      if (state.queue.length > 0) {
+        const newHead = state.commits.get(state.queue[0]);
+        if (newHead && (newHead.ciStatus === 'success' || newHead.ciStatus === 'fail')) {
+          showStepBanner();
+          return; // stepWaiting stays true
+        }
+      }
+
+      // Nothing more to evaluate right now — resume simulation
+      state.stepWaiting = false;
+      lastTimestamp = 0;
+    });
+  });
+}
+
+// ── Step Animation ─────────────────────────────
+
+function animateStepTransition(preview, onComplete) {
+  const queueBody = document.getElementById('lane-queue');
+  const isReject = preview.action === 'reject';
+  const targetId = isReject ? 'lane-rejected' : 'lane-merged';
+  const targetBody = document.getElementById(targetId);
+  const count = isReject ? 1 : preview.count;
+
+  // Make sure the cards being moved are visible
+  queueBody.scrollTop = 0;
+
+  // Gather source cards from the queue DOM
+  const sourceCards = [];
+  for (let i = 0; i < count && i < queueBody.children.length; i++) {
+    sourceCards.push(queueBody.children[i]);
+  }
+
+  if (sourceCards.length === 0) {
+    onComplete();
+    return;
+  }
+
+  const targetRect = targetBody.getBoundingClientRect();
+  const stagger = Math.min(60, 300 / sourceCards.length); // tighter stagger for large batches
+
+  // Create fixed-position clones that will fly to the target lane
+  const clones = sourceCards.map((card, i) => {
+    const rect = card.getBoundingClientRect();
+    const clone = card.cloneNode(true);
+
+    // Strip progress bar from clone for a cleaner flight
+    const progress = clone.querySelector('.card-progress');
+    if (progress) progress.remove();
+
+    clone.classList.add('card-clone-flying');
+    Object.assign(clone.style, {
+      position: 'fixed',
+      top: rect.top + 'px',
+      left: rect.left + 'px',
+      width: rect.width + 'px',
+      height: rect.height + 'px',
+      zIndex: String(1000 - i),
+      margin: '0',
+      pointerEvents: 'none',
+      transition: `top 480ms cubic-bezier(0.16, 1, 0.3, 1) ${i * stagger}ms,
+                   left 480ms cubic-bezier(0.16, 1, 0.3, 1) ${i * stagger}ms,
+                   width 480ms cubic-bezier(0.16, 1, 0.3, 1) ${i * stagger}ms,
+                   height 480ms cubic-bezier(0.16, 1, 0.3, 1) ${i * stagger}ms,
+                   opacity 300ms ease ${i * stagger + 200}ms,
+                   transform 480ms cubic-bezier(0.16, 1, 0.3, 1) ${i * stagger}ms`,
+    });
+
+    document.body.appendChild(clone);
+
+    // Dim + shrink the original in the queue
+    Object.assign(card.style, {
+      opacity: '0.1',
+      transform: 'scale(0.95)',
+      transition: 'opacity 250ms ease, transform 250ms ease',
+    });
+
+    return { clone, rect };
+  });
+
+  // Trigger the fly on next frame (ensures transition fires)
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      clones.forEach(({ clone }) => {
+        Object.assign(clone.style, {
+          top: (targetRect.top + 6) + 'px',
+          left: (targetRect.left + 6) + 'px',
+          width: (targetRect.width - 12) + 'px',
+          opacity: '0',
+          transform: 'scale(0.92)',
+        });
+      });
+    });
+  });
+
+  // Clean up after the last clone finishes flying
+  const totalDuration = 480 + (clones.length - 1) * stagger + 120;
+  setTimeout(() => {
+    clones.forEach(({ clone }) => clone.remove());
+    onComplete();
+  }, totalDuration);
+}
+
+function animateQueueReflow(onComplete) {
+  const queueBody = document.getElementById('lane-queue');
+  const limit = Math.min(config.batchSize + 5, queueBody.children.length);
+
+  for (let i = 0; i < limit; i++) {
+    const card = queueBody.children[i];
+    card.classList.add('card--shifting');
+    card.style.animationDelay = `${i * 25}ms`;
+  }
+
+  const cleanupTime = 350 + limit * 25 + 50;
+  setTimeout(() => {
+    queueBody.querySelectorAll('.card--shifting').forEach(c => {
+      c.classList.remove('card--shifting');
+      c.style.animationDelay = '';
+    });
+    if (onComplete) onComplete();
+  }, cleanupTime);
 }
 
 // ── Game Loop ──────────────────────────────────
@@ -417,7 +599,10 @@ function doReset() {
   state.isRunning = false;
   state.isPaused = false;
   state.stepWaiting = false;
+  state.animating = false;
   hideStepBanner();
+  // Clean up any in-flight animation clones
+  document.querySelectorAll('.card-clone-flying').forEach(el => el.remove());
   if (animFrameId) {
     cancelAnimationFrame(animFrameId);
     animFrameId = null;

@@ -692,6 +692,24 @@ html, body {
   animation: slide-in 0.25s var(--ease-out) both;
 }
 
+/* Flying clones during step-mode transitions */
+.card-clone-flying {
+  border-radius: var(--radius-sm);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Queue reflow after items are removed */
+.card--shifting {
+  animation: queue-shift 0.35s var(--ease-out) both;
+}
+
+@keyframes queue-shift {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+}
+
 /* Lane-header flash on batch merge */
 @keyframes flash-green {
   0%   { background: var(--green-dim); }
