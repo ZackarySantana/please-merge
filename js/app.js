@@ -671,7 +671,7 @@ function renderQueue() {
 
 function buildQueueCard(commit, isActive) {
   const runsTag = commit.ciRuns > 1
-    ? `<span class="card-runs" title="CI restarted ${commit.ciRuns - 1}x">⟳${commit.ciRuns}</span>`
+    ? `<span class="card-runs" title="This commit has run CI ${commit.ciRuns} times. It was restarted ${commit.ciRuns - 1}x due to earlier failures in the queue.">⟳${commit.ciRuns}</span>`
     : '';
 
   if (!isActive) {
@@ -725,7 +725,7 @@ function renderMergedIncremental() {
   for (let i = render.mergedCount; i < state.merged.length; i++) {
     const c = state.commits.get(state.merged[i]);
     const runsTag = c.ciRuns > 1
-      ? `<span class="card-runs" title="CI ran ${c.ciRuns} times">⟳${c.ciRuns}</span>`
+      ? `<span class="card-runs" title="This commit ran CI ${c.ciRuns} times. It was restarted ${c.ciRuns - 1}x due to earlier failures in the queue.">⟳${c.ciRuns}</span>`
       : '';
     const card = document.createElement('div');
     card.className = 'card card--merged card--entering';
@@ -749,7 +749,7 @@ function renderRejectedIncremental() {
   for (let i = render.rejectedCount; i < state.rejected.length; i++) {
     const c = state.commits.get(state.rejected[i]);
     const runsTag = c.ciRuns > 1
-      ? `<span class="card-runs" title="CI ran ${c.ciRuns} times">⟳${c.ciRuns}</span>`
+      ? `<span class="card-runs" title="This commit ran CI ${c.ciRuns} times. It was restarted ${c.ciRuns - 1}x due to earlier failures in the queue.">⟳${c.ciRuns}</span>`
       : '';
     const card = document.createElement('div');
     card.className = 'card card--rejected card--entering';
