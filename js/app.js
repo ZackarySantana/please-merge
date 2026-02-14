@@ -34,8 +34,8 @@ const PRESETS = {
     successRate: 95,
     batchSize: 10,
     totalCommits: 100,
-    ciMin: 1,
-    ciMax: 4,
+    ciDuration: 3,
+    ciJitter: 2,
     speed: 2,
     label: 'Mostly Green',
   },
@@ -43,8 +43,8 @@ const PRESETS = {
     successRate: 50,
     batchSize: 10,
     totalCommits: 100,
-    ciMin: 2,
-    ciMax: 8,
+    ciDuration: 5,
+    ciJitter: 3,
     speed: 3,
     label: 'Flaky CI',
   },
@@ -52,8 +52,8 @@ const PRESETS = {
     successRate: 15,
     batchSize: 10,
     totalCommits: 60,
-    ciMin: 1,
-    ciMax: 6,
+    ciDuration: 4,
+    ciJitter: 3,
     speed: 4,
     label: 'Disaster Mode',
   },
@@ -61,8 +61,8 @@ const PRESETS = {
     successRate: 80,
     batchSize: 20,
     totalCommits: 200,
-    ciMin: 1,
-    ciMax: 3,
+    ciDuration: 2,
+    ciJitter: 1,
     speed: 8,
     label: 'Fast & Furious',
   },
@@ -74,8 +74,8 @@ const config = {
   successRate: 70,
   batchSize: 10,
   totalCommits: 100,
-  ciMin: 1,    // seconds
-  ciMax: 10,   // seconds
+  ciDuration: 5,   // seconds — base CI duration
+  ciJitter: 4,     // seconds — ± variance around ciDuration
   speed: 1,
   stepMode: true,
 };
@@ -160,8 +160,10 @@ function flashHeader(selector) {
 // ── Simulation Engine ──────────────────────────
 
 function startCI(commit) {
-  const minMs = config.ciMin * 1000;
-  const maxMs = config.ciMax * 1000;
+  const baseMs = config.ciDuration * 1000;
+  const jitterMs = config.ciJitter * 1000;
+  const minMs = Math.max(500, baseMs - jitterMs); // floor at 0.5s
+  const maxMs = baseMs + jitterMs;
   commit.ciStatus = 'running';
   commit.ciElapsed = 0;
   commit.ciDuration = rand(minMs, maxMs);
@@ -856,26 +858,20 @@ function updateStats() {
 // ── Sidebar Bindings ───────────────────────────
 
 function readConfigFromUI() {
-  config.successRate = +document.getElementById('cfg-success-rate').value;
-  config.batchSize   = +document.getElementById('cfg-batch-size').value;
-  config.totalCommits= +document.getElementById('cfg-total-commits').value;
-  config.ciMin       = +document.getElementById('cfg-ci-min').value;
-  config.ciMax       = +document.getElementById('cfg-ci-max').value;
-  config.speed       = +document.getElementById('cfg-speed').value;
-
-  // Enforce ciMin <= ciMax
-  if (config.ciMin > config.ciMax) {
-    config.ciMax = config.ciMin;
-    document.getElementById('cfg-ci-max').value = config.ciMax;
-  }
+  config.successRate  = +document.getElementById('cfg-success-rate').value;
+  config.batchSize    = +document.getElementById('cfg-batch-size').value;
+  config.totalCommits = +document.getElementById('cfg-total-commits').value;
+  config.ciDuration   = +document.getElementById('cfg-ci-duration').value;
+  config.ciJitter     = +document.getElementById('cfg-ci-jitter').value;
+  config.speed        = +document.getElementById('cfg-speed').value;
 }
 
 function syncUIValues() {
   document.getElementById('val-success-rate').textContent = config.successRate + '%';
   document.getElementById('val-batch-size').textContent = config.batchSize;
   document.getElementById('val-total-commits').textContent = config.totalCommits;
-  document.getElementById('val-ci-min').textContent = config.ciMin + ' s';
-  document.getElementById('val-ci-max').textContent = config.ciMax + ' s';
+  document.getElementById('val-ci-duration').textContent = config.ciDuration + ' s';
+  document.getElementById('val-ci-jitter').textContent = '± ' + config.ciJitter + ' s';
   document.getElementById('val-speed').textContent = config.speed + '×';
 }
 
@@ -883,8 +879,8 @@ function writeConfigToUI() {
   document.getElementById('cfg-success-rate').value = config.successRate;
   document.getElementById('cfg-batch-size').value = config.batchSize;
   document.getElementById('cfg-total-commits').value = config.totalCommits;
-  document.getElementById('cfg-ci-min').value = config.ciMin;
-  document.getElementById('cfg-ci-max').value = config.ciMax;
+  document.getElementById('cfg-ci-duration').value = config.ciDuration;
+  document.getElementById('cfg-ci-jitter').value = config.ciJitter;
   document.getElementById('cfg-speed').value = config.speed;
   syncUIValues();
 }
@@ -895,8 +891,8 @@ function applyPreset(name) {
   config.successRate = p.successRate;
   config.batchSize = p.batchSize;
   config.totalCommits = p.totalCommits;
-  config.ciMin = p.ciMin;
-  config.ciMax = p.ciMax;
+  config.ciDuration = p.ciDuration;
+  config.ciJitter = p.ciJitter;
   config.speed = p.speed;
   writeConfigToUI();
   doReset();
@@ -919,7 +915,7 @@ function bindEvents() {
 
   // Sidebar sliders — live update labels; some require reset
   const liveSliders = ['cfg-success-rate', 'cfg-speed'];
-  const resetSliders = ['cfg-batch-size', 'cfg-total-commits', 'cfg-ci-min', 'cfg-ci-max'];
+  const resetSliders = ['cfg-batch-size', 'cfg-total-commits', 'cfg-ci-duration', 'cfg-ci-jitter'];
 
   liveSliders.forEach(id => {
     document.getElementById(id).addEventListener('input', () => {
