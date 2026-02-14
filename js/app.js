@@ -34,36 +34,36 @@ const PRESETS = {
     successRate: 95,
     batchSize: 10,
     totalCommits: 100,
-    ciDuration: 3,
-    ciJitter: 2,
-    speed: 2,
+    ciDuration: 10,
+    ciJitter: 5,
+    speed: 300,
     label: 'Mostly Green',
   },
   'flaky-ci': {
     successRate: 50,
     batchSize: 10,
     totalCommits: 100,
-    ciDuration: 5,
-    ciJitter: 3,
-    speed: 3,
+    ciDuration: 15,
+    ciJitter: 10,
+    speed: 300,
     label: 'Flaky CI',
   },
   'disaster': {
     successRate: 15,
     batchSize: 10,
     totalCommits: 60,
-    ciDuration: 4,
-    ciJitter: 3,
-    speed: 4,
+    ciDuration: 20,
+    ciJitter: 10,
+    speed: 600,
     label: 'Disaster Mode',
   },
   'fast-and-furious': {
     successRate: 80,
     batchSize: 20,
     totalCommits: 200,
-    ciDuration: 2,
-    ciJitter: 1,
-    speed: 8,
+    ciDuration: 5,
+    ciJitter: 3,
+    speed: 1200,
     label: 'Fast & Furious',
   },
 };
@@ -74,9 +74,9 @@ const config = {
   successRate: 70,
   batchSize: 10,
   totalCommits: 100,
-  ciDuration: 5,   // seconds — base CI duration
-  ciJitter: 4,     // seconds — ± variance around ciDuration
-  speed: 1,
+  ciDuration: 15,  // minutes — base CI duration
+  ciJitter: 10,    // minutes — ± variance around ciDuration
+  speed: 60,
   stepMode: true,
 };
 
@@ -144,6 +144,17 @@ function rand(min, max) {
   return min + Math.random() * (max - min);
 }
 
+// Compact time for commit cards (e.g. "4.2m", "12m", "1h 5m")
+function formatCardTime(ms) {
+  const s = ms / 1000;
+  if (s < 60) return s.toFixed(0) + 's';
+  const m = s / 60;
+  if (m < 60) return m.toFixed(1).replace(/\.0$/, '') + 'm';
+  const h = Math.floor(m / 60);
+  const rem = Math.round(m % 60);
+  return rem > 0 ? h + 'h ' + rem + 'm' : h + 'h';
+}
+
 function formatTime(date) {
   return date.toLocaleTimeString('en-US', {
     hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
@@ -162,9 +173,9 @@ function flashHeader(selector) {
 // ── Simulation Engine ──────────────────────────
 
 function startCI(commit) {
-  const baseMs = config.ciDuration * 1000;
-  const jitterMs = config.ciJitter * 1000;
-  const minMs = Math.max(500, baseMs - jitterMs); // floor at 0.5s
+  const baseMs = config.ciDuration * 60000;  // minutes → ms
+  const jitterMs = config.ciJitter * 60000;  // minutes → ms
+  const minMs = Math.max(30000, baseMs - jitterMs); // floor at 30s
   const maxMs = baseMs + jitterMs;
   commit.ciStatus = 'running';
   commit.ciElapsed = 0;
@@ -768,21 +779,19 @@ function buildQueueCard(commit, isActive) {
   }
 
   const statusClass = `card--${commit.ciStatus}`;
-  const elapsed = (commit.ciElapsed / 1000).toFixed(1);
-  const total = (commit.ciDuration / 1000).toFixed(1);
   const pct = commit.ciDuration > 0 ? Math.min(100, (commit.ciElapsed / commit.ciDuration) * 100) : 0;
 
   let badge = '';
   let timeStr = '';
 
   if (commit.ciStatus === 'running') {
-    timeStr = `<span class="card-time">${elapsed}/${total}s</span>`;
+    timeStr = `<span class="card-time">${formatCardTime(commit.ciElapsed)}/${formatCardTime(commit.ciDuration)}</span>`;
   } else if (commit.ciStatus === 'success') {
     badge = '<span class="card-badge">✓</span>';
-    timeStr = `<span class="card-time">${total}s</span>`;
+    timeStr = `<span class="card-time">${formatCardTime(commit.ciDuration)}</span>`;
   } else if (commit.ciStatus === 'fail') {
     badge = '<span class="card-badge">✕</span>';
-    timeStr = `<span class="card-time">${total}s</span>`;
+    timeStr = `<span class="card-time">${formatCardTime(commit.ciDuration)}</span>`;
   }
 
   // Progress bar always visible — fill class varies by status
@@ -871,9 +880,7 @@ function updateProgressBars() {
 
     const timeEl = card.querySelector('.card-time');
     if (timeEl) {
-      const elapsed = (c.ciElapsed / 1000).toFixed(1);
-      const total = (c.ciDuration / 1000).toFixed(1);
-      timeEl.textContent = `${elapsed}/${total}s`;
+      timeEl.textContent = `${formatCardTime(c.ciElapsed)}/${formatCardTime(c.ciDuration)}`;
     }
   }
 }
@@ -908,9 +915,15 @@ function showStatDelta(statId, deltaMs, color) {
 function formatCITime(ms) {
   const s = ms / 1000;
   if (s < 60) return s.toFixed(1) + ' s';
-  const m = Math.floor(s / 60);
-  const rem = (s % 60).toFixed(0);
-  return m + 'm ' + rem + 's';
+  const totalMin = s / 60;
+  if (totalMin < 60) {
+    const m = Math.floor(totalMin);
+    const rem = Math.round(s % 60);
+    return rem > 0 ? m + 'm ' + rem + 's' : m + ' m';
+  }
+  const h = Math.floor(totalMin / 60);
+  const remMin = Math.round(totalMin % 60);
+  return remMin > 0 ? h + 'h ' + remMin + 'm' : h + ' h';
 }
 
 function updateTimeStats() {
@@ -973,8 +986,8 @@ function syncUIValues() {
   document.getElementById('val-success-rate').textContent = config.successRate + '%';
   document.getElementById('val-batch-size').textContent = config.batchSize;
   document.getElementById('val-total-commits').textContent = config.totalCommits;
-  document.getElementById('val-ci-duration').textContent = config.ciDuration + ' s';
-  document.getElementById('val-ci-jitter').textContent = '± ' + config.ciJitter + ' s';
+  document.getElementById('val-ci-duration').textContent = config.ciDuration + ' m';
+  document.getElementById('val-ci-jitter').textContent = '± ' + config.ciJitter + ' m';
   document.getElementById('val-speed').textContent = config.speed + '×';
 }
 
