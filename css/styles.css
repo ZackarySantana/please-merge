@@ -1193,6 +1193,230 @@ html, body {
   text-align: center;
 }
 
+/* ─── Cost Panel ─── */
+.cost-trigger-wrap {
+  position: relative;
+  align-self: center;
+}
+
+.cost-trigger-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all var(--duration) var(--ease-out);
+  color: var(--text-secondary);
+}
+
+.cost-trigger-btn:hover,
+.cost-trigger-btn--active {
+  background: var(--bg-card-hover);
+  border-color: var(--text-muted);
+  color: var(--text-primary);
+}
+
+.cost-trigger-icon {
+  font-size: 15px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--green-bright);
+  line-height: 1;
+}
+
+.cost-trigger-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.cost-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 280px;
+  background: var(--bg-sidebar);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.25);
+  z-index: 200;
+  animation: cost-panel-in 0.2s var(--ease-out);
+  overflow: hidden;
+}
+
+.cost-panel[hidden] {
+  display: none;
+}
+
+@keyframes cost-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.cost-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.cost-panel-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cost-panel-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 4px;
+  border-radius: var(--radius-sm);
+  transition: color var(--duration) var(--ease-out);
+}
+
+.cost-panel-close:hover {
+  color: var(--text-primary);
+}
+
+.cost-panel-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+}
+
+.cost-panel-input-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.cost-panel-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  transition: border-color var(--duration) var(--ease-out);
+}
+
+.cost-panel-input-wrap:focus-within {
+  border-color: var(--blue);
+}
+
+.cost-panel-input-prefix,
+.cost-panel-input-suffix {
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  padding: 6px 8px;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.cost-panel-input-prefix {
+  padding-right: 2px;
+  color: var(--green-bright);
+  font-weight: 600;
+}
+
+.cost-panel-input-suffix {
+  padding-left: 2px;
+}
+
+.cost-panel-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  padding: 6px 4px;
+  text-align: right;
+}
+
+/* Remove number input spinners */
+.cost-panel-input::-webkit-outer-spin-button,
+.cost-panel-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.cost-panel-input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.cost-panel-divider {
+  height: 1px;
+  background: var(--border);
+}
+
+.cost-panel-rows {
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cost-panel-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cost-panel-row-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.cost-panel-row-value {
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+}
+
+.cost-panel-row-value--green  { color: var(--green-bright); }
+.cost-panel-row-value--red    { color: var(--red); }
+.cost-panel-row-value--purple { color: var(--purple); }
+
+.cost-panel-row-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 2px 0;
+}
+
+.cost-panel-hint {
+  padding: 8px 14px 10px;
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+}
+
 /* ─── Responsive tweaks ─── */
 @media (max-width: 1100px) {
   :root {

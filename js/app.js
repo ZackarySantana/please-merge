@@ -930,6 +930,7 @@ function updateTimeStats() {
   document.getElementById('stat-wall-clock').textContent = formatCITime(state.wallClockTime);
   const saved = state.sequentialCITime - state.wallClockTime;
   document.getElementById('stat-time-saved').textContent = saved > 0 ? formatCITime(saved) : '0 s';
+  updateCostPanel();
 }
 
 function updateStats() {
@@ -958,6 +959,9 @@ function updateStats() {
   // Wall clock & time saved
   updateTimeStats();
 
+  // Cost panel
+  updateCostPanel();
+
   // Percentages for merged vs rejected
   const settled = state.merged.length + state.rejected.length;
   const pctMerged = document.getElementById('pct-merged');
@@ -969,6 +973,88 @@ function updateStats() {
     pctMerged.textContent = '';
     pctRejected.textContent = '';
   }
+}
+
+// ── Cost Panel ─────────────────────────────────
+
+function formatCost(dollars) {
+  if (dollars < 0.01 && dollars > 0) return '< $0.01';
+  if (dollars >= 1000) return '$' + dollars.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  if (dollars >= 100) return '$' + dollars.toFixed(0);
+  if (dollars >= 10) return '$' + dollars.toFixed(1);
+  return '$' + dollars.toFixed(2);
+}
+
+function getCostRate() {
+  const input = document.getElementById('cost-rate');
+  if (!input) return 0;
+  const val = parseFloat(input.value);
+  return isNaN(val) || val < 0 ? 0 : val;
+}
+
+function updateCostPanel() {
+  const panel = document.getElementById('cost-panel');
+  if (!panel || panel.hidden) return;
+
+  const rate = getCostRate(); // $ per minute
+  const toMin = 1 / 60000;   // ms → minutes
+
+  const usefulMin = state.successCITime * toMin;
+  const wastedMin = state.wastedCITime * toMin;
+  const totalMin = usefulMin + wastedMin;
+  const seqMin = state.sequentialCITime * toMin;
+  const savedMin = seqMin - (state.wallClockTime * toMin);
+
+  document.getElementById('cost-useful').textContent = formatCost(usefulMin * rate);
+  document.getElementById('cost-wasted').textContent = formatCost(wastedMin * rate);
+  document.getElementById('cost-total').textContent = formatCost(totalMin * rate);
+  document.getElementById('cost-saved').textContent = savedMin > 0 ? formatCost(savedMin * rate) : '$0.00';
+  document.getElementById('cost-money-wasted').textContent = formatCost(wastedMin * rate);
+}
+
+function initCostPanel() {
+  const btn = document.getElementById('btn-cost');
+  const panel = document.getElementById('cost-panel');
+  const closeBtn = document.getElementById('cost-panel-close');
+  const rateInput = document.getElementById('cost-rate');
+  if (!btn || !panel) return;
+
+  function togglePanel() {
+    const opening = panel.hidden;
+    panel.hidden = !panel.hidden;
+    btn.classList.toggle('cost-trigger-btn--active', opening);
+    if (opening) {
+      updateCostPanel();
+    }
+  }
+
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    togglePanel();
+  });
+
+  closeBtn.addEventListener('click', () => {
+    panel.hidden = true;
+    btn.classList.remove('cost-trigger-btn--active');
+  });
+
+  // Update costs live when rate changes
+  rateInput.addEventListener('input', () => {
+    updateCostPanel();
+  });
+
+  // Close on outside click
+  document.addEventListener('click', (e) => {
+    if (!panel.hidden && !panel.contains(e.target) && e.target !== btn) {
+      panel.hidden = true;
+      btn.classList.remove('cost-trigger-btn--active');
+    }
+  });
+
+  // Prevent panel clicks from closing
+  panel.addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
 }
 
 // ── Sidebar Bindings ───────────────────────────
@@ -1203,6 +1289,7 @@ function initWelcome() {
 
 function init() {
   bindEvents();
+  initCostPanel();
   doReset();
   initWelcome();
 }
