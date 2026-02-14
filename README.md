@@ -1,5 +1,7 @@
 # Merge Queue Simulator
 
+[![Sponsor](https://img.shields.io/badge/sponsor-♡-db61a2?style=flat&logo=github)](https://github.com/sponsors/ZackarySantana)
+
 An interactive, single-page simulator for experimenting with GitHub merge queue behavior.
 
 GitHub's merge queue batches pull requests and tests them together before merging into `main`. This saves time by running CI in parallel, but when a commit fails, the remaining batch restarts. A low CI success rate with a large batch size can waste significant CI time.
