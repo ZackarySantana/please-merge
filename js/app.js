@@ -840,8 +840,8 @@ function syncUIValues() {
   document.getElementById('val-success-rate').textContent = config.successRate + '%';
   document.getElementById('val-batch-size').textContent = config.batchSize;
   document.getElementById('val-total-commits').textContent = config.totalCommits;
-  document.getElementById('val-ci-min').textContent = config.ciMin + 's';
-  document.getElementById('val-ci-max').textContent = config.ciMax + 's';
+  document.getElementById('val-ci-min').textContent = config.ciMin + ' s';
+  document.getElementById('val-ci-max').textContent = config.ciMax + ' s';
   document.getElementById('val-speed').textContent = config.speed + '×';
 }
 
