@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Merge Queue Simulator</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app">
+    <!-- ─── Sidebar ─── -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <svg class="sidebar-logo" viewBox="0 0 16 16" width="22" height="22" fill="currentColor">
+          <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38
+            0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95
+            0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27
+            -.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82
+            1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66
+            0 0-.42-.77-1.22-.8 0 0-.78-.01-.05.48 0 0 .53.25.89 1.17 0 0 .46 1.49 2.69.98
+            .01.72.02 1.4.02 1.61 0 .21-.15.46-.55.38A8.013 8.013 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/>
+        </svg>
+        <h2>Configuration</h2>
+      </div>
+      <div class="sidebar-body">
+        <!-- Success Rate -->
+        <div class="control-group">
+          <label class="control-label">
+            CI Success Rate
+            <span class="control-value" id="val-success-rate">70%</span>
+          </label>
+          <input type="range" id="cfg-success-rate" min="0" max="100" value="70" class="slider">
+          <div class="slider-hints"><span>0%</span><span>100%</span></div>
+        </div>
+
+        <!-- Batch Size -->
+        <div class="control-group">
+          <label class="control-label">
+            Batch Size
+            <span class="control-value" id="val-batch-size">10</span>
+          </label>
+          <input type="range" id="cfg-batch-size" min="1" max="50" value="10" class="slider">
+          <div class="slider-hints"><span>1</span><span>50</span></div>
+        </div>
+
+        <!-- Total Commits -->
+        <div class="control-group">
+          <label class="control-label">
+            Total Commits
+            <span class="control-value" id="val-total-commits">100</span>
+          </label>
+          <input type="range" id="cfg-total-commits" min="10" max="500" value="100" step="10" class="slider">
+          <div class="slider-hints"><span>10</span><span>500</span></div>
+        </div>
+
+        <!-- CI Duration Min -->
+        <div class="control-group">
+          <label class="control-label">
+            CI Duration Min
+            <span class="control-value" id="val-ci-min">1s</span>
+          </label>
+          <input type="range" id="cfg-ci-min" min="1" max="30" value="1" class="slider">
+          <div class="slider-hints"><span>1s</span><span>30s</span></div>
+        </div>
+
+        <!-- CI Duration Max -->
+        <div class="control-group">
+          <label class="control-label">
+            CI Duration Max
+            <span class="control-value" id="val-ci-max">10s</span>
+          </label>
+          <input type="range" id="cfg-ci-max" min="1" max="30" value="10" class="slider">
+          <div class="slider-hints"><span>1s</span><span>30s</span></div>
+        </div>
+
+        <!-- Speed Multiplier -->
+        <div class="control-group">
+          <label class="control-label">
+            Speed
+            <span class="control-value" id="val-speed">1×</span>
+          </label>
+          <input type="range" id="cfg-speed" min="1" max="20" value="1" class="slider">
+          <div class="slider-hints"><span>1×</span><span>20×</span></div>
+        </div>
+
+        <!-- Step Mode -->
+        <div class="control-group">
+          <label class="control-label">
+            Step Mode
+            <span class="control-value" id="val-step-mode">Off</span>
+          </label>
+          <div class="toggle-row">
+            <label class="toggle">
+              <input type="checkbox" id="cfg-step-mode">
+              <span class="toggle-track"></span>
+            </label>
+            <span class="toggle-hint">Pause before each merge/reject</span>
+          </div>
+        </div>
+
+        <!-- Presets -->
+        <div class="control-group presets-group">
+          <label class="control-label">Presets</label>
+          <div class="presets">
+            <button class="preset-btn" data-preset="mostly-green">Mostly Green</button>
+            <button class="preset-btn" data-preset="flaky-ci">Flaky CI</button>
+            <button class="preset-btn" data-preset="disaster">Disaster Mode</button>
+            <button class="preset-btn" data-preset="fast-and-furious">Fast &amp; Furious</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ─── Main Area ─── -->
+    <main class="main">
+      <!-- Top bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <h1 class="topbar-title">Merge Queue Simulator</h1>
+        </div>
+        <div class="topbar-center">
+          <button id="btn-start" class="btn btn-primary">
+            <span class="btn-icon">▶</span> Start
+          </button>
+          <button id="btn-pause" class="btn btn-secondary" disabled>
+            <span class="btn-icon">⏸</span> Pause
+          </button>
+          <button id="btn-reset" class="btn btn-ghost">
+            <span class="btn-icon">↺</span> Reset
+          </button>
+        </div>
+        <div class="topbar-right">
+          <div class="stat">
+            <span class="stat-label">Queue</span>
+            <span class="stat-value stat-queue" id="stat-queue">100</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Merged</span>
+            <span class="stat-value stat-merged" id="stat-merged">0</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Rejected</span>
+            <span class="stat-value stat-rejected" id="stat-rejected">0</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Reruns</span>
+            <span class="stat-value stat-reruns" id="stat-reruns">0</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Lanes -->
+      <div class="lanes">
+        <!-- Queue Lane -->
+        <section class="lane">
+          <div class="lane-header lane-header--queue">
+            <span class="lane-title">Queue</span>
+            <span class="lane-count" id="count-queue">100</span>
+          </div>
+          <div class="lane-body" id="lane-queue"></div>
+        </section>
+
+        <!-- Rejected Lane -->
+        <section class="lane">
+          <div class="lane-header lane-header--rejected">
+            <span class="lane-title">Rejected</span>
+            <span class="lane-header-stats">
+              <span class="lane-count" id="count-rejected">0</span>
+              <span class="lane-pct lane-pct--rejected" id="pct-rejected"></span>
+            </span>
+          </div>
+          <div class="lane-body" id="lane-rejected"></div>
+        </section>
+
+        <!-- Merged Lane -->
+        <section class="lane">
+          <div class="lane-header lane-header--merged">
+            <span class="lane-title">Merged</span>
+            <span class="lane-header-stats">
+              <span class="lane-count" id="count-merged">0</span>
+              <span class="lane-pct lane-pct--merged" id="pct-merged"></span>
+            </span>
+          </div>
+          <div class="lane-body" id="lane-merged"></div>
+        </section>
+      </div>
+
+      <!-- Step Mode Banner -->
+      <div class="step-banner" id="step-banner" hidden>
+        <div class="step-banner-inner">
+          <div class="step-banner-icon" id="step-banner-icon">⏸</div>
+          <div class="step-banner-text">
+            <div class="step-banner-title" id="step-banner-title">Evaluation paused</div>
+            <div class="step-banner-desc" id="step-banner-desc"></div>
+          </div>
+          <button class="btn btn-primary step-banner-btn" id="btn-step-continue">
+            Continue →
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,814 @@
+/* ============================================
+   GitHub Merge Queue Simulator — Styles
+   ============================================ */
+
+/* ─── Reset & Tokens ─── */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* Backgrounds */
+  --bg-body:       #0d1117;
+  --bg-sidebar:    #161b22;
+  --bg-surface:    #161b22;
+  --bg-card:       #1c2128;
+  --bg-card-hover: #22272e;
+  --bg-input:      #0d1117;
+  --bg-topbar:     #161b22;
+
+  /* Borders */
+  --border:        #30363d;
+  --border-light:  #21262d;
+
+  /* Text */
+  --text-primary:  #e6edf3;
+  --text-secondary:#8b949e;
+  --text-muted:    #484f58;
+
+  /* Accents */
+  --blue:          #388bfd;
+  --blue-dim:      rgba(56, 139, 253, 0.15);
+  --green:         #2ea043;
+  --green-bright:  #3fb950;
+  --green-dim:     rgba(46, 160, 67, 0.12);
+  --red:           #f85149;
+  --red-dim:       rgba(248, 81, 73, 0.12);
+  --yellow:        #d29922;
+  --yellow-dim:    rgba(210, 153, 34, 0.15);
+  --purple:        #a371f7;
+
+  /* Sizing */
+  --sidebar-width: 264px;
+  --topbar-height: 60px;
+  --lane-header-h: 42px;
+  --card-gap:      4px;
+  --radius:        6px;
+  --radius-sm:     4px;
+
+  /* Transitions */
+  --ease-out:      cubic-bezier(0.16, 1, 0.3, 1);
+  --duration:      200ms;
+
+  /* Fonts */
+  --font-sans:     -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-mono:     "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-body);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── App Layout ─── */
+.app {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  height: 100vh;
+}
+
+/* ─── Sidebar ─── */
+.sidebar {
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sidebar-header h2 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sidebar-logo {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.sidebar-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Scrollbar */
+.sidebar-body::-webkit-scrollbar,
+.lane-body::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar-body::-webkit-scrollbar-track,
+.lane-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-body::-webkit-scrollbar-thumb,
+.lane-body::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.sidebar-body::-webkit-scrollbar-thumb:hover,
+.lane-body::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ─── Controls ─── */
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.control-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.control-value {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+/* Range slider */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--blue);
+  cursor: pointer;
+  transition: box-shadow var(--duration) var(--ease-out);
+}
+.slider::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 0 4px var(--blue-dim);
+}
+.slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: none;
+  border-radius: 50%;
+  background: var(--blue);
+  cursor: pointer;
+}
+
+.slider-hints {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+/* Toggle switch */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-track {
+  position: absolute;
+  inset: 0;
+  background: var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background var(--duration) var(--ease-out);
+}
+
+.toggle-track::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: var(--text-secondary);
+  border-radius: 50%;
+  transition: transform var(--duration) var(--ease-out), background var(--duration) var(--ease-out);
+}
+
+.toggle input:checked + .toggle-track {
+  background: var(--blue-dim);
+}
+
+.toggle input:checked + .toggle-track::after {
+  transform: translateX(16px);
+  background: var(--blue);
+}
+
+.toggle-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Presets */
+.presets-group {
+  margin-top: 6px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+
+.presets {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.preset-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  padding: 7px 12px;
+  font-size: 12px;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--duration) var(--ease-out);
+}
+.preset-btn:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+  border-color: var(--text-muted);
+}
+
+/* ─── Main Area ─── */
+.main {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ─── Top Bar ─── */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: var(--topbar-height);
+  padding: 0 20px;
+  background: var(--bg-topbar);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.topbar-title {
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--text-primary);
+}
+
+.topbar-center {
+  display: flex;
+  gap: 8px;
+}
+
+.topbar-right {
+  display: flex;
+  gap: 16px;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--duration) var(--ease-out);
+}
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.btn-icon {
+  font-size: 11px;
+}
+
+.btn-primary {
+  background: var(--green);
+  color: #fff;
+  border-color: var(--green);
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--green-bright);
+  border-color: var(--green-bright);
+}
+
+.btn-secondary {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-color: var(--border);
+}
+.btn-secondary:hover:not(:disabled) {
+  background: var(--bg-card-hover);
+  border-color: var(--text-muted);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border-color: var(--border);
+}
+.btn-ghost:hover:not(:disabled) {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+/* Stats */
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.stat-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+.stat-value {
+  font-size: 16px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+.stat-queue   { color: var(--blue); }
+.stat-merged  { color: var(--green-bright); }
+.stat-rejected{ color: var(--red); }
+.stat-reruns  { color: var(--yellow); }
+
+/* ─── Lanes ─── */
+.lanes {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.lane {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-body);
+  overflow: hidden;
+}
+
+.lane-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--lane-header-h);
+  padding: 0 14px;
+  flex-shrink: 0;
+  border-bottom: 2px solid var(--border);
+  background: var(--bg-surface);
+}
+
+.lane-header--queue    { border-bottom-color: var(--blue); }
+.lane-header--rejected { border-bottom-color: var(--red); }
+.lane-header--merged   { border-bottom-color: var(--green); }
+
+.lane-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+}
+
+.lane-header-stats {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lane-count {
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  background: var(--bg-card);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.lane-pct {
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+}
+
+.lane-pct--merged {
+  color: var(--green-bright);
+}
+
+.lane-pct--rejected {
+  color: var(--red);
+}
+
+.lane-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--card-gap);
+}
+
+/* ─── Commit Cards ─── */
+.card {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  border: 1px solid transparent;
+  transition: background var(--duration) var(--ease-out),
+              border-color var(--duration) var(--ease-out),
+              opacity var(--duration) var(--ease-out);
+  min-height: 32px;
+  flex-shrink: 0;
+  contain: layout style;
+}
+
+.card-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 20px;
+}
+
+/* Status dot */
+.card-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--text-muted);
+  transition: background var(--duration) var(--ease-out);
+}
+
+.card-name {
+  flex: 1;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-primary);
+}
+
+.card-time {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.card-date {
+  font-size: 10px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.card-badge {
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.card-runs {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--yellow);
+  background: var(--yellow-dim);
+  padding: 1px 5px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  letter-spacing: -0.02em;
+}
+
+/* Progress bar — full width, always visible on active cards */
+.card-progress {
+  height: 3px;
+  margin-top: 5px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.card-progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--blue);
+  transition: width 80ms linear;
+  will-change: width;
+}
+
+.card-progress-fill--success {
+  background: var(--green-bright);
+}
+
+.card-progress-fill--fail {
+  background: var(--red);
+}
+
+/* ─── Card States ─── */
+
+/* Inactive (queued, not in active window) */
+.card--inactive {
+  opacity: 0.35;
+  background: transparent;
+  border-color: transparent;
+  min-height: 28px;
+  padding: 4px 10px;
+}
+.card--inactive .card-name {
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+
+/* Active — idle (just entered window, CI not started) */
+.card--idle .card-dot {
+  background: var(--text-muted);
+}
+
+/* Active — running */
+.card--running {
+  background: var(--bg-card);
+  border-color: var(--border-light);
+}
+.card--running .card-dot {
+  background: var(--blue);
+  box-shadow: 0 0 6px var(--blue-dim);
+  animation: pulse-dot 1.6s ease-in-out infinite;
+}
+.card--running .card-progress-fill {
+  background: var(--blue);
+}
+
+/* Active — success (CI passed, waiting in queue) */
+.card--success {
+  background: var(--green-dim);
+  border-color: rgba(46, 160, 67, 0.25);
+}
+.card--success .card-dot {
+  background: var(--green-bright);
+}
+.card--success .card-name {
+  color: var(--green-bright);
+}
+.card--success .card-badge {
+  color: var(--green-bright);
+}
+
+/* Active — fail (CI failed, waiting in queue) */
+.card--fail {
+  background: var(--red-dim);
+  border-color: rgba(248, 81, 73, 0.25);
+}
+.card--fail .card-dot {
+  background: var(--red);
+}
+.card--fail .card-name {
+  color: var(--red);
+}
+.card--fail .card-badge {
+  color: var(--red);
+}
+
+/* Merged lane cards */
+.card--merged {
+  background: var(--green-dim);
+  border-color: rgba(46, 160, 67, 0.18);
+}
+.card--merged .card-dot {
+  background: var(--green-bright);
+}
+.card--merged .card-badge {
+  color: var(--green-bright);
+}
+
+/* Rejected lane cards */
+.card--rejected {
+  background: var(--red-dim);
+  border-color: rgba(248, 81, 73, 0.18);
+}
+.card--rejected .card-dot {
+  background: var(--red);
+}
+.card--rejected .card-badge {
+  color: var(--red);
+}
+
+/* ─── Animations ─── */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.45; }
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card--entering {
+  animation: slide-in 0.25s var(--ease-out) both;
+}
+
+/* Lane-header flash on batch merge */
+@keyframes flash-green {
+  0%   { background: var(--green-dim); }
+  100% { background: var(--bg-surface); }
+}
+@keyframes flash-red {
+  0%   { background: var(--red-dim); }
+  100% { background: var(--bg-surface); }
+}
+.lane-header--merged.flash  { animation: flash-green 0.6s var(--ease-out); }
+.lane-header--rejected.flash{ animation: flash-red 0.6s var(--ease-out); }
+
+/* ─── Step Banner ─── */
+.step-banner {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 12px 20px;
+  background: linear-gradient(to top, rgba(13, 17, 23, 0.97), rgba(13, 17, 23, 0.92));
+  border-top: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+  animation: banner-slide-up 0.3s var(--ease-out);
+}
+
+.step-banner[hidden] {
+  display: none;
+}
+
+.step-banner-inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.step-banner-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+}
+
+.step-banner-icon--merge {
+  background: var(--green-dim);
+  border-color: rgba(46, 160, 67, 0.25);
+}
+
+.step-banner-icon--reject {
+  background: var(--red-dim);
+  border-color: rgba(248, 81, 73, 0.25);
+}
+
+.step-banner-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.step-banner-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.step-banner-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+  font-family: var(--font-mono);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.step-banner-btn {
+  flex-shrink: 0;
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+@keyframes banner-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Make .main position relative so banner can anchor to it */
+.main {
+  position: relative;
+}
+
+/* ─── Responsive tweaks ─── */
+@media (max-width: 1100px) {
+  :root {
+    --sidebar-width: 220px;
+  }
+}
+
+@media (max-width: 900px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    display: none; /* Could add a toggle for mobile */
+  }
+}
