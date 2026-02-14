@@ -183,17 +183,25 @@ function startCI(commit) {
 
 function restartActiveWindow() {
   const size = Math.min(config.batchSize, state.queue.length);
+  let wasted = 0;
   for (let i = 0; i < size; i++) {
     const c = state.commits.get(state.queue[i]);
-    // Any elapsed CI time for running commits is wasted
+    // Running commits: their elapsed time is wasted
     if (c.ciStatus === 'running' && c.ciElapsed > 0) {
-      state.wastedCITime += c.ciElapsed;
+      wasted += c.ciElapsed;
+    }
+    // Completed commits (success waiting to merge, or another fail behind head):
+    // their full CI duration is thrown away
+    if ((c.ciStatus === 'success' || c.ciStatus === 'fail') && c.ciDuration > 0) {
+      wasted += c.ciDuration;
     }
     c.ciStatus = 'idle';
     c.ciElapsed = 0;
     c.ciDuration = 0;
     c.ciOutcome = null;
   }
+  state.wastedCITime += wasted;
+  return wasted;
 }
 
 function update(dt) {
@@ -258,6 +266,8 @@ function update(dt) {
 
 function evaluateQueue() {
   let moved = false;
+  let usefulDelta = 0;
+  let wastedDelta = 0;
 
   while (state.queue.length > 0) {
     const id = state.queue[0];
@@ -267,6 +277,7 @@ function evaluateQueue() {
       state.queue.shift();
       state.merged.push(id);
       state.successCITime += c.ciDuration;
+      usefulDelta += c.ciDuration;
       moved = true;
       continue;
     }
@@ -274,10 +285,9 @@ function evaluateQueue() {
     if (c.ciStatus === 'fail') {
       state.queue.shift();
       state.rejected.push(id);
-      state.wastedCITime += c.ciDuration;
       moved = true;
-      // Restart remaining active window
-      restartActiveWindow();
+      // Restart remaining active window (wasted time tracked inside)
+      wastedDelta += restartActiveWindow();
       break; // stop — new CIs will start next frame
     }
 
@@ -290,6 +300,15 @@ function evaluateQueue() {
     renderMergedIncremental();
     renderRejectedIncremental();
     updateStats();
+
+    // Floating deltas in non-step mode
+    if (usefulDelta > 0) {
+      showStatDelta('stat-ci-useful', usefulDelta, 'var(--green-bright)');
+    }
+    if (wastedDelta > 0) {
+      showStatDelta('stat-ci-wasted', wastedDelta, 'var(--red)');
+    }
+
     // Flash lane headers for visual feedback
     if (state.merged.length > render.mergedCount) {
       flashHeader('.lane-header--merged');
@@ -303,8 +322,11 @@ function evaluateQueue() {
 }
 
 // Process only ONE action: all consecutive successes OR a single failure (not both)
+// Returns { moved, usefulDelta, wastedDelta } for overlay display
 function evaluateQueueStep() {
   let moved = false;
+  let usefulDelta = 0;
+  let wastedDelta = 0;
 
   // First: try to merge all consecutive successes from the head
   while (state.queue.length > 0) {
@@ -313,6 +335,7 @@ function evaluateQueueStep() {
       state.queue.shift();
       state.merged.push(c.id);
       state.successCITime += c.ciDuration;
+      usefulDelta += c.ciDuration;
       moved = true;
       continue;
     }
@@ -325,9 +348,9 @@ function evaluateQueueStep() {
     if (c.ciStatus === 'fail') {
       state.queue.shift();
       state.rejected.push(c.id);
-      state.wastedCITime += c.ciDuration;
       moved = true;
-      restartActiveWindow();
+      // Wasted time tracked inside restartActiveWindow
+      wastedDelta = restartActiveWindow();
     }
   }
 
@@ -345,6 +368,8 @@ function evaluateQueueStep() {
     render.mergedCount = state.merged.length;
     render.rejectedCount = state.rejected.length;
   }
+
+  return { moved, usefulDelta, wastedDelta };
 }
 
 // ── Step Mode ──────────────────────────────────
@@ -355,20 +380,35 @@ function previewEvaluation() {
 
   const head = state.commits.get(state.queue[0]);
   if (head.ciStatus === 'fail') {
+    // Preview wasted time: scan remaining active window (after head is removed)
+    const remaining = state.queue.slice(1);
+    const windowSize = Math.min(config.batchSize, remaining.length);
+    let wastedPreview = 0;
+    for (let i = 0; i < windowSize; i++) {
+      const c = state.commits.get(remaining[i]);
+      if (c.ciStatus === 'running' && c.ciElapsed > 0) {
+        wastedPreview += c.ciElapsed;
+      } else if ((c.ciStatus === 'success' || c.ciStatus === 'fail') && c.ciDuration > 0) {
+        wastedPreview += c.ciDuration;
+      }
+    }
     return {
       action: 'reject',
       commit: head,
+      wastedDelta: wastedPreview,
       description: `Reject "${head.name}" — CI failed. Remaining active window will restart CI.`,
     };
   }
 
   if (head.ciStatus === 'success') {
-    // Count consecutive successes from head
+    // Count consecutive successes from head and sum their CI time
     let count = 0;
+    let usefulPreview = 0;
     for (let i = 0; i < state.queue.length; i++) {
       const c = state.commits.get(state.queue[i]);
       if (c.ciStatus === 'success') {
         count++;
+        usefulPreview += c.ciDuration;
       } else {
         break;
       }
@@ -380,6 +420,7 @@ function previewEvaluation() {
     return {
       action: 'merge',
       count,
+      usefulDelta: usefulPreview,
       description: preview,
     };
   }
@@ -400,14 +441,17 @@ function showStepBanner() {
     icon.className = 'step-banner-icon step-banner-icon--merge';
     title.textContent = preview.count === 1 ? 'Ready to merge 1 commit' : `Ready to merge ${preview.count} commits`;
     title.style.color = 'var(--green-bright)';
+    const timeTag = preview.usefulDelta > 0 ? `  ·  Useful CI: +${formatCITime(preview.usefulDelta)}` : '';
+    desc.innerHTML = preview.description + `<span class="step-banner-time step-banner-time--useful">${timeTag}</span>`;
   } else if (preview.action === 'reject') {
     icon.textContent = '✕';
     icon.className = 'step-banner-icon step-banner-icon--reject';
     title.textContent = 'Head commit failed — reject & restart';
     title.style.color = 'var(--red)';
+    const timeTag = preview.wastedDelta > 0 ? `  ·  Wasted CI: +${formatCITime(preview.wastedDelta)}` : '';
+    desc.innerHTML = preview.description + `<span class="step-banner-time step-banner-time--wasted">${timeTag}</span>`;
   }
 
-  desc.textContent = preview.description;
   banner.hidden = false;
 }
 
@@ -431,6 +475,7 @@ function doStepContinue() {
   animateStepTransition(preview, () => {
     // Execute only this one action (merges OR reject, not both)
     evaluateQueueStep();
+
     // Force immediate re-render of queue
     renderQueue();
     render.queueDirty = false;
@@ -820,6 +865,31 @@ function updateProgressBars() {
       timeEl.textContent = `${elapsed}/${total}s`;
     }
   }
+}
+
+// ── Rendering: Stat Deltas (floating overlays) ─
+
+function showStatDelta(statId, deltaMs, color) {
+  if (deltaMs <= 0) return;
+  const anchor = document.getElementById(statId);
+  if (!anchor) return;
+
+  const el = document.createElement('span');
+  el.className = 'stat-delta';
+  el.textContent = '+' + formatCITime(deltaMs);
+  el.style.color = color;
+
+  // Position relative to the stat value
+  anchor.style.position = 'relative';
+  anchor.appendChild(el);
+
+  // Trigger animation on next frame
+  requestAnimationFrame(() => {
+    el.classList.add('stat-delta--active');
+  });
+
+  // Remove after animation
+  setTimeout(() => el.remove(), 1200);
 }
 
 // ── Rendering: Stats ───────────────────────────
