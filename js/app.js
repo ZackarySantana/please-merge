@@ -1068,9 +1068,134 @@ function bindEvents() {
   // Keyboard shortcuts
   document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT') return;
+    // Don't handle shortcuts while welcome dialog is open
+    const welcome = document.getElementById('welcome-overlay');
+    if (welcome && !welcome.hidden) return;
     if (e.code === 'Space') { e.preventDefault(); state.stepWaiting ? doStepContinue() : (!state.isRunning || state.isPaused ? doStart() : doPause()); }
     if (e.code === 'Enter' && state.stepWaiting) { e.preventDefault(); doStepContinue(); }
     if (e.code === 'KeyR')  { doReset(); }
+  });
+}
+
+// ── Welcome Dialog ─────────────────────────────
+
+const WELCOME_KEY = 'ghmq-welcome-seen';
+
+const welcome = {
+  overlay: null,
+  steps: null,
+  dots: null,
+  nextBtn: null,
+  currentStep: 0,
+  totalSteps: 4,
+};
+
+function openWelcome() {
+  const w = welcome;
+  w.currentStep = 0;
+  // Reset all steps to initial state
+  w.steps.forEach((s, i) => { s.hidden = i !== 0; });
+  w.dots.forEach((d, i) => {
+    d.classList.toggle('welcome-dot-btn--active', i === 0);
+  });
+  w.nextBtn.textContent = 'Next →';
+  w.overlay.hidden = false;
+  // Re-trigger entrance animation
+  w.overlay.classList.remove('welcome-overlay--closing');
+  w.overlay.style.animation = 'none';
+  void w.overlay.offsetWidth;
+  w.overlay.style.animation = '';
+}
+
+function closeWelcome() {
+  localStorage.setItem(WELCOME_KEY, '1');
+  welcome.overlay.classList.add('welcome-overlay--closing');
+  setTimeout(() => {
+    welcome.overlay.hidden = true;
+    welcome.overlay.classList.remove('welcome-overlay--closing');
+  }, 300);
+}
+
+function welcomeGoToStep(idx) {
+  const w = welcome;
+  if (idx < 0 || idx >= w.totalSteps) return;
+  w.steps[w.currentStep].hidden = true;
+  w.currentStep = idx;
+  w.steps[w.currentStep].hidden = false;
+  // Re-trigger animation
+  w.steps[w.currentStep].style.animation = 'none';
+  void w.steps[w.currentStep].offsetWidth;
+  w.steps[w.currentStep].style.animation = '';
+
+  w.dots.forEach((d, i) => {
+    d.classList.toggle('welcome-dot-btn--active', i === w.currentStep);
+  });
+
+  if (w.currentStep === w.totalSteps - 1) {
+    w.nextBtn.textContent = 'Get Started →';
+  } else {
+    w.nextBtn.textContent = 'Next →';
+  }
+}
+
+function initWelcome() {
+  const overlay = document.getElementById('welcome-overlay');
+  if (!overlay) return;
+
+  welcome.overlay = overlay;
+  welcome.steps = overlay.querySelectorAll('.welcome-step');
+  welcome.dots = overlay.querySelectorAll('.welcome-dot-btn');
+  welcome.nextBtn = document.getElementById('welcome-next');
+  const skipBtn = document.getElementById('welcome-skip');
+
+  // If already seen, hide immediately
+  if (localStorage.getItem(WELCOME_KEY)) {
+    overlay.hidden = true;
+  }
+
+  welcome.nextBtn.addEventListener('click', () => {
+    if (welcome.currentStep < welcome.totalSteps - 1) {
+      welcomeGoToStep(welcome.currentStep + 1);
+    } else {
+      closeWelcome();
+    }
+  });
+
+  skipBtn.addEventListener('click', closeWelcome);
+
+  welcome.dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      welcomeGoToStep(+dot.dataset.dot);
+    });
+  });
+
+  overlay.addEventListener('keydown', (e) => {
+    if (e.code === 'ArrowRight' || e.code === 'Space' || e.code === 'Enter') {
+      e.preventDefault();
+      e.stopPropagation();
+      if (welcome.currentStep < welcome.totalSteps - 1) {
+        welcomeGoToStep(welcome.currentStep + 1);
+      } else {
+        closeWelcome();
+      }
+    }
+    if (e.code === 'ArrowLeft' && welcome.currentStep > 0) {
+      e.preventDefault();
+      welcomeGoToStep(welcome.currentStep - 1);
+    }
+    if (e.code === 'Escape') {
+      closeWelcome();
+    }
+  });
+
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeWelcome();
+  });
+
+  // Help button in sidebar
+  document.getElementById('btn-help').addEventListener('click', () => {
+    localStorage.removeItem(WELCOME_KEY);
+    openWelcome();
   });
 }
 
@@ -1079,6 +1204,7 @@ function bindEvents() {
 function init() {
   bindEvents();
   doReset();
+  initWelcome();
 }
 
 document.addEventListener('DOMContentLoaded', init);
