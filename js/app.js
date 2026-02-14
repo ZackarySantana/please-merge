@@ -132,6 +132,7 @@ function generateCommits(count) {
       ciElapsed: 0,         // ms
       ciOutcome: null,       // predetermined: 'success' | 'fail'
       ciRuns: 0,            // how many times CI has been started
+      firstRunDuration: 0,  // ms — duration from the very first CI run (for sequential baseline)
     });
     queue.push(id);
   }
@@ -181,10 +182,10 @@ function startCI(commit) {
   commit.ciElapsed = 0;
   commit.ciDuration = rand(minMs, maxMs);
   commit.ciOutcome = Math.random() * 100 < config.successRate ? 'success' : 'fail';
-  // Only the first run counts toward sequential baseline —
-  // a sequential queue has no reruns (one commit at a time, no cascading failures)
+  // Record the first-run duration for the sequential baseline
+  // (credited to sequentialCITime only when the commit actually leaves the queue)
   if (commit.ciRuns === 0) {
-    state.sequentialCITime += commit.ciDuration;
+    commit.firstRunDuration = commit.ciDuration;
   }
   commit.ciRuns++;
   if (commit.ciRuns > 1) {
@@ -294,6 +295,7 @@ function evaluateQueue() {
       shifted++;
       state.merged.push(id);
       state.successCITime += c.ciDuration;
+      state.sequentialCITime += c.firstRunDuration;
       usefulDelta += c.ciDuration;
       moved = true;
       continue;
@@ -303,6 +305,7 @@ function evaluateQueue() {
       state.queue.shift();
       shifted++;
       state.rejected.push(id);
+      state.sequentialCITime += c.firstRunDuration;
       moved = true;
       // Restart remaining active window (pass how many were already removed)
       wastedDelta += restartActiveWindow(shifted);
@@ -355,6 +358,7 @@ function evaluateQueueStep() {
       shifted++;
       state.merged.push(c.id);
       state.successCITime += c.ciDuration;
+      state.sequentialCITime += c.firstRunDuration;
       usefulDelta += c.ciDuration;
       moved = true;
       continue;
@@ -369,6 +373,7 @@ function evaluateQueueStep() {
       state.queue.shift();
       shifted++;
       state.rejected.push(c.id);
+      state.sequentialCITime += c.firstRunDuration;
       moved = true;
       // Wasted time tracked inside restartActiveWindow (pass how many were already removed)
       wastedDelta = restartActiveWindow(shifted);
