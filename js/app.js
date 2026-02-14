@@ -992,24 +992,29 @@ function getCostRate() {
   return isNaN(val) || val < 0 ? 0 : val;
 }
 
+function getCostRunners() {
+  const input = document.getElementById('cost-runners');
+  if (!input) return 1;
+  const val = parseInt(input.value, 10);
+  return isNaN(val) || val < 1 ? 1 : val;
+}
+
 function updateCostPanel() {
   const panel = document.getElementById('cost-panel');
   if (!panel || panel.hidden) return;
 
-  const rate = getCostRate(); // $ per minute
-  const toMin = 1 / 60000;   // ms → minutes
+  const rate = getCostRate();       // $ per runner-minute
+  const runners = getCostRunners(); // parallel runners per CI run
+  const toMin = 1 / 60000;         // ms → minutes
+  const costPerMin = rate * runners; // effective cost per minute of CI wall time
 
   const usefulMin = state.successCITime * toMin;
   const wastedMin = state.wastedCITime * toMin;
   const totalMin = usefulMin + wastedMin;
-  const seqMin = state.sequentialCITime * toMin;
-  const savedMin = seqMin - (state.wallClockTime * toMin);
-
-  document.getElementById('cost-useful').textContent = formatCost(usefulMin * rate);
-  document.getElementById('cost-wasted').textContent = formatCost(wastedMin * rate);
-  document.getElementById('cost-total').textContent = formatCost(totalMin * rate);
-  document.getElementById('cost-saved').textContent = savedMin > 0 ? formatCost(savedMin * rate) : '$0.00';
-  document.getElementById('cost-money-wasted').textContent = formatCost(wastedMin * rate);
+  document.getElementById('cost-useful').textContent = formatCost(usefulMin * costPerMin);
+  document.getElementById('cost-wasted').textContent = formatCost(wastedMin * costPerMin);
+  document.getElementById('cost-total').textContent = formatCost(totalMin * costPerMin);
+  document.getElementById('cost-money-wasted').textContent = formatCost(wastedMin * costPerMin);
 }
 
 function initCostPanel() {
@@ -1038,8 +1043,13 @@ function initCostPanel() {
     btn.classList.remove('cost-trigger-btn--active');
   });
 
-  // Update costs live when rate changes
+  const runnersInput = document.getElementById('cost-runners');
+
+  // Update costs live when inputs change
   rateInput.addEventListener('input', () => {
+    updateCostPanel();
+  });
+  runnersInput.addEventListener('input', () => {
     updateCostPanel();
   });
 

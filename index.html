@@ -196,6 +196,14 @@
                   <span class="cost-panel-input-suffix">/ min</span>
                 </div>
               </div>
+              <div class="cost-panel-input-row">
+                <label class="cost-panel-input-label" for="cost-runners" title="Number of parallel runners per CI run. Each commit's CI may fan out across multiple machines.">Runners</label>
+                <div class="cost-panel-input-wrap">
+                  <span class="cost-panel-input-prefix cost-panel-input-prefix--muted">×</span>
+                  <input type="number" id="cost-runners" class="cost-panel-input" value="25" step="1" min="1">
+                  <span class="cost-panel-input-suffix">per run</span>
+                </div>
+              </div>
               <div class="cost-panel-divider"></div>
               <div class="cost-panel-rows">
                 <div class="cost-panel-row">
@@ -212,16 +220,13 @@
                 </div>
                 <div class="cost-panel-row-divider"></div>
                 <div class="cost-panel-row">
-                  <span class="cost-panel-row-label">Money Saved</span>
-                  <span class="cost-panel-row-value cost-panel-row-value--purple" id="cost-saved" title="Cost of running all commits sequentially minus total CI cost">$0.00</span>
-                </div>
-                <div class="cost-panel-row">
                   <span class="cost-panel-row-label">Money Wasted</span>
                   <span class="cost-panel-row-value cost-panel-row-value--red" id="cost-money-wasted" title="Total cost of wasted CI runs due to failures">$0.00</span>
                 </div>
               </div>
               <div class="cost-panel-hint">
-                Rate is per vCPU-minute. GitHub Actions Linux runners cost ~$0.008/min.
+                Rate is per runner-minute. GitHub Actions Linux runners cost ~$0.008/min.
+                Runners = how many parallel jobs each CI run fans out to (e.g. lint, test, build).
               </div>
             </div>
           </div>
