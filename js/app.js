@@ -181,10 +181,14 @@ function startCI(commit) {
   }
 }
 
-function restartActiveWindow() {
-  const size = Math.min(config.batchSize, state.queue.length);
+// alreadyRemoved = how many items were shifted out of the queue before this call
+// (e.g. consecutive successes + the failed commit itself)
+function restartActiveWindow(alreadyRemoved) {
+  alreadyRemoved = alreadyRemoved || 0;
+  // Only reset the items that were actually in the original active window
+  const remaining = Math.max(0, Math.min(config.batchSize, state.queue.length) - alreadyRemoved);
   let wasted = 0;
-  for (let i = 0; i < size; i++) {
+  for (let i = 0; i < remaining; i++) {
     const c = state.commits.get(state.queue[i]);
     // Running commits: their elapsed time is wasted
     if (c.ciStatus === 'running' && c.ciElapsed > 0) {
@@ -268,6 +272,7 @@ function evaluateQueue() {
   let moved = false;
   let usefulDelta = 0;
   let wastedDelta = 0;
+  let shifted = 0; // track how many items removed from queue head
 
   while (state.queue.length > 0) {
     const id = state.queue[0];
@@ -275,6 +280,7 @@ function evaluateQueue() {
 
     if (c.ciStatus === 'success') {
       state.queue.shift();
+      shifted++;
       state.merged.push(id);
       state.successCITime += c.ciDuration;
       usefulDelta += c.ciDuration;
@@ -284,10 +290,11 @@ function evaluateQueue() {
 
     if (c.ciStatus === 'fail') {
       state.queue.shift();
+      shifted++;
       state.rejected.push(id);
       moved = true;
-      // Restart remaining active window (wasted time tracked inside)
-      wastedDelta += restartActiveWindow();
+      // Restart remaining active window (pass how many were already removed)
+      wastedDelta += restartActiveWindow(shifted);
       break; // stop — new CIs will start next frame
     }
 
@@ -327,12 +334,14 @@ function evaluateQueueStep() {
   let moved = false;
   let usefulDelta = 0;
   let wastedDelta = 0;
+  let shifted = 0; // track how many items removed from queue head
 
   // First: try to merge all consecutive successes from the head
   while (state.queue.length > 0) {
     const c = state.commits.get(state.queue[0]);
     if (c.ciStatus === 'success') {
       state.queue.shift();
+      shifted++;
       state.merged.push(c.id);
       state.successCITime += c.ciDuration;
       usefulDelta += c.ciDuration;
@@ -347,10 +356,11 @@ function evaluateQueueStep() {
     const c = state.commits.get(state.queue[0]);
     if (c.ciStatus === 'fail') {
       state.queue.shift();
+      shifted++;
       state.rejected.push(c.id);
       moved = true;
-      // Wasted time tracked inside restartActiveWindow
-      wastedDelta = restartActiveWindow();
+      // Wasted time tracked inside restartActiveWindow (pass how many were already removed)
+      wastedDelta = restartActiveWindow(shifted);
     }
   }
 
@@ -381,8 +391,9 @@ function previewEvaluation() {
   const head = state.commits.get(state.queue[0]);
   if (head.ciStatus === 'fail') {
     // Preview wasted time: scan remaining active window (after head is removed)
+    // Only check items that were actually in the original active window (minus the head)
     const remaining = state.queue.slice(1);
-    const windowSize = Math.min(config.batchSize, remaining.length);
+    const windowSize = Math.max(0, Math.min(config.batchSize, state.queue.length) - 1);
     let wastedPreview = 0;
     for (let i = 0; i < windowSize; i++) {
       const c = state.commits.get(remaining[i]);
@@ -483,8 +494,8 @@ function doStepContinue() {
     animateQueueReflow(() => {
       state.animating = false;
 
-      // Check if the new head is also ready — if so, pause again
-      if (state.queue.length > 0) {
+      // Check if the new head is also ready — if so, pause again (only if step mode still on)
+      if (config.stepMode && state.queue.length > 0) {
         const newHead = state.commits.get(state.queue[0]);
         if (newHead && (newHead.ciStatus === 'success' || newHead.ciStatus === 'fail')) {
           showStepBanner();
@@ -1002,6 +1013,13 @@ function bindEvents() {
   document.getElementById('cfg-step-mode').addEventListener('change', (e) => {
     config.stepMode = e.target.checked;
     document.getElementById('val-step-mode').textContent = config.stepMode ? 'On' : 'Off';
+    // If step mode is turned off while waiting, execute the pending evaluation instantly
+    if (!config.stepMode && state.stepWaiting && !state.animating) {
+      hideStepBanner();
+      state.stepWaiting = false;
+      evaluateQueue();
+      lastTimestamp = 0;
+    }
   });
   document.getElementById('btn-step-continue').addEventListener('click', doStepContinue);
 
@@ -1037,7 +1055,7 @@ function bindEvents() {
   // Keyboard shortcuts
   document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT') return;
-    if (e.code === 'Space') { e.preventDefault(); state.stepWaiting ? doStepContinue() : (state.isPaused ? doStart() : doPause()); }
+    if (e.code === 'Space') { e.preventDefault(); state.stepWaiting ? doStepContinue() : (!state.isRunning || state.isPaused ? doStart() : doPause()); }
     if (e.code === 'Enter' && state.stepWaiting) { e.preventDefault(); doStepContinue(); }
     if (e.code === 'KeyR')  { doReset(); }
   });
