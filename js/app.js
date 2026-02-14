@@ -197,8 +197,11 @@ function startCI(commit) {
 // (e.g. consecutive successes + the failed commit itself)
 function restartActiveWindow(alreadyRemoved) {
   alreadyRemoved = alreadyRemoved || 0;
-  // Only reset the items that were actually in the original active window
-  const remaining = Math.max(0, Math.min(config.batchSize, state.queue.length) - alreadyRemoved);
+  // Reconstruct the original queue length (before items were shifted out)
+  // so we correctly identify which remaining items were in the active window.
+  const originalQueueLen = state.queue.length + alreadyRemoved;
+  const originalActiveSize = Math.min(config.batchSize, originalQueueLen);
+  const remaining = Math.max(0, originalActiveSize - alreadyRemoved);
   let wasted = 0;
   for (let i = 0; i < remaining; i++) {
     const c = state.commits.get(state.queue[i]);
@@ -265,18 +268,22 @@ function update(dt) {
   // 3. Re-render queue so finished CIs show green/red immediately
   if (anyCompleted) {
     render.queueDirty = true;
+  }
 
-    // Check if the head is ready for evaluation
+  // 4. Evaluate queue if head is ready (could be newly completed OR left over
+  //    from a previous frame, e.g. an item that finished before a failure was processed)
+  if (state.queue.length > 0) {
     const head = state.commits.get(state.queue[0]);
     const headReady = head && (head.ciStatus === 'success' || head.ciStatus === 'fail');
 
-    if (config.stepMode && headReady) {
-      state.stepWaiting = true;
-      showStepBanner();
-      return;
+    if (headReady) {
+      if (config.stepMode) {
+        state.stepWaiting = true;
+        showStepBanner();
+        return;
+      }
+      evaluateQueue();
     }
-
-    evaluateQueue();
   }
 }
 
