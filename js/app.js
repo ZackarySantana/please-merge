@@ -170,7 +170,11 @@ function startCI(commit) {
   commit.ciElapsed = 0;
   commit.ciDuration = rand(minMs, maxMs);
   commit.ciOutcome = Math.random() * 100 < config.successRate ? 'success' : 'fail';
-  state.sequentialCITime += commit.ciDuration; // track what sequential would cost
+  // Only the first run counts toward sequential baseline —
+  // a sequential queue has no reruns (one commit at a time, no cascading failures)
+  if (commit.ciRuns === 0) {
+    state.sequentialCITime += commit.ciDuration;
+  }
   commit.ciRuns++;
   if (commit.ciRuns > 1) {
     state.totalReruns++;
