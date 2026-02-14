@@ -88,6 +88,8 @@ const state = {
   merged: [],           // ids, newest push()ed last
   rejected: [],         // ids, newest push()ed last
   totalReruns: 0,       // total duplicate CI runs across all commits
+  wastedCITime: 0,      // ms — CI time lost to restarts + failures
+  successCITime: 0,     // ms — CI time spent on successful merges
   isRunning: false,
   isPaused: false,
   stepWaiting: false,   // true when step mode has paused before evaluation
@@ -174,6 +176,10 @@ function restartActiveWindow() {
   const size = Math.min(config.batchSize, state.queue.length);
   for (let i = 0; i < size; i++) {
     const c = state.commits.get(state.queue[i]);
+    // Any elapsed CI time for running commits is wasted
+    if (c.ciStatus === 'running' && c.ciElapsed > 0) {
+      state.wastedCITime += c.ciElapsed;
+    }
     c.ciStatus = 'idle';
     c.ciElapsed = 0;
     c.ciDuration = 0;
@@ -248,6 +254,7 @@ function evaluateQueue() {
     if (c.ciStatus === 'success') {
       state.queue.shift();
       state.merged.push(id);
+      state.successCITime += c.ciDuration;
       moved = true;
       continue;
     }
@@ -255,6 +262,7 @@ function evaluateQueue() {
     if (c.ciStatus === 'fail') {
       state.queue.shift();
       state.rejected.push(id);
+      state.wastedCITime += c.ciDuration;
       moved = true;
       // Restart remaining active window
       restartActiveWindow();
@@ -292,6 +300,7 @@ function evaluateQueueStep() {
     if (c.ciStatus === 'success') {
       state.queue.shift();
       state.merged.push(c.id);
+      state.successCITime += c.ciDuration;
       moved = true;
       continue;
     }
@@ -304,6 +313,7 @@ function evaluateQueueStep() {
     if (c.ciStatus === 'fail') {
       state.queue.shift();
       state.rejected.push(c.id);
+      state.wastedCITime += c.ciDuration;
       moved = true;
       restartActiveWindow();
     }
@@ -615,6 +625,8 @@ function doReset() {
   state.merged = [];
   state.rejected = [];
   state.totalReruns = 0;
+  state.wastedCITime = 0;
+  state.successCITime = 0;
 
   // Reset render bookkeeping
   render.mergedCount = 0;
@@ -797,6 +809,14 @@ function updateProgressBars() {
 
 // ── Rendering: Stats ───────────────────────────
 
+function formatCITime(ms) {
+  const s = ms / 1000;
+  if (s < 60) return s.toFixed(1) + ' s';
+  const m = Math.floor(s / 60);
+  const rem = (s % 60).toFixed(0);
+  return m + 'm ' + rem + 's';
+}
+
 function updateStats() {
   document.getElementById('stat-queue').textContent = state.queue.length;
   document.getElementById('stat-merged').textContent = state.merged.length;
@@ -805,6 +825,20 @@ function updateStats() {
   document.getElementById('count-queue').textContent = state.queue.length;
   document.getElementById('count-merged').textContent = state.merged.length;
   document.getElementById('count-rejected').textContent = state.rejected.length;
+
+  // CI time stats
+  document.getElementById('stat-ci-useful').textContent = formatCITime(state.successCITime);
+  document.getElementById('stat-ci-wasted').textContent = formatCITime(state.wastedCITime);
+
+  const ratioEl = document.getElementById('stat-ci-ratio');
+  if (state.successCITime > 0) {
+    const pct = Math.round((state.wastedCITime / state.successCITime) * 100);
+    ratioEl.textContent = pct + '%';
+  } else if (state.wastedCITime > 0) {
+    ratioEl.textContent = '∞';
+  } else {
+    ratioEl.textContent = '—';
+  }
 
   // Percentages for merged vs rejected
   const settled = state.merged.length + state.rejected.length;

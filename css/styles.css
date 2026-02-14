@@ -395,10 +395,20 @@ html, body {
   font-weight: 700;
   font-family: var(--font-mono);
 }
-.stat-queue   { color: var(--blue); }
-.stat-merged  { color: var(--green-bright); }
-.stat-rejected{ color: var(--red); }
-.stat-reruns  { color: var(--yellow); }
+.stat-queue     { color: var(--blue); }
+.stat-merged    { color: var(--green-bright); }
+.stat-rejected  { color: var(--red); }
+.stat-reruns    { color: var(--yellow); }
+.stat-ci-useful { color: var(--green-bright); font-size: 14px; }
+.stat-ci-wasted { color: var(--red); font-size: 14px; }
+.stat-ci-ratio  { color: var(--yellow); font-size: 14px; }
+
+.stat-divider {
+  width: 1px;
+  height: 28px;
+  background: var(--border);
+  align-self: center;
+}
 
 /* ─── Lanes ─── */
 .lanes {

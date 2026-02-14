@@ -146,6 +146,19 @@
             <span class="stat-label">Reruns</span>
             <span class="stat-value stat-reruns" id="stat-reruns">0</span>
           </div>
+          <div class="stat-divider"></div>
+          <div class="stat" title="CI time spent on commits that were successfully merged.">
+            <span class="stat-label">Useful CI</span>
+            <span class="stat-value stat-ci-useful" id="stat-ci-useful">0 s</span>
+          </div>
+          <div class="stat" title="CI time wasted on failed commits and restarted runs that were thrown away.">
+            <span class="stat-label">Wasted CI</span>
+            <span class="stat-value stat-ci-wasted" id="stat-ci-wasted">0 s</span>
+          </div>
+          <div class="stat" title="Ratio of wasted CI time to useful CI time. Lower is better.">
+            <span class="stat-label">Waste %</span>
+            <span class="stat-value stat-ci-ratio" id="stat-ci-ratio">—</span>
+          </div>
         </div>
       </header>
 
