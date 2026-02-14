@@ -1373,6 +1373,32 @@ html, body {
   -moz-appearance: textfield;
 }
 
+.cost-panel-computed {
+  padding: 8px 14px;
+  background: var(--bg-body);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cost-panel-computed-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cost-panel-computed-label {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.cost-panel-computed-value {
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+}
+
 .cost-panel-divider {
   height: 1px;
   background: var(--border);

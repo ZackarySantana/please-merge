@@ -1011,6 +1011,14 @@ function updateCostPanel() {
   const usefulMin = state.successCITime * toMin;
   const wastedMin = state.wastedCITime * toMin;
   const totalMin = usefulMin + wastedMin;
+  // Per-run computed fields: CI duration (from sidebar) × runners
+  const machineMin = config.ciDuration * runners; // minutes of machine time per run
+  document.getElementById('cost-machine-time').textContent = machineMin >= 60
+    ? (machineMin / 60).toFixed(1).replace(/\.0$/, '') + ' h'
+    : machineMin + ' min';
+  document.getElementById('cost-per-run').textContent = formatCost(machineMin * rate);
+
+  // Simulation totals
   document.getElementById('cost-useful').textContent = formatCost(usefulMin * costPerMin);
   document.getElementById('cost-wasted').textContent = formatCost(wastedMin * costPerMin);
   document.getElementById('cost-total').textContent = formatCost(totalMin * costPerMin);
