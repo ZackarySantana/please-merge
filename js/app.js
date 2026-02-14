@@ -77,7 +77,7 @@ const config = {
   ciMin: 1,    // seconds
   ciMax: 10,   // seconds
   speed: 1,
-  stepMode: false,
+  stepMode: true,
 };
 
 // ── State ──────────────────────────────────────
