@@ -1578,13 +1578,13 @@ function updateChartEstimate() {
     let em = 0;
     for (let k = 0; k < b; k++) em += k * Math.pow(p, k) * (1 - p);
     em += b * pb;
-  // Items removed per cycle = merged + rejected (failed items also leave the queue)
-  const removed = em + (1 - pb);
-  const cycles = removed > 0.0001 ? config.totalCommits / removed : 9999;
-  // Last cycle is typically a partial batch; subtract ~0.5 cycles of waste
-  const adjCycles = Math.max(1, cycles - 0.5);
-  const wallMin = adjCycles * config.ciDuration;
-  const totalRuns = adjCycles * b;
+    // Items removed per cycle = merged + rejected (failed items also leave the queue)
+    const removed = em + (1 - pb);
+    const cycles = removed > 0.0001 ? config.totalCommits / removed : 9999;
+    // Last cycle is typically a partial batch; subtract ~0.5 cycles of waste
+    const adjCycles = Math.max(1, cycles - 0.5);
+    const wallMin = adjCycles * config.ciDuration;
+    const totalRuns = adjCycles * b;
     const runners = getCostRunners();
     const rate = getCostRate();
     const totalCost = totalRuns * config.ciDuration * runners * rate;
@@ -1760,12 +1760,30 @@ function initOptimalChart() {
         return Math.round(ratio * 49) + 1; // 1-50
     }
 
-    canvas.addEventListener("click", (e) => {
+    let dragging = false;
+
+    function applyBatch(e) {
         const batch = batchFromEvent(e);
         document.getElementById("cfg-batch-size").value = batch;
         readConfigFromUI();
         syncUIValues();
-        if (!state.isRunning) doReset();
+    }
+
+    canvas.addEventListener("mousedown", (e) => {
+        dragging = true;
+        applyBatch(e);
+        e.preventDefault();
+    });
+
+    window.addEventListener("mousemove", (e) => {
+        if (dragging) applyBatch(e);
+    });
+
+    window.addEventListener("mouseup", () => {
+        if (dragging) {
+            dragging = false;
+            if (!state.isRunning) doReset();
+        }
     });
 
     canvas.addEventListener("mousemove", (e) => {
@@ -1778,17 +1796,16 @@ function initOptimalChart() {
         for (let k = 0; k < batch; k++) em += k * Math.pow(p, k) * (1 - p);
         em += batch * pb;
 
-    // Items removed per cycle = merged + rejected (failed items also leave the queue)
-    const removed = em + (1 - pb);
-    const cycles = removed > 0.0001 ? config.totalCommits / removed : 9999;
-    // Last cycle is typically a partial batch; subtract ~0.5 cycles of waste
-    const adjCycles = Math.max(1, cycles - 0.5);
+        // Items removed per cycle = merged + rejected (failed items also leave the queue)
+        const removed = em + (1 - pb);
+        const cycles = removed > 0.0001 ? config.totalCommits / removed : 9999;
+        // Last cycle is typically a partial batch; subtract ~0.5 cycles of waste
+        const adjCycles = Math.max(1, cycles - 0.5);
 
-    // Wall clock = cycles * CI duration (each cycle runs in parallel)
-    const wallMin = adjCycles * config.ciDuration;
+        const wallMin = adjCycles * config.ciDuration;
 
-    // Total CI runs = cycles * batch size, each costs ciDuration minutes of machine time
-    const totalRuns = adjCycles * batch;
+        // Total CI runs = cycles * batch size, each costs ciDuration minutes of machine time
+        const totalRuns = adjCycles * batch;
         const runners = getCostRunners();
         const rate = getCostRate();
         const totalCost = totalRuns * config.ciDuration * runners * rate;
