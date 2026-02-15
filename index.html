@@ -411,6 +411,41 @@
 
           <div class="summary-divider"></div>
 
+          <div class="summary-cost-section">
+            <div class="cost-panel-input-row">
+              <label class="cost-panel-input-label" for="sum-cost-rate">Rate</label>
+              <div class="cost-panel-input-wrap">
+                <span class="cost-panel-input-prefix">$</span>
+                <input type="number" id="sum-cost-rate" class="cost-panel-input" value="0.008" step="0.001" min="0">
+                <span class="cost-panel-input-suffix">/ min</span>
+              </div>
+            </div>
+            <div class="cost-panel-input-row">
+              <label class="cost-panel-input-label" for="sum-cost-runners" title="Number of parallel runners per CI run.">Runners</label>
+              <div class="cost-panel-input-wrap">
+                <span class="cost-panel-input-prefix cost-panel-input-prefix--muted">×</span>
+                <input type="number" id="sum-cost-runners" class="cost-panel-input" value="25" step="1" min="1">
+                <span class="cost-panel-input-suffix">per run</span>
+              </div>
+            </div>
+            <div class="cost-panel-computed">
+              <div class="cost-panel-computed-row">
+                <span class="cost-panel-computed-label">Machine time per run</span>
+                <span class="cost-panel-computed-value" id="sum-cost-machine-time">375 min</span>
+              </div>
+              <div class="cost-panel-computed-row">
+                <span class="cost-panel-computed-label">Cost per run</span>
+                <span class="cost-panel-computed-value" id="sum-cost-per-run">$3.00</span>
+              </div>
+            </div>
+            <div class="cost-panel-hint">
+              Rate is per runner-minute. GitHub Actions Linux runners cost ~$0.008/min.
+              Runners = how many parallel jobs each CI run fans out to (e.g. lint, test, build).
+            </div>
+          </div>
+
+          <div class="summary-divider"></div>
+
           <div class="summary-rows">
             <div class="summary-row">
               <span class="summary-row-label">Estimated Total Cost</span>

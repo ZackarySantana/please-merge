@@ -1242,6 +1242,16 @@ html, body {
   font-weight: 700;
 }
 
+.summary-row--muted .summary-row-label {
+  font-size: 11px;
+}
+
+.summary-row--muted .summary-row-value {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
 .summary-footer {
   padding: 14px 20px;
   border-top: 1px solid var(--border);

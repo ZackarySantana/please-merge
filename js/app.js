@@ -1072,6 +1072,17 @@ function updateSummaryPanel() {
   const wastedCIMin = state.wastedCITime * toMin;
   const totalCost = totalCIMin * costPerMin;
   const wastedCost = wastedCIMin * costPerMin;
+  // Summary cost computed fields
+  const machineMin = config.ciDuration * runners;
+  const sumMachine = document.getElementById('sum-cost-machine-time');
+  const sumPerRun = document.getElementById('sum-cost-per-run');
+  if (sumMachine) {
+    sumMachine.textContent = machineMin >= 60
+      ? (machineMin / 60).toFixed(1).replace(/\.0$/, '') + ' h'
+      : machineMin + ' min';
+  }
+  if (sumPerRun) sumPerRun.textContent = formatCost(machineMin * rate);
+
   document.getElementById('sum-total-cost').textContent = formatCost(totalCost);
   document.getElementById('sum-wasted-cost').textContent = formatCost(wastedCost);
 
@@ -1143,6 +1154,15 @@ function updateSummaryPanel() {
   }
 }
 
+function syncSummaryCostInputs() {
+  const mainRate = document.getElementById('cost-rate');
+  const mainRunners = document.getElementById('cost-runners');
+  const sumRate = document.getElementById('sum-cost-rate');
+  const sumRunners = document.getElementById('sum-cost-runners');
+  if (mainRate && sumRate) sumRate.value = mainRate.value;
+  if (mainRunners && sumRunners) sumRunners.value = mainRunners.value;
+}
+
 function showSummary() {
   const overlay = document.getElementById('summary-overlay');
   if (!overlay) return;
@@ -1150,6 +1170,7 @@ function showSummary() {
   if (title) {
     title.textContent = state.queue.length === 0 ? 'Simulation Complete' : 'Simulation Summary';
   }
+  syncSummaryCostInputs();
   overlay.hidden = false;
   updateSummaryPanel();
 }
@@ -1175,6 +1196,33 @@ function initSummary() {
   if (overlay) overlay.addEventListener('click', (e) => {
     if (e.target === overlay) hideSummary();
   });
+
+  // Sync summary cost inputs bidirectionally with main cost panel
+  const sumRate = document.getElementById('sum-cost-rate');
+  const sumRunners = document.getElementById('sum-cost-runners');
+  const mainRate = document.getElementById('cost-rate');
+  const mainRunners = document.getElementById('cost-runners');
+
+  if (sumRate && mainRate) {
+    sumRate.addEventListener('input', () => {
+      mainRate.value = sumRate.value;
+      updateCostPanel();
+      updateSummaryPanel();
+    });
+    mainRate.addEventListener('input', () => {
+      sumRate.value = mainRate.value;
+    });
+  }
+  if (sumRunners && mainRunners) {
+    sumRunners.addEventListener('input', () => {
+      mainRunners.value = sumRunners.value;
+      updateCostPanel();
+      updateSummaryPanel();
+    });
+    mainRunners.addEventListener('input', () => {
+      sumRunners.value = mainRunners.value;
+    });
+  }
 }
 
 // ── Cost Panel ─────────────────────────────────
