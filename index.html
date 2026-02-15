@@ -252,6 +252,10 @@
               </div>
             </div>
           </div>
+          <button class="cost-trigger-btn" id="btn-summary" title="Show simulation summary" hidden>
+            <span class="cost-trigger-icon">✓</span>
+            <span class="cost-trigger-label">Summary</span>
+          </button>
         </div>
       </header>
 
@@ -289,6 +293,88 @@
           </div>
           <div class="lane-body" id="lane-merged"></div>
         </section>
+      </div>
+
+      <!-- Summary Overlay -->
+      <div class="summary-overlay" id="summary-overlay" hidden>
+        <div class="summary-card">
+          <div class="summary-header">
+            <h2 class="summary-title" id="summary-title">Simulation Complete</h2>
+            <button class="summary-close" id="summary-close">✕</button>
+          </div>
+
+          <div class="summary-grid">
+            <div class="summary-stat summary-stat--merged">
+              <span class="summary-stat-value" id="sum-merged">0</span>
+              <span class="summary-stat-label">Merged</span>
+            </div>
+            <div class="summary-stat summary-stat--rejected">
+              <span class="summary-stat-value" id="sum-rejected">0</span>
+              <span class="summary-stat-label">Rejected</span>
+            </div>
+            <div class="summary-stat">
+              <span class="summary-stat-value" id="sum-success-rate">0%</span>
+              <span class="summary-stat-label">Success Rate</span>
+            </div>
+            <div class="summary-stat">
+              <span class="summary-stat-value" id="sum-reruns">0</span>
+              <span class="summary-stat-label">CI Reruns</span>
+            </div>
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <div class="summary-rows">
+            <div class="summary-row">
+              <span class="summary-row-label">Wall Clock Time</span>
+              <span class="summary-row-value" id="sum-wall-clock">—</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-row-label">Sequential Baseline</span>
+              <span class="summary-row-value" id="sum-sequential">—</span>
+            </div>
+            <div class="summary-row summary-row--highlight">
+              <span class="summary-row-label">Time Saved</span>
+              <span class="summary-row-value" id="sum-time-saved">—</span>
+            </div>
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <div class="summary-rows">
+            <div class="summary-row">
+              <span class="summary-row-label">Useful CI Time</span>
+              <span class="summary-row-value summary-row-value--green" id="sum-useful-ci">—</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-row-label">Wasted CI Time</span>
+              <span class="summary-row-value summary-row-value--red" id="sum-wasted-ci">—</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-row-label">Waste Ratio</span>
+              <span class="summary-row-value" id="sum-waste-ratio">—</span>
+            </div>
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <div class="summary-rows">
+            <div class="summary-row">
+              <span class="summary-row-label">Estimated Total Cost</span>
+              <span class="summary-row-value" id="sum-total-cost">—</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-row-label">Estimated Wasted Cost</span>
+              <span class="summary-row-value summary-row-value--red" id="sum-wasted-cost">—</span>
+            </div>
+          </div>
+
+          <div class="summary-footer">
+            <button class="btn btn-ghost" id="summary-reset">
+              <span class="btn-icon">↺</span> Reset
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- Step Mode Banner -->

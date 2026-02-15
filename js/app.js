@@ -227,6 +227,9 @@ function update(dt) {
   if (state.queue.length === 0) {
     state.isRunning = false;
     updateButtons();
+    updateStats();
+    showSummaryButton();
+    showSummary();
     return;
   }
 
@@ -687,6 +690,7 @@ function doStart() {
   state.isPaused = false;
   lastTimestamp = 0;
   updateButtons();
+  showSummaryButton();
 
   animFrameId = requestAnimationFrame(loop);
 }
@@ -703,6 +707,8 @@ function doReset() {
   state.stepWaiting = false;
   state.animating = false;
   hideStepBanner();
+  hideSummary();
+  hideSummaryButton();
   // Clean up any in-flight animation clones
   document.querySelectorAll('.card-clone-flying').forEach(el => el.remove());
   if (animFrameId) {
@@ -943,6 +949,7 @@ function updateTimeStats() {
   const saved = state.sequentialCITime - state.wallClockTime;
   document.getElementById('stat-time-saved').textContent = saved > 0 ? formatCITime(saved) : '0 s';
   updateCostPanel();
+  updateSummaryPanel();
 }
 
 function updateStats() {
@@ -985,6 +992,90 @@ function updateStats() {
     pctMerged.textContent = '';
     pctRejected.textContent = '';
   }
+}
+
+// ── Summary Overlay ────────────────────────────
+
+function showSummaryButton() {
+  const btn = document.getElementById('btn-summary');
+  if (btn) btn.hidden = false;
+}
+
+function hideSummaryButton() {
+  const btn = document.getElementById('btn-summary');
+  if (btn) btn.hidden = true;
+}
+
+function updateSummaryPanel() {
+  const overlay = document.getElementById('summary-overlay');
+  if (!overlay || overlay.hidden) return;
+
+  const total = state.merged.length + state.rejected.length;
+  const successRate = total > 0 ? Math.round((state.merged.length / total) * 100) : 0;
+  const wasteRatio = state.successCITime > 0
+    ? Math.round((state.wastedCITime / state.successCITime) * 100) + '%'
+    : state.wastedCITime > 0 ? '∞' : '—';
+  const timeSaved = state.sequentialCITime - state.wallClockTime;
+
+  // Main stats
+  document.getElementById('sum-merged').textContent = state.merged.length;
+  document.getElementById('sum-rejected').textContent = state.rejected.length;
+  document.getElementById('sum-success-rate').textContent = successRate + '%';
+  document.getElementById('sum-reruns').textContent = state.totalReruns;
+
+  // Time rows
+  document.getElementById('sum-wall-clock').textContent = formatCITime(state.wallClockTime);
+  document.getElementById('sum-sequential').textContent = formatCITime(state.sequentialCITime);
+  document.getElementById('sum-time-saved').textContent = timeSaved > 0 ? formatCITime(timeSaved) : '0 s';
+
+  // CI rows
+  document.getElementById('sum-useful-ci').textContent = formatCITime(state.successCITime);
+  document.getElementById('sum-wasted-ci').textContent = formatCITime(state.wastedCITime);
+  document.getElementById('sum-waste-ratio').textContent = wasteRatio;
+
+  // Cost rows
+  const rate = getCostRate();
+  const runners = getCostRunners();
+  const toMin = 1 / 60000;
+  const costPerMin = rate * runners;
+  const totalCIMin = (state.successCITime + state.wastedCITime) * toMin;
+  const wastedCIMin = state.wastedCITime * toMin;
+  document.getElementById('sum-total-cost').textContent = formatCost(totalCIMin * costPerMin);
+  document.getElementById('sum-wasted-cost').textContent = formatCost(wastedCIMin * costPerMin);
+}
+
+function showSummary() {
+  const overlay = document.getElementById('summary-overlay');
+  if (!overlay) return;
+  const title = document.getElementById('summary-title');
+  if (title) {
+    title.textContent = state.queue.length === 0 ? 'Simulation Complete' : 'Simulation Summary';
+  }
+  overlay.hidden = false;
+  updateSummaryPanel();
+}
+
+function hideSummary() {
+  const overlay = document.getElementById('summary-overlay');
+  if (overlay) overlay.hidden = true;
+}
+
+function initSummary() {
+  const closeBtn = document.getElementById('summary-close');
+  const resetBtn = document.getElementById('summary-reset');
+  const overlay = document.getElementById('summary-overlay');
+  const openBtn = document.getElementById('btn-summary');
+
+  if (closeBtn) closeBtn.addEventListener('click', hideSummary);
+  if (resetBtn) resetBtn.addEventListener('click', () => {
+    hideSummary();
+    doReset();
+  });
+  if (openBtn) openBtn.addEventListener('click', showSummary);
+  // Close on backdrop click
+  if (overlay) overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) hideSummary();
+  });
 }
 
 // ── Cost Panel ─────────────────────────────────
@@ -1320,6 +1411,7 @@ function initWelcome() {
 function init() {
   bindEvents();
   initCostPanel();
+  initSummary();
   doReset();
   initWelcome();
 }
