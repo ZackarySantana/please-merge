@@ -2155,14 +2155,18 @@ function initTheme() {
     const saved = localStorage.getItem('mq-theme');
     if (saved) document.documentElement.setAttribute('data-theme', saved);
 
-    document.getElementById('btn-theme').addEventListener('click', () => {
+    function toggleTheme() {
         const current = document.documentElement.getAttribute('data-theme');
         const next = current === 'light' ? 'dark' : 'light';
         document.documentElement.setAttribute('data-theme', next);
         localStorage.setItem('mq-theme', next);
         // Redraw the chart with new theme colors
         renderOptimalChart();
-    });
+    }
+
+    document.getElementById('btn-theme').addEventListener('click', toggleTheme);
+    const welcomeThemeBtn = document.getElementById('btn-theme-welcome');
+    if (welcomeThemeBtn) welcomeThemeBtn.addEventListener('click', toggleTheme);
 }
 
 function init() {
