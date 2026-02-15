@@ -284,6 +284,54 @@ html, body {
   font-family: var(--font-mono);
 }
 
+/* Optimal batch hint */
+.optimal-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.optimal-btn {
+  padding: 3px 10px;
+  font-size: 11px;
+  font-family: var(--font-sans);
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all var(--duration) var(--ease-out);
+}
+
+.optimal-btn span {
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+.optimal-btn:hover {
+  color: var(--blue);
+  border-color: var(--blue);
+  background: var(--blue-dim);
+}
+
+.optimal-info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  cursor: help;
+  flex-shrink: 0;
+}
+
 /* Toggle switch */
 .toggle-row {
   display: flex;

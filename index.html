@@ -34,6 +34,10 @@
           </label>
           <input type="range" id="cfg-batch-size" min="1" max="50" value="10" class="slider">
           <div class="slider-hints"><span>1</span><span>50</span></div>
+          <div class="optimal-hint">
+            <button class="optimal-btn" id="btn-optimal-batch" title="Set batch size to the mathematically optimal value">Optimal: ~<span id="val-optimal-batch">3</span></button>
+            <span class="optimal-info" title="Calculated as 1/(1-p) where p is your CI success rate. This is the expected number of commits before a failure, the sweet spot between parallelism and wasted CI.">?</span>
+          </div>
         </div>
 
         <!-- Total Commits -->
@@ -413,7 +417,7 @@
           </div>
           <p class="welcome-text">
             GitHub's <strong>merge queue</strong> batches pull requests and tests them together before merging into <code>main</code>.
-            This saves time by running CI in parallel — but when a commit fails, the entire batch restarts.
+            This saves time by running CI in parallel, but when a commit fails, the entire batch restarts.
           </p>
           <p class="welcome-text welcome-text--muted">
             This interactive simulator lets you experiment with different configurations and see how merge queue behavior
@@ -436,7 +440,7 @@
               <div class="welcome-lane-dot" style="background:var(--red)"></div>
               <div>
                 <strong>Rejected</strong>
-                <p>Commits whose CI failed. When the head of the queue fails, it's ejected and the remaining active window <em>restarts CI</em> — that's the costly part.</p>
+                <p>Commits whose CI failed. When the head of the queue fails, it's ejected and the remaining active window <em>restarts CI</em>. That's the costly part.</p>
               </div>
             </div>
             <div class="welcome-lane-card">
@@ -467,11 +471,11 @@
             </div>
             <div class="welcome-rule">
               <span class="welcome-rule-num">4</span>
-              <p>If the head <strong style="color:var(--red)">fails</strong>, it's rejected and <em>all remaining active commits restart CI</em> — wasting their progress.</p>
+              <p>If the head <strong style="color:var(--red)">fails</strong>, it's rejected and <em>all remaining active commits restart CI</em>, wasting their progress.</p>
             </div>
           </div>
           <p class="welcome-text welcome-text--muted" style="margin-top:12px">
-            This is why a low success rate with a large batch is so expensive — one failure can waste the CI time of many commits.
+            This is why a low success rate with a large batch is so expensive. One failure can waste the CI time of many commits.
           </p>
         </div>
 

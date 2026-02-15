@@ -433,7 +433,7 @@ function previewEvaluation() {
       action: 'reject',
       commit: head,
       wastedDelta: wastedPreview,
-      description: `Reject "${head.name}" — CI failed. Remaining active window will restart CI.`,
+      description: `Reject "${head.name}". CI failed. Remaining active window will restart CI.`,
     };
   }
 
@@ -483,7 +483,7 @@ function showStepBanner() {
   } else if (preview.action === 'reject') {
     icon.textContent = '✕';
     icon.className = 'step-banner-icon step-banner-icon--reject';
-    title.textContent = 'Head commit failed — reject & restart';
+    title.textContent = 'Head commit failed. Reject & restart.';
     title.style.color = 'var(--red)';
     const timeTag = preview.wastedDelta > 0 ? `  ·  Wasted CI: +${formatCITime(preview.wastedDelta)}` : '';
     desc.innerHTML = preview.description + `<span class="step-banner-time step-banner-time--wasted">${timeTag}</span>`;
@@ -1189,6 +1189,13 @@ function readConfigFromUI() {
   config.speed        = +document.getElementById('cfg-speed').value;
 }
 
+function getOptimalBatch() {
+  const p = config.successRate / 100;
+  if (p >= 1) return 50;   // 100% success → max parallelism
+  if (p <= 0) return 1;    // 0% success → no point batching
+  return Math.max(1, Math.min(50, Math.round(1 / (1 - p))));
+}
+
 function syncUIValues() {
   document.getElementById('val-success-rate').textContent = config.successRate + '%';
   document.getElementById('val-batch-size').textContent = config.batchSize;
@@ -1196,6 +1203,7 @@ function syncUIValues() {
   document.getElementById('val-ci-duration').textContent = config.ciDuration + ' m';
   document.getElementById('val-ci-jitter').textContent = '± ' + config.ciJitter + ' m';
   document.getElementById('val-speed').textContent = config.speed + '×';
+  document.getElementById('val-optimal-batch').textContent = getOptimalBatch();
 }
 
 function writeConfigToUI() {
@@ -1242,6 +1250,15 @@ function bindEvents() {
     }
   });
   document.getElementById('btn-step-continue').addEventListener('click', doStepContinue);
+
+  // Optimal batch size button
+  document.getElementById('btn-optimal-batch').addEventListener('click', () => {
+    const optimal = getOptimalBatch();
+    document.getElementById('cfg-batch-size').value = optimal;
+    readConfigFromUI();
+    syncUIValues();
+    if (!state.isRunning) doReset();
+  });
 
   // Sidebar sliders — live update labels; some require reset
   const liveSliders = ['cfg-success-rate', 'cfg-speed'];
