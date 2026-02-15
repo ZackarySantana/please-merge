@@ -677,6 +677,70 @@ function loop(timestamp) {
 
 // ── Controls ───────────────────────────────────
 
+function runInstant() {
+  // Run the entire simulation synchronously in one pass
+  state.isRunning = true;
+  state.isPaused = false;
+  updateButtons();
+  showSummaryButton();
+
+  // Safety limit to prevent infinite loops
+  let iterations = 0;
+  const maxIterations = config.totalCommits * config.batchSize * 10;
+
+  while (state.queue.length > 0 && iterations < maxIterations) {
+    iterations++;
+    const activeSize = Math.min(config.batchSize, state.queue.length);
+
+    // Start CI for idle active commits
+    for (let i = 0; i < activeSize; i++) {
+      const c = state.commits.get(state.queue[i]);
+      if (c.ciStatus === 'idle') {
+        startCI(c);
+      }
+    }
+
+    // Find the shortest running CI in the active window (time to next event)
+    let minRemaining = Infinity;
+    for (let i = 0; i < activeSize; i++) {
+      const c = state.commits.get(state.queue[i]);
+      if (c.ciStatus === 'running') {
+        const remaining = c.ciDuration - c.ciElapsed;
+        if (remaining < minRemaining) minRemaining = remaining;
+      }
+    }
+    if (minRemaining === Infinity) break; // nothing running
+
+    // Advance all running CIs by that amount
+    state.wallClockTime += minRemaining;
+    for (let i = 0; i < activeSize; i++) {
+      const c = state.commits.get(state.queue[i]);
+      if (c.ciStatus === 'running') {
+        c.ciElapsed += minRemaining;
+        if (c.ciElapsed >= c.ciDuration) {
+          c.ciElapsed = c.ciDuration;
+          c.ciStatus = c.ciOutcome;
+        }
+      }
+    }
+
+    // Evaluate the queue (merge successes, handle failure)
+    evaluateQueue();
+  }
+
+  // Finalize
+  state.isRunning = false;
+  render.queueDirty = true;
+  renderQueue();
+  renderMergedIncremental();
+  renderRejectedIncremental();
+  updateStats();
+  updateButtons();
+  updateTimeStats();
+  showSummaryButton();
+  showSummary();
+}
+
 function doStart() {
   if (state.isRunning && !state.isPaused) return;
 
@@ -1306,6 +1370,15 @@ function bindEvents() {
     }
   });
   document.getElementById('btn-step-continue').addEventListener('click', doStepContinue);
+
+  // Instant mode button
+  document.getElementById('btn-instant').addEventListener('click', () => {
+    // Reset first if a simulation already ran, then run instantly
+    if (state.isRunning || state.merged.length > 0 || state.rejected.length > 0) {
+      doReset();
+    }
+    runInstant();
+  });
 
   // Optimal batch size button
   document.getElementById('btn-optimal-batch').addEventListener('click', () => {
