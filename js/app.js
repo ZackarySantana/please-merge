@@ -951,17 +951,19 @@ function showStatDelta(statId, deltaMs, color) {
 // ── Rendering: Stats ───────────────────────────
 
 function formatCITime(ms) {
-  const s = ms / 1000;
-  if (s < 60) return s.toFixed(1) + ' s';
+  const sign = ms < 0 ? '-' : '';
+  const abs = Math.abs(ms);
+  const s = abs / 1000;
+  if (s < 60) return sign + s.toFixed(1) + ' s';
   const totalMin = s / 60;
   if (totalMin < 60) {
     const m = Math.floor(totalMin);
     const rem = Math.round(s % 60);
-    return rem > 0 ? m + 'm ' + rem + 's' : m + ' m';
+    return sign + (rem > 0 ? m + 'm ' + rem + 's' : m + ' m');
   }
   const h = Math.floor(totalMin / 60);
   const remMin = Math.round(totalMin % 60);
-  return remMin > 0 ? h + 'h ' + remMin + 'm' : h + ' h';
+  return sign + (remMin > 0 ? h + 'h ' + remMin + 'm' : h + ' h');
 }
 
 function updateTimeStats() {
