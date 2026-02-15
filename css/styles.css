@@ -1212,6 +1212,7 @@ body {
         rgba(13, 17, 23, 0.97),
         rgba(13, 17, 23, 0.92)
     );
+    backdrop-filter: blur(4px);
     border-top: 1px solid var(--border);
     backdrop-filter: blur(8px);
     animation: banner-slide-up 0.3s var(--ease-out);
@@ -1290,6 +1291,14 @@ body {
     padding: 8px 20px;
     font-size: 13px;
     font-weight: 600;
+}
+
+[data-theme="light"] .step-banner {
+    background: linear-gradient(
+        to top,
+        rgba(255, 255, 255, 0.97),
+        rgba(255, 255, 255, 0.92)
+    );
 }
 
 @keyframes banner-slide-up {
