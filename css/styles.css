@@ -710,6 +710,10 @@ body {
     white-space: nowrap;
     transition: all var(--duration) var(--ease-out);
 }
+.btn[hidden] {
+    display: none;
+}
+
 .btn:disabled {
     opacity: 0.4;
     cursor: not-allowed;

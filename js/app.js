@@ -2011,7 +2011,7 @@ const welcome = {
     dots: null,
     nextBtn: null,
     currentStep: 0,
-    totalSteps: 4,
+    totalSteps: 6,
 };
 
 function openWelcome() {
@@ -2025,12 +2025,14 @@ function openWelcome() {
         d.classList.toggle("welcome-dot-btn--active", i === 0);
     });
     w.nextBtn.textContent = "Next →";
+    if (w.backBtn) w.backBtn.hidden = true;
     w.overlay.hidden = false;
     // Re-trigger entrance animation
     w.overlay.classList.remove("welcome-overlay--closing");
     w.overlay.style.animation = "none";
     void w.overlay.offsetWidth;
     w.overlay.style.animation = "";
+    w.nextBtn.focus();
 }
 
 function closeWelcome() {
@@ -2062,6 +2064,8 @@ function welcomeGoToStep(idx) {
     } else {
         w.nextBtn.textContent = "Next →";
     }
+    if (w.backBtn) w.backBtn.hidden = w.currentStep === 0;
+    w.nextBtn.focus();
 }
 
 function initGlossary() {
@@ -2099,11 +2103,20 @@ function initWelcome() {
         overlay.hidden = true;
     }
 
+    const backBtn = document.getElementById("welcome-back");
+    welcome.backBtn = backBtn;
+
     welcome.nextBtn.addEventListener("click", () => {
         if (welcome.currentStep < welcome.totalSteps - 1) {
             welcomeGoToStep(welcome.currentStep + 1);
         } else {
             closeWelcome();
+        }
+    });
+
+    backBtn.addEventListener("click", () => {
+        if (welcome.currentStep > 0) {
+            welcomeGoToStep(welcome.currentStep - 1);
         }
     });
 
@@ -2152,21 +2165,21 @@ function initWelcome() {
 // ── Initialize ─────────────────────────────────
 
 function initTheme() {
-    const saved = localStorage.getItem('mq-theme');
-    if (saved) document.documentElement.setAttribute('data-theme', saved);
+    const saved = localStorage.getItem("mq-theme");
+    if (saved) document.documentElement.setAttribute("data-theme", saved);
 
     function toggleTheme() {
-        const current = document.documentElement.getAttribute('data-theme');
-        const next = current === 'light' ? 'dark' : 'light';
-        document.documentElement.setAttribute('data-theme', next);
-        localStorage.setItem('mq-theme', next);
+        const current = document.documentElement.getAttribute("data-theme");
+        const next = current === "light" ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", next);
+        localStorage.setItem("mq-theme", next);
         // Redraw the chart with new theme colors
         renderOptimalChart();
     }
 
-    document.getElementById('btn-theme').addEventListener('click', toggleTheme);
-    const welcomeThemeBtn = document.getElementById('btn-theme-welcome');
-    if (welcomeThemeBtn) welcomeThemeBtn.addEventListener('click', toggleTheme);
+    document.getElementById("btn-theme").addEventListener("click", toggleTheme);
+    const welcomeThemeBtn = document.getElementById("btn-theme-welcome");
+    if (welcomeThemeBtn) welcomeThemeBtn.addEventListener("click", toggleTheme);
 }
 
 function init() {

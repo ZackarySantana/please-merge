@@ -1356,21 +1356,133 @@
                         <div class="welcome-callout">
                             <span class="welcome-callout-icon">⏸</span>
                             <div>
-                                <strong>Step Mode</strong> is on by default. The simulation pauses before each merge or reject, showing you exactly what will happen and its CI time impact. Click <strong>Continue</strong> (or press <kbd>Space</kbd>) to proceed.
+                                <strong>Step Mode</strong> is on by default. The
+                                simulation pauses before each merge or reject,
+                                showing you exactly what will happen and its CI
+                                time impact. Click <strong>Continue</strong> (or
+                                press <kbd>Space</kbd>) to proceed.
                             </div>
                         </div>
                         <p
                             class="welcome-text welcome-text--muted"
                             style="margin-top: 12px"
                         >
-                            The <strong>stats bar</strong> at the top tracks
-                            useful vs. wasted CI time, wall clock, and time
-                            saved compared to running commits one at a time.
-                        </p>
-                        <p class="welcome-text welcome-text--muted">
                             <kbd>Space</kbd> &nbsp;Start / Pause / Continue
                             <br />
                             <kbd>R</kbd> &nbsp;Reset
+                        </p>
+                    </div>
+
+                    <!-- Step 5: Batch Size Analysis -->
+                    <div class="welcome-step" data-step="4" hidden>
+                        <h2 class="welcome-heading">Batch Size Analysis</h2>
+                        <p class="welcome-text">
+                            The sidebar includes an interactive
+                            <strong>Batch Size Analysis</strong> chart that
+                            helps you find the sweet spot for your
+                            configuration.
+                        </p>
+                        <div class="welcome-rules">
+                            <div class="welcome-rule">
+                                <span
+                                    class="welcome-rule-num"
+                                    style="
+                                        background: var(--blue-dim);
+                                        color: var(--blue);
+                                    "
+                                    >T</span
+                                >
+                                <p>
+                                    <strong>Throughput</strong> (blue) shows
+                                    expected merges per cycle before a failure.
+                                    It peaks at the optimal batch size and drops
+                                    off as batches get too large.
+                                </p>
+                            </div>
+                            <div class="welcome-rule">
+                                <span
+                                    class="welcome-rule-num"
+                                    style="
+                                        background: var(--red-dim);
+                                        color: var(--red);
+                                    "
+                                    >C</span
+                                >
+                                <p>
+                                    <strong>Est. Cost</strong> (red) shows CI
+                                    runs per merged commit. At 100% success rate
+                                    it's a flat line. As success rate drops,
+                                    larger batches waste more and more CI.
+                                </p>
+                            </div>
+                        </div>
+                        <p
+                            class="welcome-text welcome-text--muted"
+                            style="margin-top: 12px"
+                        >
+                            <strong>Click or drag</strong> on the chart to set
+                            your batch size. The <strong>Wall Clock</strong> and
+                            <strong>Est. Cost</strong> values below it update in
+                            real time based on your settings.
+                        </p>
+                    </div>
+
+                    <!-- Step 6: Cost Tracking & Summary -->
+                    <div class="welcome-step" data-step="5" hidden>
+                        <h2 class="welcome-heading">
+                            Cost Tracking &amp; Summary
+                        </h2>
+                        <p class="welcome-text">
+                            The <strong>stats bar</strong> at the top tracks
+                            useful vs. wasted CI time, wall clock, waste
+                            percentage, and time saved compared to running
+                            commits sequentially.
+                        </p>
+                        <div class="welcome-rules">
+                            <div class="welcome-rule">
+                                <span
+                                    class="welcome-rule-num"
+                                    style="
+                                        background: var(--green-dim);
+                                        color: var(--green-bright);
+                                    "
+                                    >$</span
+                                >
+                                <p>
+                                    The <strong>Summary</strong> page (top bar
+                                    button) shows full metrics after the
+                                    simulation ends, including a
+                                    <strong>cost calculator</strong> where you
+                                    set your CI rate and runner count to
+                                    estimate real-world costs.
+                                </p>
+                            </div>
+                            <div class="welcome-rule">
+                                <span
+                                    class="welcome-rule-num"
+                                    style="
+                                        background: var(--yellow-dim);
+                                        color: var(--yellow);
+                                    "
+                                    >&#x21bb;</span
+                                >
+                                <p>
+                                    After resetting and running again, the
+                                    summary shows a
+                                    <strong>comparison</strong> of your previous
+                                    run vs. the current one, so you can see the
+                                    impact of each change.
+                                </p>
+                            </div>
+                        </div>
+                        <p
+                            class="welcome-text welcome-text--muted"
+                            style="margin-top: 12px"
+                        >
+                            Use the <strong>Instant</strong> button to skip
+                            animations and get results immediately. The
+                            <strong>Glossary</strong> in the sidebar footer
+                            explains all key terms.
                         </p>
                     </div>
                 </div>
@@ -1385,11 +1497,44 @@
                         <button class="welcome-dot-btn" data-dot="1"></button>
                         <button class="welcome-dot-btn" data-dot="2"></button>
                         <button class="welcome-dot-btn" data-dot="3"></button>
+                        <button class="welcome-dot-btn" data-dot="4"></button>
+                        <button class="welcome-dot-btn" data-dot="5"></button>
                     </div>
                     <div class="welcome-actions">
-                        <button class="theme-toggle" id="btn-theme-welcome" title="Toggle light/dark mode">
-                            <svg class="theme-icon theme-icon--dark" width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 1A5 5 0 1 1 8 3a5 5 0 0 1 0 10Zm0-12a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 8 1Zm0 12a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 8 13Zm7-5a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1 0-1h1A.5.5 0 0 1 15 8ZM3 8a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1 0-1h1A.5.5 0 0 1 3 8Zm9.354-4.354a.5.5 0 0 1 0 .708l-.708.707a.5.5 0 1 1-.707-.707l.707-.708a.5.5 0 0 1 .708 0ZM5.061 11.646a.5.5 0 0 1 0 .708l-.707.707a.5.5 0 1 1-.708-.707l.708-.708a.5.5 0 0 1 .707 0Zm7.585.708a.5.5 0 0 1-.708 0l-.707-.708a.5.5 0 0 1 .707-.707l.708.707a.5.5 0 0 1 0 .708ZM5.061 4.354a.5.5 0 0 1-.707 0l-.708-.707a.5.5 0 1 1 .708-.708l.707.708a.5.5 0 0 1 0 .707Z"/></svg>
-                            <svg class="theme-icon theme-icon--light" width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278"/></svg>
+                        <button
+                            class="theme-toggle"
+                            id="btn-theme-welcome"
+                            title="Toggle light/dark mode"
+                        >
+                            <svg
+                                class="theme-icon theme-icon--dark"
+                                width="16"
+                                height="16"
+                                viewBox="0 0 16 16"
+                                fill="currentColor"
+                            >
+                                <path
+                                    d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 1A5 5 0 1 1 8 3a5 5 0 0 1 0 10Zm0-12a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 8 1Zm0 12a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 8 13Zm7-5a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1 0-1h1A.5.5 0 0 1 15 8ZM3 8a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1 0-1h1A.5.5 0 0 1 3 8Zm9.354-4.354a.5.5 0 0 1 0 .708l-.708.707a.5.5 0 1 1-.707-.707l.707-.708a.5.5 0 0 1 .708 0ZM5.061 11.646a.5.5 0 0 1 0 .708l-.707.707a.5.5 0 1 1-.708-.707l.708-.708a.5.5 0 0 1 .707 0Zm7.585.708a.5.5 0 0 1-.708 0l-.707-.708a.5.5 0 0 1 .707-.707l.708.707a.5.5 0 0 1 0 .708ZM5.061 4.354a.5.5 0 0 1-.707 0l-.708-.707a.5.5 0 1 1 .708-.708l.707.708a.5.5 0 0 1 0 .707Z"
+                                />
+                            </svg>
+                            <svg
+                                class="theme-icon theme-icon--light"
+                                width="16"
+                                height="16"
+                                viewBox="0 0 16 16"
+                                fill="currentColor"
+                            >
+                                <path
+                                    d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278"
+                                />
+                            </svg>
+                        </button>
+                        <button
+                            class="btn btn-ghost welcome-back"
+                            id="welcome-back"
+                            hidden
+                        >
+                            ← Back
                         </button>
                         <button
                             class="btn btn-ghost welcome-skip"
