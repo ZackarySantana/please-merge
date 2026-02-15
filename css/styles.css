@@ -150,15 +150,16 @@ body {
     border: 1px solid var(--border);
     border-radius: var(--radius);
     background: var(--bg-card);
-    color: var(--text-secondary);
+    color: var(--yellow);
     cursor: pointer;
     flex-shrink: 0;
     transition: color var(--duration), background var(--duration), border-color var(--duration);
 }
 
 .theme-toggle:hover {
-    color: var(--text-primary);
+    color: var(--yellow);
     background: var(--bg-card-hover);
+    border-color: var(--yellow);
 }
 
 /* Show sun in dark mode, moon in light mode */
@@ -166,6 +167,15 @@ body {
 .theme-icon--dark { display: block; }
 [data-theme="light"] .theme-icon--light { display: block; }
 [data-theme="light"] .theme-icon--dark { display: none; }
+
+[data-theme="light"] .theme-toggle {
+    color: var(--blue);
+}
+
+[data-theme="light"] .theme-toggle:hover {
+    color: var(--blue);
+    border-color: var(--blue);
+}
 
 
 .sidebar-body {
