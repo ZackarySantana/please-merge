@@ -1324,6 +1324,171 @@ function getOptimalBatch() {
   return Math.max(1, Math.min(50, Math.round(1 / (1 - p))));
 }
 
+// ── Optimal Chart ──────────────────────────────
+
+function renderOptimalChart() {
+  const canvas = document.getElementById('optimal-chart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  // Handle high-DPI displays
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+
+  const w = rect.width;
+  const h = rect.height;
+  const pad = { top: 8, right: 8, bottom: 8, left: 8 };
+  const plotW = w - pad.left - pad.right;
+  const plotH = h - pad.top - pad.bottom;
+
+  const p = config.successRate / 100;
+  const maxBatch = 50;
+
+  // Compute data series
+  const throughput = [];
+  const cost = [];
+  for (let b = 1; b <= maxBatch; b++) {
+    const pb = Math.pow(p, b);
+    throughput.push(b * pb);                              // expected merges per cycle
+
+    // Cost per merged commit: b / E[merged per cycle]
+    // E[merged] = sum_{k=0}^{b-1} k * p^k * (1-p)  +  b * p^b
+    // At p=1 this equals b, so cost = 1 (flat line). ✓
+    let em = 0;
+    for (let k = 0; k < b; k++) em += k * Math.pow(p, k) * (1 - p);
+    em += b * pb;
+    cost.push(em > 0.0001 ? b / em : b * 100);
+  }
+
+  // Normalize each series to 0-1 (linear scale for both)
+  const maxT = Math.max(...throughput, 0.001);
+  const normT = throughput.map(v => v / maxT);
+  const maxC = Math.max(...cost, 0.001);
+  const normC = cost.map(v => v / maxC);
+
+  // Read CSS colors
+  const styles = getComputedStyle(document.documentElement);
+  const colBlue = styles.getPropertyValue('--blue').trim() || '#388bfd';
+  const colRed = styles.getPropertyValue('--red').trim() || '#f85149';
+  const colBorder = styles.getPropertyValue('--border').trim() || '#30363d';
+  const colMuted = styles.getPropertyValue('--text-muted').trim() || '#484f58';
+  const colBg = styles.getPropertyValue('--bg-card').trim() || '#1c2128';
+
+  // Clear and fill background
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = colBg;
+  ctx.beginPath();
+  ctx.roundRect(0, 0, w, h, 6);
+  ctx.fill();
+
+  // Subtle grid lines
+  ctx.strokeStyle = colBorder;
+  ctx.lineWidth = 0.5;
+  for (let i = 1; i < 4; i++) {
+    const y = pad.top + plotH * (i / 4);
+    ctx.beginPath();
+    ctx.moveTo(pad.left, y);
+    ctx.lineTo(pad.left + plotW, y);
+    ctx.stroke();
+  }
+
+  // Helper: batch index to x
+  function bx(b) {
+    return pad.left + ((b - 1) / (maxBatch - 1)) * plotW;
+  }
+  // Helper: normalized value to y (0 = bottom, 1 = top)
+  function by(v) {
+    return pad.top + plotH * (1 - v);
+  }
+
+  // Draw a line series
+  function drawLine(data, color) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.5;
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    for (let i = 0; i < data.length; i++) {
+      const x = bx(i + 1);
+      const y = by(data[i]);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+
+  // Draw throughput line (blue)
+  drawLine(normT, colBlue);
+
+  // Draw cost line (red)
+  drawLine(normC, colRed);
+
+  // Optimal batch vertical dashed line
+  const optimal = getOptimalBatch();
+  const optX = bx(optimal);
+  ctx.strokeStyle = colMuted;
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath();
+  ctx.moveTo(optX, pad.top);
+  ctx.lineTo(optX, pad.top + plotH);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Current batch size vertical solid line + dots
+  const current = config.batchSize;
+  const curX = bx(current);
+  ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(curX, pad.top);
+  ctx.lineTo(curX, pad.top + plotH);
+  ctx.stroke();
+
+  // Dot on throughput line at current batch
+  const curTY = by(normT[current - 1] || 0);
+  ctx.fillStyle = colBlue;
+  ctx.beginPath();
+  ctx.arc(curX, curTY, 3.5, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Dot on cost line at current batch
+  const curCY = by(normC[current - 1] || 0);
+  ctx.fillStyle = colRed;
+  ctx.beginPath();
+  ctx.arc(curX, curCY, 3.5, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Batch number label at current position
+  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.font = '9px ' + (styles.getPropertyValue('--font-mono').trim() || 'monospace');
+  ctx.textAlign = 'center';
+  ctx.fillText(current, curX, pad.top + plotH + pad.bottom);
+}
+
+function initOptimalChart() {
+  const canvas = document.getElementById('optimal-chart');
+  if (!canvas) return;
+
+  canvas.addEventListener('click', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const pad = 8;
+    const plotW = rect.width - pad * 2;
+    const relX = e.clientX - rect.left - pad;
+    const ratio = Math.max(0, Math.min(1, relX / plotW));
+    const batch = Math.round(ratio * 49) + 1; // 1-50
+    document.getElementById('cfg-batch-size').value = batch;
+    readConfigFromUI();
+    syncUIValues();
+    if (!state.isRunning) doReset();
+  });
+
+  // Initial render
+  renderOptimalChart();
+}
+
 function syncUIValues() {
   document.getElementById('val-success-rate').textContent = config.successRate + '%';
   document.getElementById('val-batch-size').textContent = config.batchSize;
@@ -1332,6 +1497,7 @@ function syncUIValues() {
   document.getElementById('val-ci-jitter').textContent = '± ' + config.ciJitter + ' m';
   document.getElementById('val-speed').textContent = config.speed + '×';
   document.getElementById('val-optimal-batch').textContent = getOptimalBatch();
+  renderOptimalChart();
 }
 
 function writeConfigToUI() {
@@ -1586,6 +1752,7 @@ function init() {
   bindEvents();
   initSummary();
   initGlossary();
+  initOptimalChart();
   doReset();
   initWelcome();
 }

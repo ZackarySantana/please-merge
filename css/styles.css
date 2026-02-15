@@ -345,6 +345,51 @@ html, body {
   flex-shrink: 0;
 }
 
+/* Optimal chart */
+.optimal-chart-wrap {
+  margin-top: 4px;
+}
+
+#optimal-chart {
+  width: 100%;
+  cursor: pointer;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  display: block;
+}
+
+.optimal-chart-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 6px;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.optimal-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.optimal-legend-item::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.optimal-legend-throughput::before {
+  background: var(--blue);
+}
+
+.optimal-legend-cost::before {
+  background: var(--red);
+}
+
 /* Toggle switch */
 .toggle-row {
   display: flex;
@@ -1874,6 +1919,12 @@ html, body {
 }
 
 /* ─── Responsive tweaks ─── */
+@media (min-width: 1600px) {
+  #optimal-chart {
+    height: 200px;
+  }
+}
+
 @media (max-width: 1600px) {
   .stat--compact-hide {
     display: none;
