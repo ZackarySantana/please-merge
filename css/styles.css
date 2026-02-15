@@ -117,21 +117,28 @@ html, body {
 
 /* Scrollbar */
 .sidebar-body::-webkit-scrollbar,
-.lane-body::-webkit-scrollbar {
+.lane-body::-webkit-scrollbar,
+.summary-card::-webkit-scrollbar {
   width: 6px;
 }
 .sidebar-body::-webkit-scrollbar-track,
-.lane-body::-webkit-scrollbar-track {
+.lane-body::-webkit-scrollbar-track,
+.summary-card::-webkit-scrollbar-track {
   background: transparent;
 }
 .sidebar-body::-webkit-scrollbar-thumb,
-.lane-body::-webkit-scrollbar-thumb {
+.lane-body::-webkit-scrollbar-thumb,
+.summary-card::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 3px;
 }
 .sidebar-body::-webkit-scrollbar-thumb:hover,
-.lane-body::-webkit-scrollbar-thumb:hover {
+.lane-body::-webkit-scrollbar-thumb:hover,
+.summary-card::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
+}
+.summary-card::-webkit-scrollbar-track {
+  margin: 10px 0;
 }
 
 /* Sidebar footer */
