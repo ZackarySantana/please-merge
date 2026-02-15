@@ -118,27 +118,27 @@ html, body {
 /* Scrollbar */
 .sidebar-body::-webkit-scrollbar,
 .lane-body::-webkit-scrollbar,
-.summary-card::-webkit-scrollbar {
+.summary-body::-webkit-scrollbar {
   width: 6px;
 }
 .sidebar-body::-webkit-scrollbar-track,
 .lane-body::-webkit-scrollbar-track,
-.summary-card::-webkit-scrollbar-track {
+.summary-body::-webkit-scrollbar-track {
   background: transparent;
 }
 .sidebar-body::-webkit-scrollbar-thumb,
 .lane-body::-webkit-scrollbar-thumb,
-.summary-card::-webkit-scrollbar-thumb {
+.summary-body::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 3px;
 }
 .sidebar-body::-webkit-scrollbar-thumb:hover,
 .lane-body::-webkit-scrollbar-thumb:hover,
-.summary-card::-webkit-scrollbar-thumb:hover {
+.summary-body::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
 }
-.summary-card::-webkit-scrollbar-track {
-  margin: 10px 0;
+.summary-body::-webkit-scrollbar-track {
+  margin: 4px 0;
 }
 
 /* Sidebar footer */
@@ -1040,8 +1040,16 @@ html, body {
   width: 500px;
   max-width: 90vw;
   max-height: 90vh;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   animation: summarySlideUp 0.3s ease-out;
+}
+
+.summary-body {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 @keyframes summarySlideUp {
