@@ -2020,20 +2020,23 @@ body {
 /* ─── Cost Panel ─── */
 .summary-trigger-btn {
     align-self: center;
-    padding: 5px 12px;
+    padding: 6px 14px;
     font-size: 12px;
-    font-weight: 600;
-    color: #fff;
-    background: var(--blue);
-    border: 1px solid var(--blue);
+    font-weight: 500;
+    font-family: var(--font-sans);
+    color: var(--blue);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
     cursor: pointer;
+    white-space: nowrap;
     transition: all var(--duration) var(--ease-out);
 }
 
 .summary-trigger-btn:hover {
-    background: #58a6ff;
-    border-color: #58a6ff;
+    background: var(--bg-card-hover);
+    border-color: var(--blue);
+    color: var(--blue);
 }
 
 .cost-trigger-btn {
@@ -2206,6 +2209,25 @@ body {
 @media (max-width: 1100px) {
     :root {
         --sidebar-width: 220px;
+    }
+    .stat-label {
+        font-size: 8px;
+    }
+    .stat-value {
+        font-size: 12px;
+    }
+    .stat-ci-useful,
+    .stat-ci-wasted,
+    .stat-ci-ratio,
+    .stat-wall-clock,
+    .stat-time-saved {
+        font-size: 11px;
+    }
+    .stat-divider {
+        height: 20px;
+    }
+    .topbar-right {
+        gap: 8px;
     }
 }
 
