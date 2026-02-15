@@ -1366,7 +1366,8 @@ function renderOptimalChart() {
   // Normalize each series to 0-1 (linear scale for both)
   const maxT = Math.max(...throughput, 0.001);
   const normT = throughput.map(v => v / maxT);
-  const maxC = Math.max(...cost, 0.001);
+  // Ensure flat lines (e.g. 100% success) sit at mid-height, not the top
+  const maxC = Math.max(...cost, cost[0] * 2, 0.001);
   const normC = cost.map(v => v / maxC);
 
   // Read CSS colors
