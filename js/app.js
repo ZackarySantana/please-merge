@@ -1237,11 +1237,17 @@ function showSummary() {
   if (title) {
     title.textContent = state.queue.length === 0 ? 'Simulation Complete' : 'Simulation Summary';
   }
+  // If already open (instant re-run), just update without toggling hidden
+  if (!overlay.hidden) {
+    updateSummaryPanel();
+    return;
+  }
   overlay.hidden = false;
   updateSummaryPanel();
 }
 
 function hideSummary() {
+  if (state._keepSummaryOpen) return;
   const overlay = document.getElementById('summary-overlay');
   if (overlay) overlay.hidden = true;
 }
@@ -1254,12 +1260,21 @@ function initSummary() {
   const overlay = document.getElementById('summary-overlay');
   const openBtn = document.getElementById('btn-summary');
 
+  const instantBtn = document.getElementById('summary-instant');
+
   if (closeBtn) closeBtn.addEventListener('click', hideSummary);
   if (startBtn) startBtn.addEventListener('click', doStart);
   if (pauseBtn) pauseBtn.addEventListener('click', doPause);
   if (resetBtn) resetBtn.addEventListener('click', () => {
     hideSummary();
     doReset();
+  });
+  if (instantBtn) instantBtn.addEventListener('click', () => {
+    // Keep overlay open and suppress animations for in-place re-run
+    state._keepSummaryOpen = true;
+    doReset();
+    runInstant();
+    state._keepSummaryOpen = false;
   });
   if (openBtn) openBtn.addEventListener('click', showSummary);
   // Close on backdrop click

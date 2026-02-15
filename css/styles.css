@@ -1292,8 +1292,9 @@ html, body {
 }
 
 .summary-footer .btn {
-  min-width: 120px;
+  min-width: 90px;
   justify-content: center;
+  flex: 1;
 }
 
 /* ─── Welcome Dialog ─── */
