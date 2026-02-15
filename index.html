@@ -106,15 +106,19 @@
           </div>
         </div>
 
+        <hr class="sidebar-divider">
+
         <!-- Batch Size Analysis -->
         <div class="control-group">
           <label class="control-label">Batch Size Analysis</label>
           <div class="optimal-chart-wrap">
             <canvas id="optimal-chart" height="150"></canvas>
+            <div id="optimal-chart-tooltip" class="optimal-chart-tooltip" hidden></div>
             <div class="optimal-chart-legend">
               <span class="optimal-legend-item optimal-legend-throughput">Throughput</span>
               <span class="optimal-legend-item optimal-legend-cost">Est. Cost</span>
             </div>
+            <p class="optimal-chart-desc"><strong>Throughput</strong> is the expected merges per cycle before a failure. <strong>Est. Cost</strong> is CI runs per merged commit, a trend line showing how waste scales with batch size. Click to set batch size.</p>
           </div>
         </div>
       </div>

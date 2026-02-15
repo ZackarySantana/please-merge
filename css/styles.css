@@ -232,6 +232,12 @@ html, body {
 }
 
 /* ─── Controls ─── */
+.sidebar-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 4px 0;
+}
+
 .control-group {
   display: flex;
   flex-direction: column;
@@ -347,7 +353,9 @@ html, body {
 
 /* Optimal chart */
 .optimal-chart-wrap {
+  position: relative;
   margin-top: 4px;
+  overflow: hidden;
 }
 
 #optimal-chart {
@@ -356,6 +364,19 @@ html, body {
   border-radius: var(--radius);
   border: 1px solid var(--border);
   display: block;
+}
+
+.optimal-chart-tooltip {
+  position: absolute;
+  padding: 3px 7px;
+  font-size: 10px;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 2;
 }
 
 .optimal-chart-legend {
@@ -388,6 +409,17 @@ html, body {
 
 .optimal-legend-cost::before {
   background: var(--red);
+}
+
+.optimal-chart-desc {
+  margin: 6px 0 0;
+  font-size: 10px;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.optimal-chart-desc strong {
+  color: var(--text-secondary);
 }
 
 /* Toggle switch */

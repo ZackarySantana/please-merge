@@ -1472,17 +1472,43 @@ function initOptimalChart() {
   const canvas = document.getElementById('optimal-chart');
   if (!canvas) return;
 
-  canvas.addEventListener('click', (e) => {
+  const tooltip = document.getElementById('optimal-chart-tooltip');
+
+  function batchFromEvent(e) {
     const rect = canvas.getBoundingClientRect();
     const pad = 8;
     const plotW = rect.width - pad * 2;
     const relX = e.clientX - rect.left - pad;
     const ratio = Math.max(0, Math.min(1, relX / plotW));
-    const batch = Math.round(ratio * 49) + 1; // 1-50
+    return Math.round(ratio * 49) + 1; // 1-50
+  }
+
+  canvas.addEventListener('click', (e) => {
+    const batch = batchFromEvent(e);
     document.getElementById('cfg-batch-size').value = batch;
     readConfigFromUI();
     syncUIValues();
     if (!state.isRunning) doReset();
+  });
+
+  canvas.addEventListener('mousemove', (e) => {
+    const batch = batchFromEvent(e);
+    const rect = canvas.getBoundingClientRect();
+    const wrapRect = canvas.parentElement.getBoundingClientRect();
+    const relX = e.clientX - wrapRect.left;
+    const relY = e.clientY - wrapRect.top;
+    tooltip.textContent = 'Batch ' + batch;
+    // Clamp X so tooltip stays within the chart wrapper
+    const tw = tooltip.offsetWidth;
+    const clampedX = Math.max(tw / 2 + 2, Math.min(relX, wrapRect.width - tw / 2 - 2));
+    tooltip.style.left = clampedX + 'px';
+    tooltip.style.top = (relY - 28) + 'px';
+    tooltip.style.transform = 'translateX(-50%)';
+    tooltip.hidden = false;
+  });
+
+  canvas.addEventListener('mouseleave', () => {
+    tooltip.hidden = true;
   });
 
   // Initial render
