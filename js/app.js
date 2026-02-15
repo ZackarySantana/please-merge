@@ -1499,6 +1499,26 @@ function welcomeGoToStep(idx) {
   }
 }
 
+function initGlossary() {
+  const overlay = document.getElementById('glossary-overlay');
+  const closeBtn = document.getElementById('glossary-close');
+  const openBtn = document.getElementById('btn-glossary');
+  if (!overlay) return;
+
+  function showGlossary() {
+    overlay.hidden = false;
+  }
+  function hideGlossary() {
+    overlay.hidden = true;
+  }
+
+  if (openBtn) openBtn.addEventListener('click', showGlossary);
+  if (closeBtn) closeBtn.addEventListener('click', hideGlossary);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) hideGlossary();
+  });
+}
+
 function initWelcome() {
   const overlay = document.getElementById('welcome-overlay');
   if (!overlay) return;
@@ -1565,6 +1585,7 @@ function initWelcome() {
 function init() {
   bindEvents();
   initSummary();
+  initGlossary();
   doReset();
   initWelcome();
 }

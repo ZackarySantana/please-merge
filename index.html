@@ -107,6 +107,18 @@
         </div>
       </div>
       <div class="sidebar-footer">
+        <button class="sidebar-help-btn" id="btn-glossary">
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor">
+            <path d="M0 1.75A.75.75 0 0 1 .75 1h4.253c1.227 0 2.317.59 3 1.501A3.744 3.744 0 0 1 11.006 1h4.245a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-.75.75h-4.507a2.25 2.25 0 0 0-1.591.659l-.622.621a.75.75 0 0 1-1.06 0l-.622-.621A2.25 2.25 0 0 0 5.258 13H.75a.75.75 0 0 1-.75-.75Zm7.251 10.324.004-5.073-.002-2.253A2.25 2.25 0 0 0 5.003 2.5H1.5v9h3.757a3.75 3.75 0 0 1 1.994.574ZM8.755 4.75l-.004 7.322a3.752 3.752 0 0 1 1.992-.572H14.5v-9h-3.495a2.25 2.25 0 0 0-2.25 2.25Z"/>
+          </svg>
+          Glossary
+        </button>
+        <button class="sidebar-help-btn" id="btn-help">
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor">
+            <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.92 6.085h.001a.749.749 0 1 1-1.342-.67c.169-.339.516-.644.932-.839.418-.197.9-.295 1.388-.222.49.074.909.318 1.205.66.296.343.456.77.42 1.235-.046.596-.378.933-.693 1.157-.315.224-.615.35-.86.458l-.004.002c-.26.115-.47.208-.615.368-.145.16-.24.405-.24.782v.156a.75.75 0 0 1-1.5 0v-.156c0-.624.157-1.1.46-1.432.3-.327.677-.514.952-.633l.035-.015c.259-.113.46-.201.638-.338.175-.134.262-.267.278-.453a.685.685 0 0 0-.148-.426.554.554 0 0 0-.382-.213.818.818 0 0 0-.603.098c-.21.098-.376.265-.447.398Zm1.33 6.165a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
+          </svg>
+          Help &amp; Tour
+        </button>
         <div class="sidebar-footer-links">
           <a class="sidebar-link" href="https://github.com/ZackarySantana/please-merge" target="_blank" rel="noopener noreferrer" title="View on GitHub">
             <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor">
@@ -126,12 +138,6 @@
             Sponsor
           </a>
         </div>
-        <button class="sidebar-help-btn" id="btn-help">
-          <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor">
-            <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.92 6.085h.001a.749.749 0 1 1-1.342-.67c.169-.339.516-.644.932-.839.418-.197.9-.295 1.388-.222.49.074.909.318 1.205.66.296.343.456.77.42 1.235-.046.596-.378.933-.693 1.157-.315.224-.615.35-.86.458l-.004.002c-.26.115-.47.208-.615.368-.145.16-.24.405-.24.782v.156a.75.75 0 0 1-1.5 0v-.156c0-.624.157-1.1.46-1.432.3-.327.677-.514.952-.633l.035-.015c.259-.113.46-.201.638-.338.175-.134.262-.267.278-.453a.685.685 0 0 0-.148-.426.554.554 0 0 0-.382-.213.818.818 0 0 0-.603.098c-.21.098-.376.265-.447.398Zm1.33 6.165a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
-          </svg>
-          Help &amp; Tour
-        </button>
       </div>
     </aside>
 
@@ -416,6 +422,93 @@
             <button class="btn btn-ghost" id="summary-instant" title="Reset and run instantly">
               <span class="btn-icon">⚡</span> Instant
             </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Glossary Overlay -->
+      <div class="glossary-overlay" id="glossary-overlay" hidden>
+        <div class="glossary-dialog">
+          <div class="glossary-header">
+            <h2 class="glossary-title">Glossary</h2>
+            <button class="glossary-close" id="glossary-close">&#10005;</button>
+          </div>
+          <div class="glossary-body">
+
+            <h3 class="glossary-section">Terms</h3>
+
+            <div class="glossary-entry">
+              <dt class="glossary-term">Merge Queue</dt>
+              <dd class="glossary-def">A FIFO queue of commits waiting to be validated by CI and merged into the main branch. Commits are processed in order from the HEAD.</dd>
+            </div>
+            <div class="glossary-entry">
+              <dt class="glossary-term">Batch / Active Window</dt>
+              <dd class="glossary-def">The group of commits at the front of the queue that run CI in parallel. Controlled by the "Batch Size" slider.</dd>
+            </div>
+            <div class="glossary-entry">
+              <dt class="glossary-term">HEAD</dt>
+              <dd class="glossary-def">The first (oldest) commit in the queue. Only the HEAD commit can be merged or rejected. All evaluation starts here.</dd>
+            </div>
+            <div class="glossary-entry">
+              <dt class="glossary-term">CI (Continuous Integration)</dt>
+              <dd class="glossary-def">The automated test/build process each commit goes through. Duration and outcome are randomized in the simulator based on your configuration.</dd>
+            </div>
+            <div class="glossary-entry">
+              <dt class="glossary-term">Rebase / Restart</dt>
+              <dd class="glossary-def">When a commit ahead of you fails, your CI results are invalidated and must be re-run from scratch. This is the primary source of wasted CI time.</dd>
+            </div>
+            <div class="glossary-entry">
+              <dt class="glossary-term">Speculative Execution</dt>
+              <dd class="glossary-def">Running CI on multiple commits simultaneously, betting they will all pass. If one fails, the work done on later commits is wasted.</dd>
+            </div>
+            <div class="glossary-entry">
+              <dt class="glossary-term">Wall Clock Time</dt>
+              <dd class="glossary-def">Total simulated time elapsed from start to finish. Batching reduces this compared to running commits one at a time.</dd>
+            </div>
+            <div class="glossary-entry">
+              <dt class="glossary-term">Useful CI / Wasted CI</dt>
+              <dd class="glossary-def">Useful CI is time spent on runs that led to a successful merge. Wasted CI is time spent on runs that were thrown away due to failures or restarts.</dd>
+            </div>
+            <div class="glossary-entry">
+              <dt class="glossary-term">Reruns</dt>
+              <dd class="glossary-def">The number of duplicate CI runs caused by failures forcing the active window to restart. Each rerun adds to wasted CI time.</dd>
+            </div>
+            <div class="glossary-entry">
+              <dt class="glossary-term">Waste %</dt>
+              <dd class="glossary-def">The ratio of wasted CI time to useful CI time. Lower is better. A high waste percentage suggests the batch size may be too large for the success rate.</dd>
+            </div>
+            <div class="glossary-entry">
+              <dt class="glossary-term">Optimal Batch Size</dt>
+              <dd class="glossary-def">Calculated as 1/(1-p) where p is the CI success rate. This is the expected number of commits before a failure, balancing parallelism with waste risk.</dd>
+            </div>
+
+            <h3 class="glossary-section">Scenarios</h3>
+
+            <div class="glossary-entry">
+              <dt class="glossary-term">HEAD commit succeeds</dt>
+              <dd class="glossary-def">The commit is merged into main and removed from the queue. The next commit becomes the new HEAD.</dd>
+            </div>
+            <div class="glossary-entry">
+              <dt class="glossary-term">Consecutive successes at HEAD</dt>
+              <dd class="glossary-def">Multiple commits at the front of the queue that all passed CI are merged together in one step. This is the best-case scenario for throughput.</dd>
+            </div>
+            <div class="glossary-entry">
+              <dt class="glossary-term">HEAD commit fails</dt>
+              <dd class="glossary-def">The commit is rejected and moved to the Rejected lane. All remaining commits in the active window have their CI restarted, since their runs were based on the failed commit being present.</dd>
+            </div>
+            <div class="glossary-entry">
+              <dt class="glossary-term">Mid-window failure</dt>
+              <dd class="glossary-def">A commit fails CI but is not yet at HEAD. It waits in the queue showing its red status until all commits before it are processed. When it reaches HEAD, it is rejected.</dd>
+            </div>
+            <div class="glossary-entry">
+              <dt class="glossary-term">All commits in batch succeed</dt>
+              <dd class="glossary-def">The entire active window merges and the next batch of commits from the queue begins CI. This represents maximum efficiency with zero waste.</dd>
+            </div>
+            <div class="glossary-entry">
+              <dt class="glossary-term">Queue empty</dt>
+              <dd class="glossary-def">All commits have been processed (merged or rejected). The simulation ends and the summary is displayed.</dd>
+            </div>
+
           </div>
         </div>
       </div>

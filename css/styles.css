@@ -118,26 +118,31 @@ html, body {
 /* Scrollbar */
 .sidebar-body::-webkit-scrollbar,
 .lane-body::-webkit-scrollbar,
-.summary-body::-webkit-scrollbar {
+.summary-body::-webkit-scrollbar,
+.glossary-body::-webkit-scrollbar {
   width: 6px;
 }
 .sidebar-body::-webkit-scrollbar-track,
 .lane-body::-webkit-scrollbar-track,
-.summary-body::-webkit-scrollbar-track {
+.summary-body::-webkit-scrollbar-track,
+.glossary-body::-webkit-scrollbar-track {
   background: transparent;
 }
 .sidebar-body::-webkit-scrollbar-thumb,
 .lane-body::-webkit-scrollbar-thumb,
-.summary-body::-webkit-scrollbar-thumb {
+.summary-body::-webkit-scrollbar-thumb,
+.glossary-body::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 3px;
 }
 .sidebar-body::-webkit-scrollbar-thumb:hover,
 .lane-body::-webkit-scrollbar-thumb:hover,
-.summary-body::-webkit-scrollbar-thumb:hover {
+.summary-body::-webkit-scrollbar-thumb:hover,
+.glossary-body::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
 }
-.summary-body::-webkit-scrollbar-track {
+.summary-body::-webkit-scrollbar-track,
+.glossary-body::-webkit-scrollbar-track {
   margin: 4px 0;
 }
 
@@ -154,7 +159,6 @@ html, body {
 .sidebar-footer-links {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 12px;
 }
 
@@ -171,8 +175,10 @@ html, body {
 }
 
 .sponsor-btn {
+  flex: 1;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   padding: 4px 12px;
   height: 32px;
@@ -1295,6 +1301,117 @@ html, body {
   min-width: 90px;
   justify-content: center;
   flex: 1;
+}
+
+/* ─── Glossary Dialog ─── */
+.glossary-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 950;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  animation: glossaryFadeIn 0.3s ease-out;
+}
+
+.glossary-overlay[hidden] {
+  display: none;
+}
+
+@keyframes glossaryFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.glossary-dialog {
+  background: var(--bg-sidebar);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: 500px;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: glossarySlideUp 0.3s ease-out;
+}
+
+@keyframes glossarySlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.glossary-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.glossary-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.glossary-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  transition: color var(--duration) var(--ease-out);
+}
+
+.glossary-close:hover {
+  color: var(--text-primary);
+}
+
+.glossary-body {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding: 16px 20px 20px;
+}
+
+.glossary-section {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin: 0 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.glossary-section:not(:first-child) {
+  margin-top: 20px;
+}
+
+.glossary-entry {
+  margin-bottom: 12px;
+}
+
+.glossary-term {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.glossary-def {
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  margin: 0;
 }
 
 /* ─── Welcome Dialog ─── */
