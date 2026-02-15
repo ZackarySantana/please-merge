@@ -1,674 +1,1378 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/svg+xml" href="imgs/logo.svg">
-  <title>Merge Queue Simulator</title>
-  <link rel="stylesheet" href="css/styles.css">
-</head>
-<body>
-  <div class="app">
-    <!-- ─── Sidebar ─── -->
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <img class="sidebar-logo" src="imgs/logo.svg" width="22" height="22" alt="Merge Queue Simulator">
-        <h2>Configuration</h2>
-      </div>
-      <div class="sidebar-body">
-        <!-- Success Rate -->
-        <div class="control-group">
-          <label class="control-label">
-            CI Success Rate
-            <span class="control-value" id="val-success-rate">70%</span>
-          </label>
-          <input type="range" id="cfg-success-rate" min="0" max="100" value="70" class="slider">
-          <div class="slider-hints"><span>0%</span><span>100%</span></div>
-        </div>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="icon" type="image/svg+xml" href="imgs/logo.svg" />
+        <title>Merge Queue Simulator</title>
+        <link rel="stylesheet" href="css/styles.css" />
+    </head>
+    <body>
+        <div class="app">
+            <!-- ─── Sidebar ─── -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <img
+                        class="sidebar-logo"
+                        src="imgs/logo.svg"
+                        width="22"
+                        height="22"
+                        alt="Merge Queue Simulator"
+                    />
+                    <h2>Configuration</h2>
+                </div>
+                <div class="sidebar-body">
+                    <!-- Success Rate -->
+                    <div class="control-group">
+                        <label class="control-label">
+                            CI Success Rate
+                            <span class="control-value" id="val-success-rate"
+                                >70%</span
+                            >
+                        </label>
+                        <input
+                            type="range"
+                            id="cfg-success-rate"
+                            min="0"
+                            max="100"
+                            value="70"
+                            class="slider"
+                        />
+                        <div class="slider-hints">
+                            <span>0%</span><span>100%</span>
+                        </div>
+                    </div>
 
-        <!-- Batch Size -->
-        <div class="control-group">
-          <label class="control-label">
-            Batch Size
-            <span class="control-value" id="val-batch-size">10</span>
-          </label>
-          <input type="range" id="cfg-batch-size" min="1" max="50" value="10" class="slider">
-          <div class="slider-hints"><span>1</span><span>50</span></div>
-          <div class="optimal-hint">
-            <button class="optimal-btn" id="btn-optimal-batch" title="Set batch size to the mathematically optimal value">Optimal: ~<span id="val-optimal-batch">3</span></button>
-            <span class="optimal-info" title="Calculated as 1/(1-p) where p is your CI success rate. This is the expected number of commits before a failure, the sweet spot between parallelism and wasted CI.">?</span>
-          </div>
-        </div>
+                    <!-- Batch Size -->
+                    <div class="control-group">
+                        <label class="control-label">
+                            Batch Size
+                            <span class="control-value" id="val-batch-size"
+                                >10</span
+                            >
+                        </label>
+                        <input
+                            type="range"
+                            id="cfg-batch-size"
+                            min="1"
+                            max="50"
+                            value="10"
+                            class="slider"
+                        />
+                        <div class="slider-hints">
+                            <span>1</span><span>50</span>
+                        </div>
+                        <div class="optimal-hint">
+                            <button
+                                class="optimal-btn"
+                                id="btn-optimal-batch"
+                                title="Set batch size to the mathematically optimal value"
+                            >
+                                Optimal: ~<span id="val-optimal-batch">3</span>
+                            </button>
+                            <span
+                                class="optimal-info"
+                                title="Calculated as 1/(1-p) where p is your CI success rate. This is the expected number of commits before a failure, the sweet spot between parallelism and wasted CI."
+                                >?</span
+                            >
+                        </div>
+                    </div>
 
-        <!-- Total Commits -->
-        <div class="control-group">
-          <label class="control-label">
-            Total Commits
-            <span class="control-value" id="val-total-commits">100</span>
-          </label>
-          <input type="range" id="cfg-total-commits" min="10" max="500" value="100" step="10" class="slider">
-          <div class="slider-hints"><span>10</span><span>500</span></div>
-        </div>
+                    <!-- Total Commits -->
+                    <div class="control-group">
+                        <label class="control-label">
+                            Total Commits
+                            <span class="control-value" id="val-total-commits"
+                                >100</span
+                            >
+                        </label>
+                        <input
+                            type="range"
+                            id="cfg-total-commits"
+                            min="10"
+                            max="500"
+                            value="100"
+                            step="10"
+                            class="slider"
+                        />
+                        <div class="slider-hints">
+                            <span>10</span><span>500</span>
+                        </div>
+                    </div>
 
-        <!-- CI Duration -->
-        <div class="control-group">
-          <label class="control-label">
-            CI Duration
-            <span class="control-value" id="val-ci-duration">15 m</span>
-          </label>
-          <input type="range" id="cfg-ci-duration" min="1" max="60" value="15" class="slider">
-          <div class="slider-hints"><span>1 m</span><span>60 m</span></div>
-        </div>
+                    <!-- CI Duration -->
+                    <div class="control-group">
+                        <label class="control-label">
+                            CI Duration
+                            <span class="control-value" id="val-ci-duration"
+                                >15 m</span
+                            >
+                        </label>
+                        <input
+                            type="range"
+                            id="cfg-ci-duration"
+                            min="1"
+                            max="60"
+                            value="15"
+                            class="slider"
+                        />
+                        <div class="slider-hints">
+                            <span>1 m</span><span>60 m</span>
+                        </div>
+                    </div>
 
-        <!-- CI Jitter -->
-        <div class="control-group">
-          <label class="control-label">
-            CI Jitter
-            <span class="control-value" id="val-ci-jitter">± 10 m</span>
-          </label>
-          <input type="range" id="cfg-ci-jitter" min="0" max="30" value="10" class="slider">
-          <div class="slider-hints"><span>± 0 m</span><span>± 30 m</span></div>
-        </div>
+                    <!-- CI Jitter -->
+                    <div class="control-group">
+                        <label class="control-label">
+                            CI Jitter
+                            <span class="control-value" id="val-ci-jitter"
+                                >± 10 m</span
+                            >
+                        </label>
+                        <input
+                            type="range"
+                            id="cfg-ci-jitter"
+                            min="0"
+                            max="30"
+                            value="10"
+                            class="slider"
+                        />
+                        <div class="slider-hints">
+                            <span>± 0 m</span><span>± 30 m</span>
+                        </div>
+                    </div>
 
-        <!-- Speed Multiplier -->
-        <div class="control-group">
-          <label class="control-label">
-            Speed
-            <span class="control-value" id="val-speed">60×</span>
-          </label>
-          <input type="range" id="cfg-speed" min="60" max="3600" value="60" step="60" class="slider">
-          <div class="slider-hints"><span>60×</span><span>3600×</span></div>
-        </div>
+                    <!-- Speed Multiplier -->
+                    <div class="control-group">
+                        <label class="control-label">
+                            Speed
+                            <span class="control-value" id="val-speed"
+                                >60×</span
+                            >
+                        </label>
+                        <input
+                            type="range"
+                            id="cfg-speed"
+                            min="60"
+                            max="3600"
+                            value="60"
+                            step="60"
+                            class="slider"
+                        />
+                        <div class="slider-hints">
+                            <span>60×</span><span>3600×</span>
+                        </div>
+                    </div>
 
-        <!-- Step Mode -->
-        <div class="control-group">
-          <label class="control-label">
-            Step Mode
-            <span class="control-value" id="val-step-mode">On</span>
-          </label>
-          <label class="toggle-row">
-            <span class="toggle">
-              <input type="checkbox" id="cfg-step-mode" checked>
-              <span class="toggle-track"></span>
-            </span>
-            <span class="toggle-hint">Pause before each merge/reject</span>
-          </label>
-        </div>
+                    <!-- Step Mode -->
+                    <div class="control-group">
+                        <label class="control-label">
+                            Step Mode
+                            <span class="control-value" id="val-step-mode"
+                                >On</span
+                            >
+                        </label>
+                        <label class="toggle-row">
+                            <span class="toggle">
+                                <input
+                                    type="checkbox"
+                                    id="cfg-step-mode"
+                                    checked
+                                />
+                                <span class="toggle-track"></span>
+                            </span>
+                            <span class="toggle-hint"
+                                >Pause before each merge/reject</span
+                            >
+                        </label>
+                    </div>
 
-        <!-- Presets -->
-        <div class="control-group presets-group">
-          <label class="control-label">Presets</label>
-          <div class="presets">
-            <button class="preset-btn" data-preset="mostly-green">Mostly Green</button>
-            <button class="preset-btn" data-preset="flaky-ci">Flaky CI</button>
-            <button class="preset-btn" data-preset="disaster">Disaster Mode</button>
-            <button class="preset-btn" data-preset="fast-and-furious">Fast &amp; Furious</button>
-          </div>
-        </div>
+                    <!-- Presets -->
+                    <div class="control-group presets-group">
+                        <label class="control-label">Presets</label>
+                        <div class="presets">
+                            <button
+                                class="preset-btn"
+                                data-preset="mostly-green"
+                            >
+                                Mostly Green
+                            </button>
+                            <button class="preset-btn" data-preset="flaky-ci">
+                                Flaky CI
+                            </button>
+                            <button class="preset-btn" data-preset="disaster">
+                                Disaster Mode
+                            </button>
+                            <button
+                                class="preset-btn"
+                                data-preset="fast-and-furious"
+                            >
+                                Fast &amp; Furious
+                            </button>
+                        </div>
+                    </div>
 
-        <hr class="sidebar-divider">
+                    <hr class="sidebar-divider" />
 
-        <!-- Batch Size Analysis -->
-        <div class="control-group">
-          <label class="control-label">Batch Size Analysis</label>
-          <div class="optimal-chart-wrap">
-            <canvas id="optimal-chart" height="150"></canvas>
-            <div id="optimal-chart-tooltip" class="optimal-chart-tooltip" hidden></div>
-            <div class="optimal-chart-legend">
-              <span class="optimal-legend-item optimal-legend-throughput">Throughput</span>
-              <span class="optimal-legend-item optimal-legend-cost">Est. Cost</span>
-            </div>
-            <p class="optimal-chart-desc"><strong>Throughput</strong> is the expected merges per cycle before a failure. <strong>Est. Cost</strong> is CI runs per merged commit, a trend line showing how waste scales with batch size. Click to set batch size.</p>
-          </div>
-        </div>
-      </div>
-      <div class="sidebar-footer">
-        <button class="sidebar-help-btn" id="btn-glossary">
-          <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor">
-            <path d="M0 1.75A.75.75 0 0 1 .75 1h4.253c1.227 0 2.317.59 3 1.501A3.744 3.744 0 0 1 11.006 1h4.245a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-.75.75h-4.507a2.25 2.25 0 0 0-1.591.659l-.622.621a.75.75 0 0 1-1.06 0l-.622-.621A2.25 2.25 0 0 0 5.258 13H.75a.75.75 0 0 1-.75-.75Zm7.251 10.324.004-5.073-.002-2.253A2.25 2.25 0 0 0 5.003 2.5H1.5v9h3.757a3.75 3.75 0 0 1 1.994.574ZM8.755 4.75l-.004 7.322a3.752 3.752 0 0 1 1.992-.572H14.5v-9h-3.495a2.25 2.25 0 0 0-2.25 2.25Z"/>
-          </svg>
-          Glossary
-        </button>
-        <button class="sidebar-help-btn" id="btn-help">
-          <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor">
-            <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.92 6.085h.001a.749.749 0 1 1-1.342-.67c.169-.339.516-.644.932-.839.418-.197.9-.295 1.388-.222.49.074.909.318 1.205.66.296.343.456.77.42 1.235-.046.596-.378.933-.693 1.157-.315.224-.615.35-.86.458l-.004.002c-.26.115-.47.208-.615.368-.145.16-.24.405-.24.782v.156a.75.75 0 0 1-1.5 0v-.156c0-.624.157-1.1.46-1.432.3-.327.677-.514.952-.633l.035-.015c.259-.113.46-.201.638-.338.175-.134.262-.267.278-.453a.685.685 0 0 0-.148-.426.554.554 0 0 0-.382-.213.818.818 0 0 0-.603.098c-.21.098-.376.265-.447.398Zm1.33 6.165a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
-          </svg>
-          Help &amp; Tour
-        </button>
-        <div class="sidebar-footer-links">
-          <a class="sidebar-link" href="https://github.com/ZackarySantana/please-merge" target="_blank" rel="noopener noreferrer" title="View on GitHub">
-            <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor">
-              <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38
+                    <!-- Batch Size Analysis -->
+                    <div class="control-group">
+                        <label class="control-label">Batch Size Analysis</label>
+                        <div class="optimal-chart-wrap">
+                            <canvas id="optimal-chart" height="150"></canvas>
+                            <div
+                                id="optimal-chart-tooltip"
+                                class="optimal-chart-tooltip"
+                                hidden
+                            ></div>
+                            <div class="optimal-chart-legend">
+                                <span
+                                    class="optimal-legend-item optimal-legend-throughput"
+                                    >Throughput</span
+                                >
+                                <span
+                                    class="optimal-legend-item optimal-legend-cost"
+                                    >Est. Cost</span
+                                >
+                            </div>
+                            <p class="optimal-chart-desc">
+                                <strong>Throughput</strong> is the expected
+                                merges per cycle before a failure.
+                                <strong>Est. Cost</strong> is CI runs per merged
+                                commit, a trend line showing how waste scales
+                                with batch size. Click to set batch size.
+                            </p>
+                            <div
+                                class="optimal-chart-estimates"
+                                id="optimal-chart-estimates"
+                            >
+                                <div class="optimal-estimate-row">
+                                    <span class="optimal-estimate-label"
+                                        >Wall Clock</span
+                                    >
+                                    <span
+                                        class="optimal-estimate-value"
+                                        id="est-wall-clock"
+                                        >--</span
+                                    >
+                                </div>
+                                <div class="optimal-estimate-row">
+                                    <span class="optimal-estimate-label"
+                                        >Est. Cost</span
+                                    >
+                                    <span
+                                        class="optimal-estimate-value"
+                                        id="est-cost"
+                                        >--</span
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-footer">
+                    <button class="sidebar-help-btn" id="btn-glossary">
+                        <svg
+                            viewBox="0 0 16 16"
+                            width="14"
+                            height="14"
+                            fill="currentColor"
+                        >
+                            <path
+                                d="M0 1.75A.75.75 0 0 1 .75 1h4.253c1.227 0 2.317.59 3 1.501A3.744 3.744 0 0 1 11.006 1h4.245a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-.75.75h-4.507a2.25 2.25 0 0 0-1.591.659l-.622.621a.75.75 0 0 1-1.06 0l-.622-.621A2.25 2.25 0 0 0 5.258 13H.75a.75.75 0 0 1-.75-.75Zm7.251 10.324.004-5.073-.002-2.253A2.25 2.25 0 0 0 5.003 2.5H1.5v9h3.757a3.75 3.75 0 0 1 1.994.574ZM8.755 4.75l-.004 7.322a3.752 3.752 0 0 1 1.992-.572H14.5v-9h-3.495a2.25 2.25 0 0 0-2.25 2.25Z"
+                            />
+                        </svg>
+                        Glossary
+                    </button>
+                    <button class="sidebar-help-btn" id="btn-help">
+                        <svg
+                            viewBox="0 0 16 16"
+                            width="14"
+                            height="14"
+                            fill="currentColor"
+                        >
+                            <path
+                                d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.92 6.085h.001a.749.749 0 1 1-1.342-.67c.169-.339.516-.644.932-.839.418-.197.9-.295 1.388-.222.49.074.909.318 1.205.66.296.343.456.77.42 1.235-.046.596-.378.933-.693 1.157-.315.224-.615.35-.86.458l-.004.002c-.26.115-.47.208-.615.368-.145.16-.24.405-.24.782v.156a.75.75 0 0 1-1.5 0v-.156c0-.624.157-1.1.46-1.432.3-.327.677-.514.952-.633l.035-.015c.259-.113.46-.201.638-.338.175-.134.262-.267.278-.453a.685.685 0 0 0-.148-.426.554.554 0 0 0-.382-.213.818.818 0 0 0-.603.098c-.21.098-.376.265-.447.398Zm1.33 6.165a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+                            />
+                        </svg>
+                        Help &amp; Tour
+                    </button>
+                    <div class="sidebar-footer-links">
+                        <a
+                            class="sidebar-link"
+                            href="https://github.com/ZackarySantana/please-merge"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="View on GitHub"
+                        >
+                            <svg
+                                viewBox="0 0 16 16"
+                                width="18"
+                                height="18"
+                                fill="currentColor"
+                            >
+                                <path
+                                    d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38
                 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95
                 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27
                 -.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82
                 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66
                 0 0-.42-.77-1.22-.8 0 0-.78-.01-.05.48 0 0 .53.25.89 1.17 0 0 .46 1.49 2.69.98
-                .01.72.02 1.4.02 1.61 0 .21-.15.46-.55.38A8.013 8.013 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/>
-            </svg>
-          </a>
-          <a class="sponsor-btn" href="https://github.com/sponsors/ZackarySantana" target="_blank" rel="noopener noreferrer">
-            <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor">
-              <path d="m8 14.25.345.666a.75.75 0 0 1-.69 0l-.008-.004-.018-.01a7.152 7.152 0 0 1-.31-.17 22.055 22.055 0 0 1-3.434-2.414C2.045 10.731 0 8.35 0 5.5 0 2.836 2.086 1 4.25 1 5.797 1 7.153 1.802 8 3.02 8.847 1.802 10.203 1 11.75 1 13.914 1 16 2.836 16 5.5c0 2.85-2.045 5.231-3.885 6.818a22.066 22.066 0 0 1-3.744 2.584l-.018.01-.006.003h-.002ZM4.25 2.5c-1.336 0-2.75 1.164-2.75 3 0 2.15 1.58 4.144 3.365 5.682A20.58 20.58 0 0 0 8 13.393a20.58 20.58 0 0 0 3.135-2.211C12.92 9.644 14.5 7.65 14.5 5.5c0-1.836-1.414-3-2.75-3-1.373 0-2.609.986-3.029 2.456a.749.749 0 0 1-1.442 0C6.859 3.486 5.623 2.5 4.25 2.5Z"/>
-            </svg>
-            Sponsor
-          </a>
+                .01.72.02 1.4.02 1.61 0 .21-.15.46-.55.38A8.013 8.013 0 0 1 0 8c0-4.42 3.58-8 8-8Z"
+                                />
+                            </svg>
+                        </a>
+                        <a
+                            class="sponsor-btn"
+                            href="https://github.com/sponsors/ZackarySantana"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            <svg
+                                viewBox="0 0 16 16"
+                                width="14"
+                                height="14"
+                                fill="currentColor"
+                            >
+                                <path
+                                    d="m8 14.25.345.666a.75.75 0 0 1-.69 0l-.008-.004-.018-.01a7.152 7.152 0 0 1-.31-.17 22.055 22.055 0 0 1-3.434-2.414C2.045 10.731 0 8.35 0 5.5 0 2.836 2.086 1 4.25 1 5.797 1 7.153 1.802 8 3.02 8.847 1.802 10.203 1 11.75 1 13.914 1 16 2.836 16 5.5c0 2.85-2.045 5.231-3.885 6.818a22.066 22.066 0 0 1-3.744 2.584l-.018.01-.006.003h-.002ZM4.25 2.5c-1.336 0-2.75 1.164-2.75 3 0 2.15 1.58 4.144 3.365 5.682A20.58 20.58 0 0 0 8 13.393a20.58 20.58 0 0 0 3.135-2.211C12.92 9.644 14.5 7.65 14.5 5.5c0-1.836-1.414-3-2.75-3-1.373 0-2.609.986-3.029 2.456a.749.749 0 0 1-1.442 0C6.859 3.486 5.623 2.5 4.25 2.5Z"
+                                />
+                            </svg>
+                            Sponsor
+                        </a>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- ─── Main Area ─── -->
+            <main class="main">
+                <!-- Top bar -->
+                <header class="topbar">
+                    <div class="topbar-left">
+                        <h1 class="topbar-title">Merge Queue Simulator</h1>
+                    </div>
+                    <div class="topbar-center">
+                        <button id="btn-start" class="btn btn-primary">
+                            <span class="btn-icon">▶</span> Start
+                        </button>
+                        <button
+                            id="btn-pause"
+                            class="btn btn-secondary"
+                            disabled
+                        >
+                            <span class="btn-icon">⏸</span> Pause
+                        </button>
+                        <button id="btn-reset" class="btn btn-ghost">
+                            <span class="btn-icon">↺</span> Reset
+                        </button>
+                        <button
+                            id="btn-instant"
+                            class="btn btn-ghost"
+                            title="Run the entire simulation instantly"
+                        >
+                            <span class="btn-icon">⚡</span> Instant
+                        </button>
+                    </div>
+                    <div class="topbar-right">
+                        <div
+                            class="stat stat--compact-hide"
+                            title="Commits still waiting in the merge queue to be processed."
+                        >
+                            <span class="stat-label">Queue</span>
+                            <span class="stat-value stat-queue" id="stat-queue"
+                                >100</span
+                            >
+                        </div>
+                        <div
+                            class="stat stat--compact-hide"
+                            title="Commits that passed CI and were successfully merged into main."
+                        >
+                            <span class="stat-label">Merged</span>
+                            <span
+                                class="stat-value stat-merged"
+                                id="stat-merged"
+                                >0</span
+                            >
+                        </div>
+                        <div
+                            class="stat stat--compact-hide"
+                            title="Commits that failed CI and were rejected from the queue."
+                        >
+                            <span class="stat-label">Rejected</span>
+                            <span
+                                class="stat-value stat-rejected"
+                                id="stat-rejected"
+                                >0</span
+                            >
+                        </div>
+                        <div
+                            class="stat stat--compact-hide"
+                            title="Total duplicate CI runs caused by failures forcing the active window to restart."
+                        >
+                            <span class="stat-label">Reruns</span>
+                            <span
+                                class="stat-value stat-reruns"
+                                id="stat-reruns"
+                                >0</span
+                            >
+                        </div>
+                        <div class="stat-divider stat--compact-hide"></div>
+                        <div
+                            class="stat stat--narrow-hide"
+                            title="CI time spent on commits that were successfully merged."
+                        >
+                            <span class="stat-label">Useful CI</span>
+                            <span
+                                class="stat-value stat-ci-useful"
+                                id="stat-ci-useful"
+                                >0 s</span
+                            >
+                        </div>
+                        <div
+                            class="stat stat--narrow-hide"
+                            title="CI time wasted on failed commits and restarted runs that were thrown away."
+                        >
+                            <span class="stat-label">Wasted CI</span>
+                            <span
+                                class="stat-value stat-ci-wasted"
+                                id="stat-ci-wasted"
+                                >0 s</span
+                            >
+                        </div>
+                        <div
+                            class="stat stat--narrow-hide"
+                            title="Ratio of wasted CI time to useful CI time. Lower is better."
+                        >
+                            <span class="stat-label">Waste %</span>
+                            <span
+                                class="stat-value stat-ci-ratio"
+                                id="stat-ci-ratio"
+                                >—</span
+                            >
+                        </div>
+                        <div class="stat-divider stat--narrow-hide"></div>
+                        <div
+                            class="stat"
+                            title="Total simulated wall-clock time elapsed since the simulation started."
+                        >
+                            <span class="stat-label">Wall Clock</span>
+                            <span
+                                class="stat-value stat-wall-clock"
+                                id="stat-wall-clock"
+                                >0 s</span
+                            >
+                        </div>
+                        <div
+                            class="stat"
+                            title="Time saved by batching CI runs in parallel vs. running every commit one at a time."
+                        >
+                            <span class="stat-label">Time Saved</span>
+                            <span
+                                class="stat-value stat-time-saved"
+                                id="stat-time-saved"
+                                >0 s</span
+                            >
+                        </div>
+                        <div class="stat-divider"></div>
+                        <button
+                            class="summary-trigger-btn"
+                            id="btn-summary"
+                            title="Show simulation summary"
+                        >
+                            Summary
+                        </button>
+                    </div>
+                </header>
+
+                <!-- Lanes -->
+                <div class="lanes">
+                    <!-- Queue Lane -->
+                    <section class="lane">
+                        <div class="lane-header lane-header--queue">
+                            <span class="lane-title">Queue</span>
+                            <span class="lane-count" id="count-queue">100</span>
+                        </div>
+                        <div class="lane-body" id="lane-queue"></div>
+                    </section>
+
+                    <!-- Rejected Lane -->
+                    <section class="lane">
+                        <div class="lane-header lane-header--rejected">
+                            <span class="lane-title">Rejected</span>
+                            <span class="lane-header-stats">
+                                <span class="lane-count" id="count-rejected"
+                                    >0</span
+                                >
+                                <span
+                                    class="lane-pct lane-pct--rejected"
+                                    id="pct-rejected"
+                                ></span>
+                            </span>
+                        </div>
+                        <div class="lane-body" id="lane-rejected"></div>
+                    </section>
+
+                    <!-- Merged Lane -->
+                    <section class="lane">
+                        <div class="lane-header lane-header--merged">
+                            <span class="lane-title">Merged</span>
+                            <span class="lane-header-stats">
+                                <span class="lane-count" id="count-merged"
+                                    >0</span
+                                >
+                                <span
+                                    class="lane-pct lane-pct--merged"
+                                    id="pct-merged"
+                                ></span>
+                            </span>
+                        </div>
+                        <div class="lane-body" id="lane-merged"></div>
+                    </section>
+                </div>
+
+                <!-- Summary Overlay -->
+                <div class="summary-overlay" id="summary-overlay" hidden>
+                    <div class="summary-card">
+                        <div class="summary-header">
+                            <h2 class="summary-title" id="summary-title">
+                                Simulation Complete
+                            </h2>
+                            <button class="summary-close" id="summary-close">
+                                ✕
+                            </button>
+                        </div>
+
+                        <div class="summary-body">
+                            <div class="summary-grid">
+                                <div class="summary-stat summary-stat--blue">
+                                    <span
+                                        class="summary-stat-value"
+                                        id="sum-hero-wall-clock"
+                                        >0 s</span
+                                    >
+                                    <span class="summary-stat-label"
+                                        >Wall Clock</span
+                                    >
+                                </div>
+                                <div class="summary-stat summary-stat--blue">
+                                    <span
+                                        class="summary-stat-value"
+                                        id="sum-hero-time-saved"
+                                        >0 s</span
+                                    >
+                                    <span class="summary-stat-label"
+                                        >Time Saved</span
+                                    >
+                                </div>
+                                <div class="summary-stat summary-stat--yellow">
+                                    <span
+                                        class="summary-stat-value"
+                                        id="sum-hero-waste-ratio"
+                                        >—</span
+                                    >
+                                    <span class="summary-stat-label"
+                                        >Waste %</span
+                                    >
+                                </div>
+                                <div
+                                    class="summary-stat summary-stat--rejected"
+                                >
+                                    <span
+                                        class="summary-stat-value"
+                                        id="sum-hero-wasted-ci"
+                                        >0 s</span
+                                    >
+                                    <span class="summary-stat-label"
+                                        >Wasted CI</span
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- Comparison column header (hidden when no previous run) -->
+                            <div
+                                class="summary-col-header"
+                                id="summary-col-header"
+                                hidden
+                            >
+                                <span class="summary-col-label"></span>
+                                <span class="summary-col-label">Prev</span>
+                                <span class="summary-col-label">Current</span>
+                                <span class="summary-col-label">Diff</span>
+                            </div>
+
+                            <div class="summary-divider"></div>
+
+                            <div class="summary-rows">
+                                <div class="summary-row">
+                                    <span class="summary-row-label"
+                                        >Batch Size</span
+                                    >
+                                    <span
+                                        class="summary-row-prev"
+                                        id="sum-batch-prev"
+                                    ></span>
+                                    <span
+                                        class="summary-row-value"
+                                        id="sum-batch"
+                                        >—</span
+                                    >
+                                    <span
+                                        class="summary-row-diff"
+                                        id="sum-batch-diff"
+                                    ></span>
+                                </div>
+                                <div class="summary-row">
+                                    <span class="summary-row-label"
+                                        >Processed</span
+                                    >
+                                    <span
+                                        class="summary-row-prev"
+                                        id="sum-processed-prev"
+                                    ></span>
+                                    <span
+                                        class="summary-row-value"
+                                        id="sum-processed"
+                                        >0</span
+                                    >
+                                    <span
+                                        class="summary-row-diff"
+                                        id="sum-processed-diff"
+                                    ></span>
+                                </div>
+                                <div class="summary-row">
+                                    <span class="summary-row-label"
+                                        >Merged</span
+                                    >
+                                    <span
+                                        class="summary-row-prev"
+                                        id="sum-merged-cmp-prev"
+                                    ></span>
+                                    <span
+                                        class="summary-row-value summary-row-value--green"
+                                        id="sum-merged-cmp"
+                                        >0</span
+                                    >
+                                    <span
+                                        class="summary-row-diff"
+                                        id="sum-merged-cmp-diff"
+                                    ></span>
+                                </div>
+                                <div class="summary-row">
+                                    <span class="summary-row-label"
+                                        >Rejected</span
+                                    >
+                                    <span
+                                        class="summary-row-prev"
+                                        id="sum-rejected-cmp-prev"
+                                    ></span>
+                                    <span
+                                        class="summary-row-value summary-row-value--red"
+                                        id="sum-rejected-cmp"
+                                        >0</span
+                                    >
+                                    <span
+                                        class="summary-row-diff"
+                                        id="sum-rejected-cmp-diff"
+                                    ></span>
+                                </div>
+                            </div>
+
+                            <div class="summary-divider"></div>
+
+                            <div class="summary-rows">
+                                <div class="summary-row">
+                                    <span class="summary-row-label"
+                                        >Wall Clock Time</span
+                                    >
+                                    <span
+                                        class="summary-row-prev"
+                                        id="sum-wall-clock-prev"
+                                    ></span>
+                                    <span
+                                        class="summary-row-value"
+                                        id="sum-wall-clock"
+                                        >—</span
+                                    >
+                                    <span
+                                        class="summary-row-diff"
+                                        id="sum-wall-clock-diff"
+                                    ></span>
+                                </div>
+                                <div class="summary-row">
+                                    <span class="summary-row-label"
+                                        >Sequential Baseline</span
+                                    >
+                                    <span
+                                        class="summary-row-prev"
+                                        id="sum-sequential-prev"
+                                    ></span>
+                                    <span
+                                        class="summary-row-value"
+                                        id="sum-sequential"
+                                        >—</span
+                                    >
+                                    <span
+                                        class="summary-row-diff"
+                                        id="sum-sequential-diff"
+                                    ></span>
+                                </div>
+                                <div class="summary-row summary-row--highlight">
+                                    <span class="summary-row-label"
+                                        >Time Saved</span
+                                    >
+                                    <span
+                                        class="summary-row-prev"
+                                        id="sum-time-saved-prev"
+                                    ></span>
+                                    <span
+                                        class="summary-row-value"
+                                        id="sum-time-saved"
+                                        >—</span
+                                    >
+                                    <span
+                                        class="summary-row-diff"
+                                        id="sum-time-saved-diff"
+                                    ></span>
+                                </div>
+                            </div>
+
+                            <div class="summary-divider"></div>
+
+                            <div class="summary-rows">
+                                <div class="summary-row">
+                                    <span class="summary-row-label"
+                                        >Useful CI Time</span
+                                    >
+                                    <span
+                                        class="summary-row-prev"
+                                        id="sum-useful-ci-prev"
+                                    ></span>
+                                    <span
+                                        class="summary-row-value summary-row-value--green"
+                                        id="sum-useful-ci"
+                                        >—</span
+                                    >
+                                    <span
+                                        class="summary-row-diff"
+                                        id="sum-useful-ci-diff"
+                                    ></span>
+                                </div>
+                                <div class="summary-row">
+                                    <span class="summary-row-label"
+                                        >Wasted CI Time</span
+                                    >
+                                    <span
+                                        class="summary-row-prev"
+                                        id="sum-wasted-ci-prev"
+                                    ></span>
+                                    <span
+                                        class="summary-row-value summary-row-value--red"
+                                        id="sum-wasted-ci"
+                                        >—</span
+                                    >
+                                    <span
+                                        class="summary-row-diff"
+                                        id="sum-wasted-ci-diff"
+                                    ></span>
+                                </div>
+                                <div class="summary-row">
+                                    <span class="summary-row-label"
+                                        >Waste Ratio</span
+                                    >
+                                    <span
+                                        class="summary-row-prev"
+                                        id="sum-waste-ratio-prev"
+                                    ></span>
+                                    <span
+                                        class="summary-row-value"
+                                        id="sum-waste-ratio"
+                                        >—</span
+                                    >
+                                    <span
+                                        class="summary-row-diff"
+                                        id="sum-waste-ratio-diff"
+                                    ></span>
+                                </div>
+                            </div>
+
+                            <div class="summary-divider"></div>
+
+                            <div class="summary-cost-section">
+                                <div class="cost-panel-input-row">
+                                    <label
+                                        class="cost-panel-input-label"
+                                        for="sum-cost-rate"
+                                        >Rate</label
+                                    >
+                                    <div class="cost-panel-input-wrap">
+                                        <span class="cost-panel-input-prefix"
+                                            >$</span
+                                        >
+                                        <input
+                                            type="number"
+                                            id="sum-cost-rate"
+                                            class="cost-panel-input"
+                                            value="0.008"
+                                            step="0.001"
+                                            min="0"
+                                        />
+                                        <span class="cost-panel-input-suffix"
+                                            >/ min</span
+                                        >
+                                    </div>
+                                </div>
+                                <div class="cost-panel-input-row">
+                                    <label
+                                        class="cost-panel-input-label"
+                                        for="sum-cost-runners"
+                                        title="Number of parallel runners per CI run."
+                                        >Runners</label
+                                    >
+                                    <div class="cost-panel-input-wrap">
+                                        <span
+                                            class="cost-panel-input-prefix cost-panel-input-prefix--muted"
+                                            >×</span
+                                        >
+                                        <input
+                                            type="number"
+                                            id="sum-cost-runners"
+                                            class="cost-panel-input"
+                                            value="25"
+                                            step="1"
+                                            min="1"
+                                        />
+                                        <span class="cost-panel-input-suffix"
+                                            >per run</span
+                                        >
+                                    </div>
+                                </div>
+                                <div class="cost-panel-computed">
+                                    <div class="cost-panel-computed-row">
+                                        <span class="cost-panel-computed-label"
+                                            >Machine time per run</span
+                                        >
+                                        <span
+                                            class="cost-panel-computed-value"
+                                            id="sum-cost-machine-time"
+                                            >375 min</span
+                                        >
+                                    </div>
+                                    <div class="cost-panel-computed-row">
+                                        <span class="cost-panel-computed-label"
+                                            >Cost per run</span
+                                        >
+                                        <span
+                                            class="cost-panel-computed-value"
+                                            id="sum-cost-per-run"
+                                            >$3.00</span
+                                        >
+                                    </div>
+                                </div>
+                                <div class="cost-panel-hint">
+                                    Rate is per runner-minute. GitHub Actions
+                                    Linux runners cost ~$0.008/min. Runners =
+                                    how many parallel jobs each CI run fans out
+                                    to (e.g. lint, test, build).
+                                </div>
+                            </div>
+
+                            <div class="summary-divider"></div>
+
+                            <div class="summary-rows">
+                                <div class="summary-row">
+                                    <span class="summary-row-label"
+                                        >Estimated Total Cost</span
+                                    >
+                                    <span
+                                        class="summary-row-prev"
+                                        id="sum-total-cost-prev"
+                                    ></span>
+                                    <span
+                                        class="summary-row-value"
+                                        id="sum-total-cost"
+                                        >—</span
+                                    >
+                                    <span
+                                        class="summary-row-diff"
+                                        id="sum-total-cost-diff"
+                                    ></span>
+                                </div>
+                                <div class="summary-row">
+                                    <span class="summary-row-label"
+                                        >Estimated Wasted Cost</span
+                                    >
+                                    <span
+                                        class="summary-row-prev"
+                                        id="sum-wasted-cost-prev"
+                                    ></span>
+                                    <span
+                                        class="summary-row-value summary-row-value--red"
+                                        id="sum-wasted-cost"
+                                        >—</span
+                                    >
+                                    <span
+                                        class="summary-row-diff"
+                                        id="sum-wasted-cost-diff"
+                                    ></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="summary-footer">
+                            <button class="btn btn-primary" id="summary-start">
+                                <span class="btn-icon">▶</span> Start
+                            </button>
+                            <button
+                                class="btn btn-secondary"
+                                id="summary-pause"
+                                disabled
+                            >
+                                <span class="btn-icon">⏸</span> Pause
+                            </button>
+                            <button class="btn btn-ghost" id="summary-reset">
+                                <span class="btn-icon">↺</span> Reset
+                            </button>
+                            <button
+                                class="btn btn-ghost"
+                                id="summary-instant"
+                                title="Reset and run instantly"
+                            >
+                                <span class="btn-icon">⚡</span> Instant
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Glossary Overlay -->
+                <div class="glossary-overlay" id="glossary-overlay" hidden>
+                    <div class="glossary-dialog">
+                        <div class="glossary-header">
+                            <h2 class="glossary-title">Glossary</h2>
+                            <button class="glossary-close" id="glossary-close">
+                                &#10005;
+                            </button>
+                        </div>
+                        <div class="glossary-body">
+                            <h3 class="glossary-section">Terms</h3>
+
+                            <div class="glossary-entry">
+                                <dt class="glossary-term">Merge Queue</dt>
+                                <dd class="glossary-def">
+                                    A FIFO queue of commits waiting to be
+                                    validated by CI and merged into the main
+                                    branch. Commits are processed in order from
+                                    the HEAD.
+                                </dd>
+                            </div>
+                            <div class="glossary-entry">
+                                <dt class="glossary-term">
+                                    Batch / Active Window
+                                </dt>
+                                <dd class="glossary-def">
+                                    The group of commits at the front of the
+                                    queue that run CI in parallel. Controlled by
+                                    the "Batch Size" slider.
+                                </dd>
+                            </div>
+                            <div class="glossary-entry">
+                                <dt class="glossary-term">HEAD</dt>
+                                <dd class="glossary-def">
+                                    The first (oldest) commit in the queue. Only
+                                    the HEAD commit can be merged or rejected.
+                                    All evaluation starts here.
+                                </dd>
+                            </div>
+                            <div class="glossary-entry">
+                                <dt class="glossary-term">
+                                    CI (Continuous Integration)
+                                </dt>
+                                <dd class="glossary-def">
+                                    The automated test/build process each commit
+                                    goes through. Duration and outcome are
+                                    randomized in the simulator based on your
+                                    configuration.
+                                </dd>
+                            </div>
+                            <div class="glossary-entry">
+                                <dt class="glossary-term">Rebase / Restart</dt>
+                                <dd class="glossary-def">
+                                    When a commit ahead of you fails, your CI
+                                    results are invalidated and must be re-run
+                                    from scratch. This is the primary source of
+                                    wasted CI time.
+                                </dd>
+                            </div>
+                            <div class="glossary-entry">
+                                <dt class="glossary-term">
+                                    Speculative Execution
+                                </dt>
+                                <dd class="glossary-def">
+                                    Running CI on multiple commits
+                                    simultaneously, betting they will all pass.
+                                    If one fails, the work done on later commits
+                                    is wasted.
+                                </dd>
+                            </div>
+                            <div class="glossary-entry">
+                                <dt class="glossary-term">Wall Clock Time</dt>
+                                <dd class="glossary-def">
+                                    Total simulated time elapsed from start to
+                                    finish. Batching reduces this compared to
+                                    running commits one at a time.
+                                </dd>
+                            </div>
+                            <div class="glossary-entry">
+                                <dt class="glossary-term">
+                                    Useful CI / Wasted CI
+                                </dt>
+                                <dd class="glossary-def">
+                                    Useful CI is time spent on runs that led to
+                                    a successful merge. Wasted CI is time spent
+                                    on runs that were thrown away due to
+                                    failures or restarts.
+                                </dd>
+                            </div>
+                            <div class="glossary-entry">
+                                <dt class="glossary-term">Reruns</dt>
+                                <dd class="glossary-def">
+                                    The number of duplicate CI runs caused by
+                                    failures forcing the active window to
+                                    restart. Each rerun adds to wasted CI time.
+                                </dd>
+                            </div>
+                            <div class="glossary-entry">
+                                <dt class="glossary-term">Waste %</dt>
+                                <dd class="glossary-def">
+                                    The ratio of wasted CI time to useful CI
+                                    time. Lower is better. A high waste
+                                    percentage suggests the batch size may be
+                                    too large for the success rate.
+                                </dd>
+                            </div>
+                            <div class="glossary-entry">
+                                <dt class="glossary-term">
+                                    Optimal Batch Size
+                                </dt>
+                                <dd class="glossary-def">
+                                    Calculated as 1/(1-p) where p is the CI
+                                    success rate. This is the expected number of
+                                    commits before a failure, balancing
+                                    parallelism with waste risk.
+                                </dd>
+                            </div>
+
+                            <h3 class="glossary-section">Scenarios</h3>
+
+                            <div class="glossary-entry">
+                                <dt class="glossary-term">
+                                    HEAD commit succeeds
+                                </dt>
+                                <dd class="glossary-def">
+                                    The commit is merged into main and removed
+                                    from the queue. The next commit becomes the
+                                    new HEAD.
+                                </dd>
+                            </div>
+                            <div class="glossary-entry">
+                                <dt class="glossary-term">
+                                    Consecutive successes at HEAD
+                                </dt>
+                                <dd class="glossary-def">
+                                    Multiple commits at the front of the queue
+                                    that all passed CI are merged together in
+                                    one step. This is the best-case scenario for
+                                    throughput.
+                                </dd>
+                            </div>
+                            <div class="glossary-entry">
+                                <dt class="glossary-term">HEAD commit fails</dt>
+                                <dd class="glossary-def">
+                                    The commit is rejected and moved to the
+                                    Rejected lane. All remaining commits in the
+                                    active window have their CI restarted, since
+                                    their runs were based on the failed commit
+                                    being present.
+                                </dd>
+                            </div>
+                            <div class="glossary-entry">
+                                <dt class="glossary-term">
+                                    Mid-window failure
+                                </dt>
+                                <dd class="glossary-def">
+                                    A commit fails CI but is not yet at HEAD. It
+                                    waits in the queue showing its red status
+                                    until all commits before it are processed.
+                                    When it reaches HEAD, it is rejected.
+                                </dd>
+                            </div>
+                            <div class="glossary-entry">
+                                <dt class="glossary-term">
+                                    All commits in batch succeed
+                                </dt>
+                                <dd class="glossary-def">
+                                    The entire active window merges and the next
+                                    batch of commits from the queue begins CI.
+                                    This represents maximum efficiency with zero
+                                    waste.
+                                </dd>
+                            </div>
+                            <div class="glossary-entry">
+                                <dt class="glossary-term">Queue empty</dt>
+                                <dd class="glossary-def">
+                                    All commits have been processed (merged or
+                                    rejected). The simulation ends and the
+                                    summary is displayed.
+                                </dd>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step Mode Banner -->
+                <div class="step-banner" id="step-banner" hidden>
+                    <div class="step-banner-inner">
+                        <div class="step-banner-icon" id="step-banner-icon">
+                            ⏸
+                        </div>
+                        <div class="step-banner-text">
+                            <div
+                                class="step-banner-title"
+                                id="step-banner-title"
+                            >
+                                Evaluation paused
+                            </div>
+                            <div
+                                class="step-banner-desc"
+                                id="step-banner-desc"
+                            ></div>
+                        </div>
+                        <button
+                            class="btn btn-primary step-banner-btn"
+                            id="btn-step-continue"
+                        >
+                            Continue →
+                        </button>
+                    </div>
+                </div>
+            </main>
         </div>
-      </div>
-    </aside>
-
-    <!-- ─── Main Area ─── -->
-    <main class="main">
-      <!-- Top bar -->
-      <header class="topbar">
-        <div class="topbar-left">
-          <h1 class="topbar-title">Merge Queue Simulator</h1>
-        </div>
-        <div class="topbar-center">
-          <button id="btn-start" class="btn btn-primary">
-            <span class="btn-icon">▶</span> Start
-          </button>
-          <button id="btn-pause" class="btn btn-secondary" disabled>
-            <span class="btn-icon">⏸</span> Pause
-          </button>
-          <button id="btn-reset" class="btn btn-ghost">
-            <span class="btn-icon">↺</span> Reset
-          </button>
-          <button id="btn-instant" class="btn btn-ghost" title="Run the entire simulation instantly">
-            <span class="btn-icon">⚡</span> Instant
-          </button>
-        </div>
-        <div class="topbar-right">
-          <div class="stat stat--compact-hide" title="Commits still waiting in the merge queue to be processed.">
-            <span class="stat-label">Queue</span>
-            <span class="stat-value stat-queue" id="stat-queue">100</span>
-          </div>
-          <div class="stat stat--compact-hide" title="Commits that passed CI and were successfully merged into main.">
-            <span class="stat-label">Merged</span>
-            <span class="stat-value stat-merged" id="stat-merged">0</span>
-          </div>
-          <div class="stat stat--compact-hide" title="Commits that failed CI and were rejected from the queue.">
-            <span class="stat-label">Rejected</span>
-            <span class="stat-value stat-rejected" id="stat-rejected">0</span>
-          </div>
-          <div class="stat stat--compact-hide" title="Total duplicate CI runs caused by failures forcing the active window to restart.">
-            <span class="stat-label">Reruns</span>
-            <span class="stat-value stat-reruns" id="stat-reruns">0</span>
-          </div>
-          <div class="stat-divider stat--compact-hide"></div>
-          <div class="stat stat--narrow-hide" title="CI time spent on commits that were successfully merged.">
-            <span class="stat-label">Useful CI</span>
-            <span class="stat-value stat-ci-useful" id="stat-ci-useful">0 s</span>
-          </div>
-          <div class="stat stat--narrow-hide" title="CI time wasted on failed commits and restarted runs that were thrown away.">
-            <span class="stat-label">Wasted CI</span>
-            <span class="stat-value stat-ci-wasted" id="stat-ci-wasted">0 s</span>
-          </div>
-          <div class="stat stat--narrow-hide" title="Ratio of wasted CI time to useful CI time. Lower is better.">
-            <span class="stat-label">Waste %</span>
-            <span class="stat-value stat-ci-ratio" id="stat-ci-ratio">—</span>
-          </div>
-          <div class="stat-divider stat--narrow-hide"></div>
-          <div class="stat" title="Total simulated wall-clock time elapsed since the simulation started.">
-            <span class="stat-label">Wall Clock</span>
-            <span class="stat-value stat-wall-clock" id="stat-wall-clock">0 s</span>
-          </div>
-          <div class="stat" title="Time saved by batching CI runs in parallel vs. running every commit one at a time.">
-            <span class="stat-label">Time Saved</span>
-            <span class="stat-value stat-time-saved" id="stat-time-saved">0 s</span>
-          </div>
-          <div class="stat-divider"></div>
-          <button class="summary-trigger-btn" id="btn-summary" title="Show simulation summary">
-            Summary
-          </button>
-        </div>
-      </header>
-
-      <!-- Lanes -->
-      <div class="lanes">
-        <!-- Queue Lane -->
-        <section class="lane">
-          <div class="lane-header lane-header--queue">
-            <span class="lane-title">Queue</span>
-            <span class="lane-count" id="count-queue">100</span>
-          </div>
-          <div class="lane-body" id="lane-queue"></div>
-        </section>
-
-        <!-- Rejected Lane -->
-        <section class="lane">
-          <div class="lane-header lane-header--rejected">
-            <span class="lane-title">Rejected</span>
-            <span class="lane-header-stats">
-              <span class="lane-count" id="count-rejected">0</span>
-              <span class="lane-pct lane-pct--rejected" id="pct-rejected"></span>
-            </span>
-          </div>
-          <div class="lane-body" id="lane-rejected"></div>
-        </section>
-
-        <!-- Merged Lane -->
-        <section class="lane">
-          <div class="lane-header lane-header--merged">
-            <span class="lane-title">Merged</span>
-            <span class="lane-header-stats">
-              <span class="lane-count" id="count-merged">0</span>
-              <span class="lane-pct lane-pct--merged" id="pct-merged"></span>
-            </span>
-          </div>
-          <div class="lane-body" id="lane-merged"></div>
-        </section>
-      </div>
-
-      <!-- Summary Overlay -->
-      <div class="summary-overlay" id="summary-overlay" hidden>
-        <div class="summary-card">
-          <div class="summary-header">
-            <h2 class="summary-title" id="summary-title">Simulation Complete</h2>
-            <button class="summary-close" id="summary-close">✕</button>
-          </div>
-
-          <div class="summary-body">
-
-          <div class="summary-grid">
-            <div class="summary-stat summary-stat--blue">
-              <span class="summary-stat-value" id="sum-hero-wall-clock">0 s</span>
-              <span class="summary-stat-label">Wall Clock</span>
-            </div>
-            <div class="summary-stat summary-stat--blue">
-              <span class="summary-stat-value" id="sum-hero-time-saved">0 s</span>
-              <span class="summary-stat-label">Time Saved</span>
-            </div>
-            <div class="summary-stat summary-stat--yellow">
-              <span class="summary-stat-value" id="sum-hero-waste-ratio">—</span>
-              <span class="summary-stat-label">Waste %</span>
-            </div>
-            <div class="summary-stat summary-stat--rejected">
-              <span class="summary-stat-value" id="sum-hero-wasted-ci">0 s</span>
-              <span class="summary-stat-label">Wasted CI</span>
-            </div>
-          </div>
-
-          <!-- Comparison column header (hidden when no previous run) -->
-          <div class="summary-col-header" id="summary-col-header" hidden>
-            <span class="summary-col-label"></span>
-            <span class="summary-col-label">Prev</span>
-            <span class="summary-col-label">Current</span>
-            <span class="summary-col-label">Diff</span>
-          </div>
-
-          <div class="summary-divider"></div>
-
-          <div class="summary-rows">
-            <div class="summary-row">
-              <span class="summary-row-label">Batch Size</span>
-              <span class="summary-row-prev" id="sum-batch-prev"></span>
-              <span class="summary-row-value" id="sum-batch">—</span>
-              <span class="summary-row-diff" id="sum-batch-diff"></span>
-            </div>
-            <div class="summary-row">
-              <span class="summary-row-label">Processed</span>
-              <span class="summary-row-prev" id="sum-processed-prev"></span>
-              <span class="summary-row-value" id="sum-processed">0</span>
-              <span class="summary-row-diff" id="sum-processed-diff"></span>
-            </div>
-            <div class="summary-row">
-              <span class="summary-row-label">Merged</span>
-              <span class="summary-row-prev" id="sum-merged-cmp-prev"></span>
-              <span class="summary-row-value summary-row-value--green" id="sum-merged-cmp">0</span>
-              <span class="summary-row-diff" id="sum-merged-cmp-diff"></span>
-            </div>
-            <div class="summary-row">
-              <span class="summary-row-label">Rejected</span>
-              <span class="summary-row-prev" id="sum-rejected-cmp-prev"></span>
-              <span class="summary-row-value summary-row-value--red" id="sum-rejected-cmp">0</span>
-              <span class="summary-row-diff" id="sum-rejected-cmp-diff"></span>
-            </div>
-          </div>
-
-          <div class="summary-divider"></div>
-
-          <div class="summary-rows">
-            <div class="summary-row">
-              <span class="summary-row-label">Wall Clock Time</span>
-              <span class="summary-row-prev" id="sum-wall-clock-prev"></span>
-              <span class="summary-row-value" id="sum-wall-clock">—</span>
-              <span class="summary-row-diff" id="sum-wall-clock-diff"></span>
-            </div>
-            <div class="summary-row">
-              <span class="summary-row-label">Sequential Baseline</span>
-              <span class="summary-row-prev" id="sum-sequential-prev"></span>
-              <span class="summary-row-value" id="sum-sequential">—</span>
-              <span class="summary-row-diff" id="sum-sequential-diff"></span>
-            </div>
-            <div class="summary-row summary-row--highlight">
-              <span class="summary-row-label">Time Saved</span>
-              <span class="summary-row-prev" id="sum-time-saved-prev"></span>
-              <span class="summary-row-value" id="sum-time-saved">—</span>
-              <span class="summary-row-diff" id="sum-time-saved-diff"></span>
-            </div>
-          </div>
-
-          <div class="summary-divider"></div>
-
-          <div class="summary-rows">
-            <div class="summary-row">
-              <span class="summary-row-label">Useful CI Time</span>
-              <span class="summary-row-prev" id="sum-useful-ci-prev"></span>
-              <span class="summary-row-value summary-row-value--green" id="sum-useful-ci">—</span>
-              <span class="summary-row-diff" id="sum-useful-ci-diff"></span>
-            </div>
-            <div class="summary-row">
-              <span class="summary-row-label">Wasted CI Time</span>
-              <span class="summary-row-prev" id="sum-wasted-ci-prev"></span>
-              <span class="summary-row-value summary-row-value--red" id="sum-wasted-ci">—</span>
-              <span class="summary-row-diff" id="sum-wasted-ci-diff"></span>
-            </div>
-            <div class="summary-row">
-              <span class="summary-row-label">Waste Ratio</span>
-              <span class="summary-row-prev" id="sum-waste-ratio-prev"></span>
-              <span class="summary-row-value" id="sum-waste-ratio">—</span>
-              <span class="summary-row-diff" id="sum-waste-ratio-diff"></span>
-            </div>
-          </div>
-
-          <div class="summary-divider"></div>
-
-          <div class="summary-cost-section">
-            <div class="cost-panel-input-row">
-              <label class="cost-panel-input-label" for="sum-cost-rate">Rate</label>
-              <div class="cost-panel-input-wrap">
-                <span class="cost-panel-input-prefix">$</span>
-                <input type="number" id="sum-cost-rate" class="cost-panel-input" value="0.008" step="0.001" min="0">
-                <span class="cost-panel-input-suffix">/ min</span>
-              </div>
-            </div>
-            <div class="cost-panel-input-row">
-              <label class="cost-panel-input-label" for="sum-cost-runners" title="Number of parallel runners per CI run.">Runners</label>
-              <div class="cost-panel-input-wrap">
-                <span class="cost-panel-input-prefix cost-panel-input-prefix--muted">×</span>
-                <input type="number" id="sum-cost-runners" class="cost-panel-input" value="25" step="1" min="1">
-                <span class="cost-panel-input-suffix">per run</span>
-              </div>
-            </div>
-            <div class="cost-panel-computed">
-              <div class="cost-panel-computed-row">
-                <span class="cost-panel-computed-label">Machine time per run</span>
-                <span class="cost-panel-computed-value" id="sum-cost-machine-time">375 min</span>
-              </div>
-              <div class="cost-panel-computed-row">
-                <span class="cost-panel-computed-label">Cost per run</span>
-                <span class="cost-panel-computed-value" id="sum-cost-per-run">$3.00</span>
-              </div>
-            </div>
-            <div class="cost-panel-hint">
-              Rate is per runner-minute. GitHub Actions Linux runners cost ~$0.008/min.
-              Runners = how many parallel jobs each CI run fans out to (e.g. lint, test, build).
-            </div>
-          </div>
-
-          <div class="summary-divider"></div>
-
-          <div class="summary-rows">
-            <div class="summary-row">
-              <span class="summary-row-label">Estimated Total Cost</span>
-              <span class="summary-row-prev" id="sum-total-cost-prev"></span>
-              <span class="summary-row-value" id="sum-total-cost">—</span>
-              <span class="summary-row-diff" id="sum-total-cost-diff"></span>
-            </div>
-            <div class="summary-row">
-              <span class="summary-row-label">Estimated Wasted Cost</span>
-              <span class="summary-row-prev" id="sum-wasted-cost-prev"></span>
-              <span class="summary-row-value summary-row-value--red" id="sum-wasted-cost">—</span>
-              <span class="summary-row-diff" id="sum-wasted-cost-diff"></span>
-            </div>
-          </div>
-          </div>
-
-          <div class="summary-footer">
-            <button class="btn btn-primary" id="summary-start">
-              <span class="btn-icon">▶</span> Start
-            </button>
-            <button class="btn btn-secondary" id="summary-pause" disabled>
-              <span class="btn-icon">⏸</span> Pause
-            </button>
-            <button class="btn btn-ghost" id="summary-reset">
-              <span class="btn-icon">↺</span> Reset
-            </button>
-            <button class="btn btn-ghost" id="summary-instant" title="Reset and run instantly">
-              <span class="btn-icon">⚡</span> Instant
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Glossary Overlay -->
-      <div class="glossary-overlay" id="glossary-overlay" hidden>
-        <div class="glossary-dialog">
-          <div class="glossary-header">
-            <h2 class="glossary-title">Glossary</h2>
-            <button class="glossary-close" id="glossary-close">&#10005;</button>
-          </div>
-          <div class="glossary-body">
-
-            <h3 class="glossary-section">Terms</h3>
-
-            <div class="glossary-entry">
-              <dt class="glossary-term">Merge Queue</dt>
-              <dd class="glossary-def">A FIFO queue of commits waiting to be validated by CI and merged into the main branch. Commits are processed in order from the HEAD.</dd>
-            </div>
-            <div class="glossary-entry">
-              <dt class="glossary-term">Batch / Active Window</dt>
-              <dd class="glossary-def">The group of commits at the front of the queue that run CI in parallel. Controlled by the "Batch Size" slider.</dd>
-            </div>
-            <div class="glossary-entry">
-              <dt class="glossary-term">HEAD</dt>
-              <dd class="glossary-def">The first (oldest) commit in the queue. Only the HEAD commit can be merged or rejected. All evaluation starts here.</dd>
-            </div>
-            <div class="glossary-entry">
-              <dt class="glossary-term">CI (Continuous Integration)</dt>
-              <dd class="glossary-def">The automated test/build process each commit goes through. Duration and outcome are randomized in the simulator based on your configuration.</dd>
-            </div>
-            <div class="glossary-entry">
-              <dt class="glossary-term">Rebase / Restart</dt>
-              <dd class="glossary-def">When a commit ahead of you fails, your CI results are invalidated and must be re-run from scratch. This is the primary source of wasted CI time.</dd>
-            </div>
-            <div class="glossary-entry">
-              <dt class="glossary-term">Speculative Execution</dt>
-              <dd class="glossary-def">Running CI on multiple commits simultaneously, betting they will all pass. If one fails, the work done on later commits is wasted.</dd>
-            </div>
-            <div class="glossary-entry">
-              <dt class="glossary-term">Wall Clock Time</dt>
-              <dd class="glossary-def">Total simulated time elapsed from start to finish. Batching reduces this compared to running commits one at a time.</dd>
-            </div>
-            <div class="glossary-entry">
-              <dt class="glossary-term">Useful CI / Wasted CI</dt>
-              <dd class="glossary-def">Useful CI is time spent on runs that led to a successful merge. Wasted CI is time spent on runs that were thrown away due to failures or restarts.</dd>
-            </div>
-            <div class="glossary-entry">
-              <dt class="glossary-term">Reruns</dt>
-              <dd class="glossary-def">The number of duplicate CI runs caused by failures forcing the active window to restart. Each rerun adds to wasted CI time.</dd>
-            </div>
-            <div class="glossary-entry">
-              <dt class="glossary-term">Waste %</dt>
-              <dd class="glossary-def">The ratio of wasted CI time to useful CI time. Lower is better. A high waste percentage suggests the batch size may be too large for the success rate.</dd>
-            </div>
-            <div class="glossary-entry">
-              <dt class="glossary-term">Optimal Batch Size</dt>
-              <dd class="glossary-def">Calculated as 1/(1-p) where p is the CI success rate. This is the expected number of commits before a failure, balancing parallelism with waste risk.</dd>
-            </div>
-
-            <h3 class="glossary-section">Scenarios</h3>
-
-            <div class="glossary-entry">
-              <dt class="glossary-term">HEAD commit succeeds</dt>
-              <dd class="glossary-def">The commit is merged into main and removed from the queue. The next commit becomes the new HEAD.</dd>
-            </div>
-            <div class="glossary-entry">
-              <dt class="glossary-term">Consecutive successes at HEAD</dt>
-              <dd class="glossary-def">Multiple commits at the front of the queue that all passed CI are merged together in one step. This is the best-case scenario for throughput.</dd>
-            </div>
-            <div class="glossary-entry">
-              <dt class="glossary-term">HEAD commit fails</dt>
-              <dd class="glossary-def">The commit is rejected and moved to the Rejected lane. All remaining commits in the active window have their CI restarted, since their runs were based on the failed commit being present.</dd>
-            </div>
-            <div class="glossary-entry">
-              <dt class="glossary-term">Mid-window failure</dt>
-              <dd class="glossary-def">A commit fails CI but is not yet at HEAD. It waits in the queue showing its red status until all commits before it are processed. When it reaches HEAD, it is rejected.</dd>
-            </div>
-            <div class="glossary-entry">
-              <dt class="glossary-term">All commits in batch succeed</dt>
-              <dd class="glossary-def">The entire active window merges and the next batch of commits from the queue begins CI. This represents maximum efficiency with zero waste.</dd>
-            </div>
-            <div class="glossary-entry">
-              <dt class="glossary-term">Queue empty</dt>
-              <dd class="glossary-def">All commits have been processed (merged or rejected). The simulation ends and the summary is displayed.</dd>
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-      <!-- Step Mode Banner -->
-      <div class="step-banner" id="step-banner" hidden>
-        <div class="step-banner-inner">
-          <div class="step-banner-icon" id="step-banner-icon">⏸</div>
-          <div class="step-banner-text">
-            <div class="step-banner-title" id="step-banner-title">Evaluation paused</div>
-            <div class="step-banner-desc" id="step-banner-desc"></div>
-          </div>
-          <button class="btn btn-primary step-banner-btn" id="btn-step-continue">
-            Continue →
-          </button>
-        </div>
-      </div>
-    </main>
-  </div>
-  <!-- ─── Welcome Dialog ─── -->
-  <div class="welcome-overlay" id="welcome-overlay">
-    <div class="welcome-dialog">
-      <div class="welcome-steps" id="welcome-steps">
-
-        <!-- Step 1: Intro -->
-        <div class="welcome-step" data-step="0">
-          <div class="welcome-hero">
-            <svg viewBox="0 0 16 16" width="40" height="40" fill="currentColor" style="color:var(--blue)">
-              <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38
+        <!-- ─── Welcome Dialog ─── -->
+        <div class="welcome-overlay" id="welcome-overlay">
+            <div class="welcome-dialog">
+                <div class="welcome-steps" id="welcome-steps">
+                    <!-- Step 1: Intro -->
+                    <div class="welcome-step" data-step="0">
+                        <div class="welcome-hero">
+                            <svg
+                                viewBox="0 0 16 16"
+                                width="40"
+                                height="40"
+                                fill="currentColor"
+                                style="color: var(--blue)"
+                            >
+                                <path
+                                    d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38
                 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95
                 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27
                 -.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82
                 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66
                 0 0-.42-.77-1.22-.8 0 0-.78-.01-.05.48 0 0 .53.25.89 1.17 0 0 .46 1.49 2.69.98
-                .01.72.02 1.4.02 1.61 0 .21-.15.46-.55.38A8.013 8.013 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/>
-            </svg>
-            <h1 class="welcome-title">Merge Queue Simulator</h1>
-          </div>
-          <p class="welcome-text">
-            GitHub's <strong>merge queue</strong> batches pull requests and tests them together before merging into <code>main</code>.
-            This saves time by running CI in parallel, but when a commit fails, the entire batch restarts.
-          </p>
-          <p class="welcome-text welcome-text--muted">
-            This interactive simulator lets you experiment with different configurations and see how merge queue behavior
-            changes with varying CI success rates, batch sizes, and durations.
-          </p>
+                .01.72.02 1.4.02 1.61 0 .21-.15.46-.55.38A8.013 8.013 0 0 1 0 8c0-4.42 3.58-8 8-8Z"
+                                />
+                            </svg>
+                            <h1 class="welcome-title">Merge Queue Simulator</h1>
+                        </div>
+                        <p class="welcome-text">
+                            GitHub's <strong>merge queue</strong> batches pull
+                            requests and tests them together before merging into
+                            <code>main</code>. This saves time by running CI in
+                            parallel, but when a commit fails, the entire batch
+                            restarts.
+                        </p>
+                        <p class="welcome-text welcome-text--muted">
+                            This interactive simulator lets you experiment with
+                            different configurations and see how merge queue
+                            behavior changes with varying CI success rates,
+                            batch sizes, and durations.
+                        </p>
+                    </div>
+
+                    <!-- Step 2: The three lanes -->
+                    <div class="welcome-step" data-step="1" hidden>
+                        <h2 class="welcome-heading">The Three Lanes</h2>
+                        <div class="welcome-lanes">
+                            <div class="welcome-lane-card">
+                                <div
+                                    class="welcome-lane-dot"
+                                    style="background: var(--blue)"
+                                ></div>
+                                <div>
+                                    <strong>Queue</strong>
+                                    <p>
+                                        Commits waiting to be tested. The top
+                                        <em>N</em> form the "active window" and
+                                        run CI in parallel. The rest wait their
+                                        turn.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="welcome-lane-card">
+                                <div
+                                    class="welcome-lane-dot"
+                                    style="background: var(--red)"
+                                ></div>
+                                <div>
+                                    <strong>Rejected</strong>
+                                    <p>
+                                        Commits whose CI failed. When the head
+                                        of the queue fails, it's ejected and the
+                                        remaining active window
+                                        <em>restarts CI</em>. That's the costly
+                                        part.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="welcome-lane-card">
+                                <div
+                                    class="welcome-lane-dot"
+                                    style="background: var(--green-bright)"
+                                ></div>
+                                <div>
+                                    <strong>Merged</strong>
+                                    <p>
+                                        Commits that passed CI and were merged
+                                        into main. Consecutive successes at the
+                                        head are batched together in one merge.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: How it works -->
+                    <div class="welcome-step" data-step="2" hidden>
+                        <h2 class="welcome-heading">How the Queue Works</h2>
+                        <div class="welcome-rules">
+                            <div class="welcome-rule">
+                                <span class="welcome-rule-num">1</span>
+                                <p>
+                                    The first <strong>N commits</strong> (batch
+                                    size) run CI simultaneously with random
+                                    durations.
+                                </p>
+                            </div>
+                            <div class="welcome-rule">
+                                <span class="welcome-rule-num">2</span>
+                                <p>
+                                    When CI finishes, the queue evaluates from
+                                    the <strong>head</strong> (oldest) down.
+                                </p>
+                            </div>
+                            <div class="welcome-rule">
+                                <span class="welcome-rule-num">3</span>
+                                <p>
+                                    Consecutive
+                                    <strong style="color: var(--green-bright)"
+                                        >successes</strong
+                                    >
+                                    from the head are merged together.
+                                </p>
+                            </div>
+                            <div class="welcome-rule">
+                                <span class="welcome-rule-num">4</span>
+                                <p>
+                                    If the head
+                                    <strong style="color: var(--red)"
+                                        >fails</strong
+                                    >, it's rejected and
+                                    <em
+                                        >all remaining active commits restart
+                                        CI</em
+                                    >, wasting their progress.
+                                </p>
+                            </div>
+                        </div>
+                        <p
+                            class="welcome-text welcome-text--muted"
+                            style="margin-top: 12px"
+                        >
+                            This is why a low success rate with a large batch is
+                            so expensive. One failure can waste the CI time of
+                            many commits.
+                        </p>
+                    </div>
+
+                    <!-- Step 4: Controls -->
+                    <div class="welcome-step" data-step="3" hidden>
+                        <h2 class="welcome-heading">
+                            Controls &amp; Step Mode
+                        </h2>
+                        <p class="welcome-text">
+                            Use the <strong>sidebar</strong> on the left to
+                            configure success rate, batch size, CI duration, and
+                            speed. Try the <strong>presets</strong> for quick
+                            scenarios.
+                        </p>
+                        <div class="welcome-callout">
+                            <span class="welcome-callout-icon">⏸</span>
+                            <div>
+                                <strong>Step Mode</strong> is on by default. The
+                                simulation pauses before each merge or reject,
+                                showing you exactly what will happen and its CI
+                                time impact. Click <strong>Continue</strong> (or
+                                press <kbd>Space</kbd>) to proceed.
+                            </div>
+                        </div>
+                        <p
+                            class="welcome-text welcome-text--muted"
+                            style="margin-top: 12px"
+                        >
+                            The <strong>stats bar</strong> at the top tracks
+                            useful vs. wasted CI time, wall clock, and time
+                            saved compared to running commits one at a time.
+                        </p>
+                        <p class="welcome-text welcome-text--muted">
+                            <kbd>Space</kbd> &nbsp;Start / Pause / Continue
+                            &nbsp;&nbsp; <kbd>R</kbd> &nbsp;Reset
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="welcome-footer">
+                    <div class="welcome-dots" id="welcome-dots">
+                        <button
+                            class="welcome-dot-btn welcome-dot-btn--active"
+                            data-dot="0"
+                        ></button>
+                        <button class="welcome-dot-btn" data-dot="1"></button>
+                        <button class="welcome-dot-btn" data-dot="2"></button>
+                        <button class="welcome-dot-btn" data-dot="3"></button>
+                    </div>
+                    <div class="welcome-actions">
+                        <button
+                            class="btn btn-ghost welcome-skip"
+                            id="welcome-skip"
+                        >
+                            Skip
+                        </button>
+                        <button
+                            class="btn btn-primary welcome-next"
+                            id="welcome-next"
+                        >
+                            Next →
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Step 2: The three lanes -->
-        <div class="welcome-step" data-step="1" hidden>
-          <h2 class="welcome-heading">The Three Lanes</h2>
-          <div class="welcome-lanes">
-            <div class="welcome-lane-card">
-              <div class="welcome-lane-dot" style="background:var(--blue)"></div>
-              <div>
-                <strong>Queue</strong>
-                <p>Commits waiting to be tested. The top <em>N</em> form the "active window" and run CI in parallel. The rest wait their turn.</p>
-              </div>
-            </div>
-            <div class="welcome-lane-card">
-              <div class="welcome-lane-dot" style="background:var(--red)"></div>
-              <div>
-                <strong>Rejected</strong>
-                <p>Commits whose CI failed. When the head of the queue fails, it's ejected and the remaining active window <em>restarts CI</em>. That's the costly part.</p>
-              </div>
-            </div>
-            <div class="welcome-lane-card">
-              <div class="welcome-lane-dot" style="background:var(--green-bright)"></div>
-              <div>
-                <strong>Merged</strong>
-                <p>Commits that passed CI and were merged into main. Consecutive successes at the head are batched together in one merge.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 3: How it works -->
-        <div class="welcome-step" data-step="2" hidden>
-          <h2 class="welcome-heading">How the Queue Works</h2>
-          <div class="welcome-rules">
-            <div class="welcome-rule">
-              <span class="welcome-rule-num">1</span>
-              <p>The first <strong>N commits</strong> (batch size) run CI simultaneously with random durations.</p>
-            </div>
-            <div class="welcome-rule">
-              <span class="welcome-rule-num">2</span>
-              <p>When CI finishes, the queue evaluates from the <strong>head</strong> (oldest) down.</p>
-            </div>
-            <div class="welcome-rule">
-              <span class="welcome-rule-num">3</span>
-              <p>Consecutive <strong style="color:var(--green-bright)">successes</strong> from the head are merged together.</p>
-            </div>
-            <div class="welcome-rule">
-              <span class="welcome-rule-num">4</span>
-              <p>If the head <strong style="color:var(--red)">fails</strong>, it's rejected and <em>all remaining active commits restart CI</em>, wasting their progress.</p>
-            </div>
-          </div>
-          <p class="welcome-text welcome-text--muted" style="margin-top:12px">
-            This is why a low success rate with a large batch is so expensive. One failure can waste the CI time of many commits.
-          </p>
-        </div>
-
-        <!-- Step 4: Controls -->
-        <div class="welcome-step" data-step="3" hidden>
-          <h2 class="welcome-heading">Controls &amp; Step Mode</h2>
-          <p class="welcome-text">
-            Use the <strong>sidebar</strong> on the left to configure success rate, batch size, CI duration, and speed.
-            Try the <strong>presets</strong> for quick scenarios.
-          </p>
-          <div class="welcome-callout">
-            <span class="welcome-callout-icon">⏸</span>
-            <div>
-              <strong>Step Mode</strong> is on by default. The simulation pauses before each merge or reject,
-              showing you exactly what will happen and its CI time impact. Click <strong>Continue</strong> (or press <kbd>Space</kbd>) to proceed.
-            </div>
-          </div>
-          <p class="welcome-text welcome-text--muted" style="margin-top:12px">
-            The <strong>stats bar</strong> at the top tracks useful vs. wasted CI time, wall clock, and time saved compared to running commits one at a time.
-          </p>
-          <p class="welcome-text welcome-text--muted">
-            <kbd>Space</kbd> &nbsp;Start / Pause / Continue &nbsp;&nbsp; <kbd>R</kbd> &nbsp;Reset
-          </p>
-        </div>
-      </div>
-
-      <!-- Footer -->
-      <div class="welcome-footer">
-        <div class="welcome-dots" id="welcome-dots">
-          <button class="welcome-dot-btn welcome-dot-btn--active" data-dot="0"></button>
-          <button class="welcome-dot-btn" data-dot="1"></button>
-          <button class="welcome-dot-btn" data-dot="2"></button>
-          <button class="welcome-dot-btn" data-dot="3"></button>
-        </div>
-        <div class="welcome-actions">
-          <button class="btn btn-ghost welcome-skip" id="welcome-skip">Skip</button>
-          <button class="btn btn-primary welcome-next" id="welcome-next">Next →</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script src="js/app.js"></script>
-  <!-- Cloudflare Web Analytics -->
-  <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "310d486dfabd4a3f9c3516880b3f3b03"}'></script>
-  <!-- End Cloudflare Web Analytics -->
-</body>
+        <script src="js/app.js"></script>
+        <!-- Cloudflare Web Analytics -->
+        <script
+            defer
+            src="https://static.cloudflareinsights.com/beacon.min.js"
+            data-cf-beacon='{"token": "310d486dfabd4a3f9c3516880b3f3b03"}'
+        ></script>
+        <!-- End Cloudflare Web Analytics -->
+    </body>
 </html>
