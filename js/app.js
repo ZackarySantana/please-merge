@@ -1629,6 +1629,7 @@ function renderOptimalChart() {
     // Compute data series
     const throughput = [];
     const cost = [];
+    const wallClock = [];
     for (let b = 1; b <= maxBatch; b++) {
         const pb = Math.pow(p, b);
         throughput.push(b * pb); // expected merges per cycle
@@ -1640,6 +1641,11 @@ function renderOptimalChart() {
         for (let k = 0; k < b; k++) em += k * Math.pow(p, k) * (1 - p);
         em += b * pb;
         cost.push(em > 0.0001 ? b / em : b * 100);
+
+        // Wall clock: cycles * ciDuration (lower = better)
+        const removed = em + (1 - pb);
+        const cycles = removed > 0.0001 ? config.totalCommits / removed : 9999;
+        wallClock.push(cycles * config.ciDuration);
     }
 
     // Normalize each series to 0-1 (linear scale for both)
@@ -1648,6 +1654,9 @@ function renderOptimalChart() {
     // Ensure flat lines (e.g. 100% success) sit at mid-height, not the top
     const maxC = Math.max(...cost, cost[0] * 2, 0.001);
     const normC = cost.map((v) => v / maxC);
+    // Wall clock: normalize like cost (higher on chart = more time)
+    const maxW = Math.max(...wallClock, 0.001);
+    const normW = wallClock.map((v) => v / maxW);
 
     // Read CSS colors
     const styles = getComputedStyle(document.documentElement);
@@ -1659,6 +1668,7 @@ function renderOptimalChart() {
     const colBg = styles.getPropertyValue("--bg-card").trim() || "#1c2128";
     const colText =
         styles.getPropertyValue("--text-primary").trim() || "#e6edf3";
+    const colPurple = styles.getPropertyValue("--purple").trim() || "#a371f7";
 
     // Clear and fill background
     ctx.clearRect(0, 0, w, h);
@@ -1708,6 +1718,9 @@ function renderOptimalChart() {
     // Draw cost line (red)
     drawLine(normC, colRed);
 
+    // Draw wall clock line (purple)
+    drawLine(normW, colPurple);
+
     // Optimal batch vertical dashed line
     const optimal = getOptimalBatch();
     const optX = bx(optimal);
@@ -1742,6 +1755,13 @@ function renderOptimalChart() {
     ctx.fillStyle = colRed;
     ctx.beginPath();
     ctx.arc(curX, curCY, 3.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Dot on wall clock line at current batch
+    const curWY = by(normW[current - 1] || 0);
+    ctx.fillStyle = colPurple;
+    ctx.beginPath();
+    ctx.arc(curX, curWY, 3.5, 0, Math.PI * 2);
     ctx.fill();
 
     // Batch number label at current position

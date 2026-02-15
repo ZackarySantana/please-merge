@@ -524,6 +524,10 @@ body {
     background: var(--red);
 }
 
+.optimal-legend-wall::before {
+    background: var(--purple);
+}
+
 .optimal-chart-desc {
     margin: 6px 0 0;
     font-size: 10px;
