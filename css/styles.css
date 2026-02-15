@@ -1590,6 +1590,24 @@ html, body {
 }
 
 /* ─── Cost Panel ─── */
+.summary-trigger-btn {
+  align-self: center;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--blue);
+  border: 1px solid var(--blue);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all var(--duration) var(--ease-out);
+}
+
+.summary-trigger-btn:hover {
+  background: #58a6ff;
+  border-color: #58a6ff;
+}
+
 .cost-trigger-btn {
   display: flex;
   flex-direction: column;

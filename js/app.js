@@ -1096,15 +1096,8 @@ function updateStats() {
 
 // ── Summary Overlay ────────────────────────────
 
-function showSummaryButton() {
-  const btn = document.getElementById('btn-summary');
-  if (btn) btn.hidden = false;
-}
-
-function hideSummaryButton() {
-  const btn = document.getElementById('btn-summary');
-  if (btn) btn.hidden = true;
-}
+function showSummaryButton() {}
+function hideSummaryButton() {}
 
 function updateSummaryPanel() {
   const overlay = document.getElementById('summary-overlay');
