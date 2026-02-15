@@ -96,6 +96,7 @@ const state = {
   isPaused: false,
   stepWaiting: false,   // true when step mode has paused before evaluation
   animating: false,     // true during step-mode transition animation
+  previousRun: null,    // snapshot of last completed run for comparison
 };
 
 // Render bookkeeping (to do incremental DOM updates)
@@ -717,6 +718,25 @@ function doReset() {
   }
   lastTimestamp = 0;
 
+  // Snapshot current run for comparison (only if something actually ran)
+  if (state.merged.length > 0 || state.rejected.length > 0) {
+    const rate = getCostRate();
+    const runners = getCostRunners();
+    const toMin = 1 / 60000;
+    const costPerMin = rate * runners;
+    state.previousRun = {
+      merged: state.merged.length,
+      rejected: state.rejected.length,
+      reruns: state.totalReruns,
+      wallClockTime: state.wallClockTime,
+      sequentialCITime: state.sequentialCITime,
+      successCITime: state.successCITime,
+      wastedCITime: state.wastedCITime,
+      totalCost: (state.successCITime + state.wastedCITime) * toMin * costPerMin,
+      wastedCost: state.wastedCITime * toMin * costPerMin,
+    };
+  }
+
   const { commits, queue } = generateCommits(config.totalCommits);
   state.commits = commits;
   state.queue = queue;
@@ -1013,8 +1033,8 @@ function updateSummaryPanel() {
   const total = state.merged.length + state.rejected.length;
   const successRate = total > 0 ? Math.round((state.merged.length / total) * 100) : 0;
   const wasteRatio = state.successCITime > 0
-    ? Math.round((state.wastedCITime / state.successCITime) * 100) + '%'
-    : state.wastedCITime > 0 ? '∞' : '—';
+    ? Math.round((state.wastedCITime / state.successCITime) * 100)
+    : state.wastedCITime > 0 ? Infinity : 0;
   const timeSaved = state.sequentialCITime - state.wallClockTime;
 
   // Main stats
@@ -1031,7 +1051,7 @@ function updateSummaryPanel() {
   // CI rows
   document.getElementById('sum-useful-ci').textContent = formatCITime(state.successCITime);
   document.getElementById('sum-wasted-ci').textContent = formatCITime(state.wastedCITime);
-  document.getElementById('sum-waste-ratio').textContent = wasteRatio;
+  document.getElementById('sum-waste-ratio').textContent = wasteRatio === Infinity ? '∞' : wasteRatio ? wasteRatio + '%' : '—';
 
   // Cost rows
   const rate = getCostRate();
@@ -1040,8 +1060,67 @@ function updateSummaryPanel() {
   const costPerMin = rate * runners;
   const totalCIMin = (state.successCITime + state.wastedCITime) * toMin;
   const wastedCIMin = state.wastedCITime * toMin;
-  document.getElementById('sum-total-cost').textContent = formatCost(totalCIMin * costPerMin);
-  document.getElementById('sum-wasted-cost').textContent = formatCost(wastedCIMin * costPerMin);
+  const totalCost = totalCIMin * costPerMin;
+  const wastedCost = wastedCIMin * costPerMin;
+  document.getElementById('sum-total-cost').textContent = formatCost(totalCost);
+  document.getElementById('sum-wasted-cost').textContent = formatCost(wastedCost);
+
+  // Comparison with previous run
+  const prev = state.previousRun;
+  const hasCompare = !!prev;
+  const colHeader = document.getElementById('summary-col-header');
+  if (colHeader) colHeader.hidden = !hasCompare;
+
+  // Toggle compare grid layout on all summary rows
+  document.querySelectorAll('.summary-row').forEach(row => {
+    row.classList.toggle('summary-row--compare', hasCompare);
+  });
+
+  // Helper: set prev value, diff value, and diff color
+  // lowerIsBetter: true for costs/waste/time, false for time saved/useful
+  function setCompare(id, currentVal, prevVal, formatter, lowerIsBetter) {
+    const prevEl = document.getElementById(id + '-prev');
+    const diffEl = document.getElementById(id + '-diff');
+    if (!prevEl || !diffEl) return;
+    if (!hasCompare) {
+      prevEl.textContent = '';
+      diffEl.textContent = '';
+      diffEl.className = 'summary-row-diff';
+      return;
+    }
+    prevEl.textContent = formatter(prevVal);
+    const delta = currentVal - prevVal;
+    if (Math.abs(delta) < 0.001) {
+      diffEl.textContent = '=';
+      diffEl.className = 'summary-row-diff';
+    } else {
+      const sign = delta > 0 ? '+' : '';
+      diffEl.textContent = sign + formatter(delta);
+      const isBetter = lowerIsBetter ? delta < 0 : delta > 0;
+      diffEl.className = 'summary-row-diff ' + (isBetter ? 'summary-row-diff--better' : 'summary-row-diff--worse');
+    }
+  }
+
+  if (prev) {
+    const prevTimeSaved = prev.sequentialCITime - prev.wallClockTime;
+    const prevWasteRatio = prev.successCITime > 0
+      ? Math.round((prev.wastedCITime / prev.successCITime) * 100) : 0;
+
+    setCompare('sum-wall-clock', state.wallClockTime, prev.wallClockTime, formatCITime, true);
+    setCompare('sum-sequential', state.sequentialCITime, prev.sequentialCITime, formatCITime, true);
+    setCompare('sum-time-saved', Math.max(0, timeSaved), Math.max(0, prevTimeSaved), formatCITime, false);
+    setCompare('sum-useful-ci', state.successCITime, prev.successCITime, formatCITime, false);
+    setCompare('sum-wasted-ci', state.wastedCITime, prev.wastedCITime, formatCITime, true);
+    setCompare('sum-waste-ratio', wasteRatio === Infinity ? 999 : wasteRatio, prevWasteRatio, v => v + '%', true);
+    setCompare('sum-total-cost', totalCost, prev.totalCost, formatCost, true);
+    setCompare('sum-wasted-cost', wastedCost, prev.wastedCost, formatCost, true);
+  } else {
+    // Clear all prev/diff fields
+    ['sum-wall-clock', 'sum-sequential', 'sum-time-saved', 'sum-useful-ci',
+     'sum-wasted-ci', 'sum-waste-ratio', 'sum-total-cost', 'sum-wasted-cost'].forEach(id => {
+      setCompare(id, 0, 0, () => '', true);
+    });
+  }
 }
 
 function showSummary() {

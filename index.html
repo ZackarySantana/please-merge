@@ -326,20 +326,34 @@
             </div>
           </div>
 
+          <!-- Comparison column header (hidden when no previous run) -->
+          <div class="summary-col-header" id="summary-col-header" hidden>
+            <span class="summary-col-label"></span>
+            <span class="summary-col-label">Prev</span>
+            <span class="summary-col-label">Current</span>
+            <span class="summary-col-label">Diff</span>
+          </div>
+
           <div class="summary-divider"></div>
 
           <div class="summary-rows">
             <div class="summary-row">
               <span class="summary-row-label">Wall Clock Time</span>
+              <span class="summary-row-prev" id="sum-wall-clock-prev"></span>
               <span class="summary-row-value" id="sum-wall-clock">—</span>
+              <span class="summary-row-diff" id="sum-wall-clock-diff"></span>
             </div>
             <div class="summary-row">
               <span class="summary-row-label">Sequential Baseline</span>
+              <span class="summary-row-prev" id="sum-sequential-prev"></span>
               <span class="summary-row-value" id="sum-sequential">—</span>
+              <span class="summary-row-diff" id="sum-sequential-diff"></span>
             </div>
             <div class="summary-row summary-row--highlight">
               <span class="summary-row-label">Time Saved</span>
+              <span class="summary-row-prev" id="sum-time-saved-prev"></span>
               <span class="summary-row-value" id="sum-time-saved">—</span>
+              <span class="summary-row-diff" id="sum-time-saved-diff"></span>
             </div>
           </div>
 
@@ -348,15 +362,21 @@
           <div class="summary-rows">
             <div class="summary-row">
               <span class="summary-row-label">Useful CI Time</span>
+              <span class="summary-row-prev" id="sum-useful-ci-prev"></span>
               <span class="summary-row-value summary-row-value--green" id="sum-useful-ci">—</span>
+              <span class="summary-row-diff" id="sum-useful-ci-diff"></span>
             </div>
             <div class="summary-row">
               <span class="summary-row-label">Wasted CI Time</span>
+              <span class="summary-row-prev" id="sum-wasted-ci-prev"></span>
               <span class="summary-row-value summary-row-value--red" id="sum-wasted-ci">—</span>
+              <span class="summary-row-diff" id="sum-wasted-ci-diff"></span>
             </div>
             <div class="summary-row">
               <span class="summary-row-label">Waste Ratio</span>
+              <span class="summary-row-prev" id="sum-waste-ratio-prev"></span>
               <span class="summary-row-value" id="sum-waste-ratio">—</span>
+              <span class="summary-row-diff" id="sum-waste-ratio-diff"></span>
             </div>
           </div>
 
@@ -365,11 +385,15 @@
           <div class="summary-rows">
             <div class="summary-row">
               <span class="summary-row-label">Estimated Total Cost</span>
+              <span class="summary-row-prev" id="sum-total-cost-prev"></span>
               <span class="summary-row-value" id="sum-total-cost">—</span>
+              <span class="summary-row-diff" id="sum-total-cost-diff"></span>
             </div>
             <div class="summary-row">
               <span class="summary-row-label">Estimated Wasted Cost</span>
+              <span class="summary-row-prev" id="sum-wasted-cost-prev"></span>
               <span class="summary-row-value summary-row-value--red" id="sum-wasted-cost">—</span>
+              <span class="summary-row-diff" id="sum-wasted-cost-diff"></span>
             </div>
           </div>
 
