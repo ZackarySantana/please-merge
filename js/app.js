@@ -1581,10 +1581,9 @@ function updateChartEstimate() {
     // Items removed per cycle = merged + rejected (failed items also leave the queue)
     const removed = em + (1 - pb);
     const cycles = removed > 0.0001 ? config.totalCommits / removed : 9999;
-    // Last cycle is typically a partial batch; subtract ~0.5 cycles of waste
-    const adjCycles = Math.max(1, cycles - 0.5);
-    const wallMin = adjCycles * config.ciDuration;
-    const totalRuns = adjCycles * b;
+    const wallMin = cycles * config.ciDuration;
+    // Last cycle is typically a partial batch; subtract ~0.5 cycles for CI runs
+    const totalRuns = Math.max(1, cycles - 0.5) * b;
     const runners = getCostRunners();
     const rate = getCostRate();
     const totalCost = totalRuns * config.ciDuration * runners * rate;
@@ -1799,13 +1798,10 @@ function initOptimalChart() {
         // Items removed per cycle = merged + rejected (failed items also leave the queue)
         const removed = em + (1 - pb);
         const cycles = removed > 0.0001 ? config.totalCommits / removed : 9999;
-        // Last cycle is typically a partial batch; subtract ~0.5 cycles of waste
-        const adjCycles = Math.max(1, cycles - 0.5);
+        const wallMin = cycles * config.ciDuration;
 
-        const wallMin = adjCycles * config.ciDuration;
-
-        // Total CI runs = cycles * batch size, each costs ciDuration minutes of machine time
-        const totalRuns = adjCycles * batch;
+        // Last cycle is typically a partial batch; subtract ~0.5 cycles for CI runs
+        const totalRuns = Math.max(1, cycles - 0.5) * batch;
         const runners = getCostRunners();
         const rate = getCostRate();
         const totalCost = totalRuns * config.ciDuration * runners * rate;
