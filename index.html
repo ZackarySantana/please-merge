@@ -193,71 +193,7 @@
             <span class="stat-value stat-time-saved" id="stat-time-saved">0 s</span>
           </div>
           <div class="stat-divider"></div>
-          <div class="cost-trigger-wrap">
-            <button class="cost-trigger-btn" id="btn-cost" title="Show CI cost breakdown">
-              <span class="cost-trigger-icon">$</span>
-              <span class="cost-trigger-label">Cost</span>
-            </button>
-            <!-- Cost Panel Dropdown -->
-            <div class="cost-panel" id="cost-panel" hidden>
-              <div class="cost-panel-header">
-                <span class="cost-panel-title">CI Cost Calculator</span>
-                <button class="cost-panel-close" id="cost-panel-close">✕</button>
-              </div>
-              <div class="cost-panel-input-row">
-                <label class="cost-panel-input-label" for="cost-rate">Rate</label>
-                <div class="cost-panel-input-wrap">
-                  <span class="cost-panel-input-prefix">$</span>
-                  <input type="number" id="cost-rate" class="cost-panel-input" value="0.008" step="0.001" min="0">
-                  <span class="cost-panel-input-suffix">/ min</span>
-                </div>
-              </div>
-              <div class="cost-panel-input-row">
-                <label class="cost-panel-input-label" for="cost-runners" title="Number of parallel runners per CI run. Each commit's CI may fan out across multiple machines.">Runners</label>
-                <div class="cost-panel-input-wrap">
-                  <span class="cost-panel-input-prefix cost-panel-input-prefix--muted">×</span>
-                  <input type="number" id="cost-runners" class="cost-panel-input" value="25" step="1" min="1">
-                  <span class="cost-panel-input-suffix">per run</span>
-                </div>
-              </div>
-              <div class="cost-panel-computed">
-                <div class="cost-panel-computed-row">
-                  <span class="cost-panel-computed-label">Machine time per run</span>
-                  <span class="cost-panel-computed-value" id="cost-machine-time">375 min</span>
-                </div>
-                <div class="cost-panel-computed-row">
-                  <span class="cost-panel-computed-label">Cost per run</span>
-                  <span class="cost-panel-computed-value" id="cost-per-run">$3.00</span>
-                </div>
-              </div>
-              <div class="cost-panel-divider"></div>
-              <div class="cost-panel-rows">
-                <div class="cost-panel-row">
-                  <span class="cost-panel-row-label">Useful CI</span>
-                  <span class="cost-panel-row-value cost-panel-row-value--green" id="cost-useful">$0.00</span>
-                </div>
-                <div class="cost-panel-row">
-                  <span class="cost-panel-row-label">Wasted CI</span>
-                  <span class="cost-panel-row-value cost-panel-row-value--red" id="cost-wasted">$0.00</span>
-                </div>
-                <div class="cost-panel-row">
-                  <span class="cost-panel-row-label">Total CI</span>
-                  <span class="cost-panel-row-value" id="cost-total">$0.00</span>
-                </div>
-                <div class="cost-panel-row-divider"></div>
-                <div class="cost-panel-row">
-                  <span class="cost-panel-row-label">Money Wasted</span>
-                  <span class="cost-panel-row-value cost-panel-row-value--red" id="cost-money-wasted" title="Total cost of wasted CI runs due to failures">$0.00</span>
-                </div>
-              </div>
-              <div class="cost-panel-hint">
-                Rate is per runner-minute. GitHub Actions Linux runners cost ~$0.008/min.
-                Runners = how many parallel jobs each CI run fans out to (e.g. lint, test, build).
-              </div>
-            </div>
-          </div>
           <button class="cost-trigger-btn" id="btn-summary" title="Show simulation summary" hidden>
-            <span class="cost-trigger-icon">✓</span>
             <span class="cost-trigger-label">Summary</span>
           </button>
         </div>
@@ -308,21 +244,21 @@
           </div>
 
           <div class="summary-grid">
-            <div class="summary-stat summary-stat--merged">
-              <span class="summary-stat-value" id="sum-merged">0</span>
-              <span class="summary-stat-label">Merged</span>
+            <div class="summary-stat summary-stat--blue">
+              <span class="summary-stat-value" id="sum-hero-wall-clock">0 s</span>
+              <span class="summary-stat-label">Wall Clock</span>
+            </div>
+            <div class="summary-stat summary-stat--blue">
+              <span class="summary-stat-value" id="sum-hero-time-saved">0 s</span>
+              <span class="summary-stat-label">Time Saved</span>
+            </div>
+            <div class="summary-stat summary-stat--yellow">
+              <span class="summary-stat-value" id="sum-hero-waste-ratio">—</span>
+              <span class="summary-stat-label">Waste %</span>
             </div>
             <div class="summary-stat summary-stat--rejected">
-              <span class="summary-stat-value" id="sum-rejected">0</span>
-              <span class="summary-stat-label">Rejected</span>
-            </div>
-            <div class="summary-stat">
-              <span class="summary-stat-value" id="sum-success-rate">0%</span>
-              <span class="summary-stat-label">Success Rate</span>
-            </div>
-            <div class="summary-stat">
-              <span class="summary-stat-value" id="sum-reruns">0</span>
-              <span class="summary-stat-label">CI Reruns</span>
+              <span class="summary-stat-value" id="sum-hero-wasted-ci">0 s</span>
+              <span class="summary-stat-label">Wasted CI</span>
             </div>
           </div>
 
@@ -462,6 +398,12 @@
           </div>
 
           <div class="summary-footer">
+            <button class="btn btn-primary" id="summary-start">
+              <span class="btn-icon">▶</span> Start
+            </button>
+            <button class="btn btn-secondary" id="summary-pause" disabled>
+              <span class="btn-icon">⏸</span> Pause
+            </button>
             <button class="btn btn-ghost" id="summary-reset">
               <span class="btn-icon">↺</span> Reset
             </button>

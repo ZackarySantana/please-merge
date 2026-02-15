@@ -767,20 +767,36 @@ function doReset() {
 function updateButtons() {
   const startBtn = document.getElementById('btn-start');
   const pauseBtn = document.getElementById('btn-pause');
+  const sumStartBtn = document.getElementById('summary-start');
+  const sumPauseBtn = document.getElementById('summary-pause');
 
   if (state.isRunning && !state.isPaused) {
     startBtn.disabled = true;
     pauseBtn.disabled = false;
+    if (sumStartBtn) sumStartBtn.disabled = true;
+    if (sumPauseBtn) sumPauseBtn.disabled = false;
   } else if (state.isRunning && state.isPaused) {
     startBtn.disabled = false;
     startBtn.querySelector('.btn-icon').textContent = '▶';
     startBtn.lastChild.textContent = ' Resume';
     pauseBtn.disabled = true;
+    if (sumStartBtn) {
+      sumStartBtn.disabled = false;
+      sumStartBtn.querySelector('.btn-icon').textContent = '▶';
+      sumStartBtn.lastChild.textContent = ' Resume';
+    }
+    if (sumPauseBtn) sumPauseBtn.disabled = true;
   } else {
     startBtn.disabled = state.queue.length === 0;
     startBtn.querySelector('.btn-icon').textContent = '▶';
     startBtn.lastChild.textContent = ' Start';
     pauseBtn.disabled = true;
+    if (sumStartBtn) {
+      sumStartBtn.disabled = state.queue.length === 0;
+      sumStartBtn.querySelector('.btn-icon').textContent = '▶';
+      sumStartBtn.lastChild.textContent = ' Start';
+    }
+    if (sumPauseBtn) sumPauseBtn.disabled = true;
   }
 }
 
@@ -972,7 +988,6 @@ function updateTimeStats() {
   document.getElementById('stat-wall-clock').textContent = formatCITime(state.wallClockTime);
   const saved = state.sequentialCITime - state.wallClockTime;
   document.getElementById('stat-time-saved').textContent = saved > 0 ? formatCITime(saved) : '0 s';
-  updateCostPanel();
   updateSummaryPanel();
 }
 
@@ -1001,9 +1016,6 @@ function updateStats() {
 
   // Wall clock & time saved
   updateTimeStats();
-
-  // Cost panel
-  updateCostPanel();
 
   // Percentages for merged vs rejected
   const settled = state.merged.length + state.rejected.length;
@@ -1041,11 +1053,11 @@ function updateSummaryPanel() {
     : state.wastedCITime > 0 ? Infinity : 0;
   const timeSaved = state.sequentialCITime - state.wallClockTime;
 
-  // Main stats (top grid)
-  document.getElementById('sum-merged').textContent = state.merged.length;
-  document.getElementById('sum-rejected').textContent = state.rejected.length;
-  document.getElementById('sum-success-rate').textContent = successRate + '%';
-  document.getElementById('sum-reruns').textContent = state.totalReruns;
+  // Hero stats (top grid)
+  document.getElementById('sum-hero-wall-clock').textContent = formatCITime(state.wallClockTime);
+  document.getElementById('sum-hero-time-saved').textContent = timeSaved > 0 ? formatCITime(timeSaved) : '0 s';
+  document.getElementById('sum-hero-waste-ratio').textContent = wasteRatio === Infinity ? '∞' : wasteRatio ? wasteRatio + '%' : '—';
+  document.getElementById('sum-hero-wasted-ci').textContent = formatCITime(state.wastedCITime);
 
   // Queue stats rows
   document.getElementById('sum-batch').textContent = config.batchSize;
@@ -1154,15 +1166,6 @@ function updateSummaryPanel() {
   }
 }
 
-function syncSummaryCostInputs() {
-  const mainRate = document.getElementById('cost-rate');
-  const mainRunners = document.getElementById('cost-runners');
-  const sumRate = document.getElementById('sum-cost-rate');
-  const sumRunners = document.getElementById('sum-cost-runners');
-  if (mainRate && sumRate) sumRate.value = mainRate.value;
-  if (mainRunners && sumRunners) sumRunners.value = mainRunners.value;
-}
-
 function showSummary() {
   const overlay = document.getElementById('summary-overlay');
   if (!overlay) return;
@@ -1170,7 +1173,6 @@ function showSummary() {
   if (title) {
     title.textContent = state.queue.length === 0 ? 'Simulation Complete' : 'Simulation Summary';
   }
-  syncSummaryCostInputs();
   overlay.hidden = false;
   updateSummaryPanel();
 }
@@ -1183,10 +1185,14 @@ function hideSummary() {
 function initSummary() {
   const closeBtn = document.getElementById('summary-close');
   const resetBtn = document.getElementById('summary-reset');
+  const startBtn = document.getElementById('summary-start');
+  const pauseBtn = document.getElementById('summary-pause');
   const overlay = document.getElementById('summary-overlay');
   const openBtn = document.getElementById('btn-summary');
 
   if (closeBtn) closeBtn.addEventListener('click', hideSummary);
+  if (startBtn) startBtn.addEventListener('click', doStart);
+  if (pauseBtn) pauseBtn.addEventListener('click', doPause);
   if (resetBtn) resetBtn.addEventListener('click', () => {
     hideSummary();
     doReset();
@@ -1197,35 +1203,14 @@ function initSummary() {
     if (e.target === overlay) hideSummary();
   });
 
-  // Sync summary cost inputs bidirectionally with main cost panel
+  // Update summary when cost inputs change
   const sumRate = document.getElementById('sum-cost-rate');
   const sumRunners = document.getElementById('sum-cost-runners');
-  const mainRate = document.getElementById('cost-rate');
-  const mainRunners = document.getElementById('cost-runners');
-
-  if (sumRate && mainRate) {
-    sumRate.addEventListener('input', () => {
-      mainRate.value = sumRate.value;
-      updateCostPanel();
-      updateSummaryPanel();
-    });
-    mainRate.addEventListener('input', () => {
-      sumRate.value = mainRate.value;
-    });
-  }
-  if (sumRunners && mainRunners) {
-    sumRunners.addEventListener('input', () => {
-      mainRunners.value = sumRunners.value;
-      updateCostPanel();
-      updateSummaryPanel();
-    });
-    mainRunners.addEventListener('input', () => {
-      sumRunners.value = mainRunners.value;
-    });
-  }
+  if (sumRate) sumRate.addEventListener('input', updateSummaryPanel);
+  if (sumRunners) sumRunners.addEventListener('input', updateSummaryPanel);
 }
 
-// ── Cost Panel ─────────────────────────────────
+// ── Cost Helpers ────────────────────────────────
 
 function formatCost(dollars) {
   if (dollars < 0.01 && dollars > 0) return '< $0.01';
@@ -1236,93 +1221,17 @@ function formatCost(dollars) {
 }
 
 function getCostRate() {
-  const input = document.getElementById('cost-rate');
+  const input = document.getElementById('sum-cost-rate');
   if (!input) return 0;
   const val = parseFloat(input.value);
   return isNaN(val) || val < 0 ? 0 : val;
 }
 
 function getCostRunners() {
-  const input = document.getElementById('cost-runners');
+  const input = document.getElementById('sum-cost-runners');
   if (!input) return 1;
   const val = parseInt(input.value, 10);
   return isNaN(val) || val < 1 ? 1 : val;
-}
-
-function updateCostPanel() {
-  const panel = document.getElementById('cost-panel');
-  if (!panel || panel.hidden) return;
-
-  const rate = getCostRate();       // $ per runner-minute
-  const runners = getCostRunners(); // parallel runners per CI run
-  const toMin = 1 / 60000;         // ms → minutes
-  const costPerMin = rate * runners; // effective cost per minute of CI wall time
-
-  const usefulMin = state.successCITime * toMin;
-  const wastedMin = state.wastedCITime * toMin;
-  const totalMin = usefulMin + wastedMin;
-  // Per-run computed fields: CI duration (from sidebar) × runners
-  const machineMin = config.ciDuration * runners; // minutes of machine time per run
-  document.getElementById('cost-machine-time').textContent = machineMin >= 60
-    ? (machineMin / 60).toFixed(1).replace(/\.0$/, '') + ' h'
-    : machineMin + ' min';
-  document.getElementById('cost-per-run').textContent = formatCost(machineMin * rate);
-
-  // Simulation totals
-  document.getElementById('cost-useful').textContent = formatCost(usefulMin * costPerMin);
-  document.getElementById('cost-wasted').textContent = formatCost(wastedMin * costPerMin);
-  document.getElementById('cost-total').textContent = formatCost(totalMin * costPerMin);
-  document.getElementById('cost-money-wasted').textContent = formatCost(wastedMin * costPerMin);
-}
-
-function initCostPanel() {
-  const btn = document.getElementById('btn-cost');
-  const panel = document.getElementById('cost-panel');
-  const closeBtn = document.getElementById('cost-panel-close');
-  const rateInput = document.getElementById('cost-rate');
-  if (!btn || !panel) return;
-
-  function togglePanel() {
-    const opening = panel.hidden;
-    panel.hidden = !panel.hidden;
-    btn.classList.toggle('cost-trigger-btn--active', opening);
-    if (opening) {
-      updateCostPanel();
-    }
-  }
-
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    togglePanel();
-  });
-
-  closeBtn.addEventListener('click', () => {
-    panel.hidden = true;
-    btn.classList.remove('cost-trigger-btn--active');
-  });
-
-  const runnersInput = document.getElementById('cost-runners');
-
-  // Update costs live when inputs change
-  rateInput.addEventListener('input', () => {
-    updateCostPanel();
-  });
-  runnersInput.addEventListener('input', () => {
-    updateCostPanel();
-  });
-
-  // Close on outside click
-  document.addEventListener('click', (e) => {
-    if (!panel.hidden && !panel.contains(e.target) && e.target !== btn) {
-      panel.hidden = true;
-      btn.classList.remove('cost-trigger-btn--active');
-    }
-  });
-
-  // Prevent panel clicks from closing
-  panel.addEventListener('click', (e) => {
-    e.stopPropagation();
-  });
 }
 
 // ── Sidebar Bindings ───────────────────────────
@@ -1574,7 +1483,6 @@ function initWelcome() {
 
 function init() {
   bindEvents();
-  initCostPanel();
   initSummary();
   doReset();
   initWelcome();
