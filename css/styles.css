@@ -1723,6 +1723,18 @@ html, body {
 }
 
 /* ─── Responsive tweaks ─── */
+@media (max-width: 1600px) {
+  .stat--compact-hide {
+    display: none;
+  }
+}
+
+@media (max-width: 1300px) {
+  .stat--narrow-hide {
+    display: none;
+  }
+}
+
 @media (max-width: 1100px) {
   :root {
     --sidebar-width: 220px;

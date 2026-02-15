@@ -157,36 +157,36 @@
           </button>
         </div>
         <div class="topbar-right">
-          <div class="stat" title="Commits still waiting in the merge queue to be processed.">
+          <div class="stat stat--compact-hide" title="Commits still waiting in the merge queue to be processed.">
             <span class="stat-label">Queue</span>
             <span class="stat-value stat-queue" id="stat-queue">100</span>
           </div>
-          <div class="stat" title="Commits that passed CI and were successfully merged into main.">
+          <div class="stat stat--compact-hide" title="Commits that passed CI and were successfully merged into main.">
             <span class="stat-label">Merged</span>
             <span class="stat-value stat-merged" id="stat-merged">0</span>
           </div>
-          <div class="stat" title="Commits that failed CI and were rejected from the queue.">
+          <div class="stat stat--compact-hide" title="Commits that failed CI and were rejected from the queue.">
             <span class="stat-label">Rejected</span>
             <span class="stat-value stat-rejected" id="stat-rejected">0</span>
           </div>
-          <div class="stat" title="Total duplicate CI runs caused by failures forcing the active window to restart.">
+          <div class="stat stat--compact-hide" title="Total duplicate CI runs caused by failures forcing the active window to restart.">
             <span class="stat-label">Reruns</span>
             <span class="stat-value stat-reruns" id="stat-reruns">0</span>
           </div>
-          <div class="stat-divider"></div>
-          <div class="stat" title="CI time spent on commits that were successfully merged.">
+          <div class="stat-divider stat--compact-hide"></div>
+          <div class="stat stat--narrow-hide" title="CI time spent on commits that were successfully merged.">
             <span class="stat-label">Useful CI</span>
             <span class="stat-value stat-ci-useful" id="stat-ci-useful">0 s</span>
           </div>
-          <div class="stat" title="CI time wasted on failed commits and restarted runs that were thrown away.">
+          <div class="stat stat--narrow-hide" title="CI time wasted on failed commits and restarted runs that were thrown away.">
             <span class="stat-label">Wasted CI</span>
             <span class="stat-value stat-ci-wasted" id="stat-ci-wasted">0 s</span>
           </div>
-          <div class="stat" title="Ratio of wasted CI time to useful CI time. Lower is better.">
+          <div class="stat stat--narrow-hide" title="Ratio of wasted CI time to useful CI time. Lower is better.">
             <span class="stat-label">Waste %</span>
             <span class="stat-value stat-ci-ratio" id="stat-ci-ratio">—</span>
           </div>
-          <div class="stat-divider"></div>
+          <div class="stat-divider stat--narrow-hide"></div>
           <div class="stat" title="Total simulated wall-clock time elapsed since the simulation started.">
             <span class="stat-label">Wall Clock</span>
             <span class="stat-value stat-wall-clock" id="stat-wall-clock">0 s</span>
