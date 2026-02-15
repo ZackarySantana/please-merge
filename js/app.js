@@ -727,6 +727,8 @@ function doReset() {
     state.previousRun = {
       merged: state.merged.length,
       rejected: state.rejected.length,
+      processed: state.merged.length + state.rejected.length,
+      batchSize: config.batchSize,
       reruns: state.totalReruns,
       wallClockTime: state.wallClockTime,
       sequentialCITime: state.sequentialCITime,
@@ -1039,11 +1041,17 @@ function updateSummaryPanel() {
     : state.wastedCITime > 0 ? Infinity : 0;
   const timeSaved = state.sequentialCITime - state.wallClockTime;
 
-  // Main stats
+  // Main stats (top grid)
   document.getElementById('sum-merged').textContent = state.merged.length;
   document.getElementById('sum-rejected').textContent = state.rejected.length;
   document.getElementById('sum-success-rate').textContent = successRate + '%';
   document.getElementById('sum-reruns').textContent = state.totalReruns;
+
+  // Queue stats rows
+  document.getElementById('sum-batch').textContent = config.batchSize;
+  document.getElementById('sum-processed').textContent = total;
+  document.getElementById('sum-merged-cmp').textContent = state.merged.length;
+  document.getElementById('sum-rejected-cmp').textContent = state.rejected.length;
 
   // Time rows
   document.getElementById('sum-wall-clock').textContent = formatCITime(state.wallClockTime);
@@ -1103,11 +1111,20 @@ function updateSummaryPanel() {
     }
   }
 
+  const fmtInt = v => String(v);
+
   if (prev) {
     const prevTimeSaved = prev.sequentialCITime - prev.wallClockTime;
     const prevWasteRatio = prev.successCITime > 0
       ? Math.round((prev.wastedCITime / prev.successCITime) * 100) : 0;
 
+    // Queue stats
+    setCompare('sum-batch', config.batchSize, prev.batchSize, fmtInt, false);
+    setCompare('sum-processed', total, prev.processed, fmtInt, false);
+    setCompare('sum-merged-cmp', state.merged.length, prev.merged, fmtInt, false);
+    setCompare('sum-rejected-cmp', state.rejected.length, prev.rejected, fmtInt, true);
+
+    // Time
     setCompare('sum-wall-clock', state.wallClockTime, prev.wallClockTime, formatCITime, true);
     setCompare('sum-sequential', state.sequentialCITime, prev.sequentialCITime, formatCITime, true);
     setCompare('sum-time-saved', Math.max(0, timeSaved), Math.max(0, prevTimeSaved), formatCITime, false);
@@ -1118,7 +1135,8 @@ function updateSummaryPanel() {
     setCompare('sum-wasted-cost', wastedCost, prev.wastedCost, formatCost, true);
   } else {
     // Clear all prev/diff fields
-    ['sum-wall-clock', 'sum-sequential', 'sum-time-saved', 'sum-useful-ci',
+    ['sum-batch', 'sum-processed', 'sum-merged-cmp', 'sum-rejected-cmp',
+     'sum-wall-clock', 'sum-sequential', 'sum-time-saved', 'sum-useful-ci',
      'sum-wasted-ci', 'sum-waste-ratio', 'sum-total-cost', 'sum-wasted-cost'].forEach(id => {
       setCompare(id, 0, 0, () => '', true);
     });
