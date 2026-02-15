@@ -1976,9 +1976,6 @@ body {
 
 .welcome-callout strong {
     color: var(--text-primary);
-    font-size: 13px;
-    display: block;
-    margin-bottom: 4px;
 }
 
 .welcome-callout div {
