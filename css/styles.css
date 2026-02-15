@@ -62,6 +62,35 @@
         "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
 }
 
+/* ─── Light Theme ─── */
+[data-theme="light"] {
+    --bg-body: #f6f8fa;
+    --bg-sidebar: #ffffff;
+    --bg-surface: #ffffff;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f3f4f6;
+    --bg-input: #f6f8fa;
+    --bg-topbar: #ffffff;
+
+    --border: #d0d7de;
+    --border-light: #e1e4e8;
+
+    --text-primary: #1f2328;
+    --text-secondary: #656d76;
+    --text-muted: #8b949e;
+
+    --blue: #0969da;
+    --blue-dim: rgba(9, 105, 218, 0.1);
+    --green: #1a7f37;
+    --green-bright: #2da44e;
+    --green-dim: rgba(26, 127, 55, 0.1);
+    --red: #cf222e;
+    --red-dim: rgba(207, 34, 46, 0.08);
+    --yellow: #9a6700;
+    --yellow-dim: rgba(154, 103, 0, 0.1);
+    --purple: #8250df;
+}
+
 html,
 body {
     height: 100%;
@@ -94,7 +123,8 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 16px 18px;
+    height: var(--topbar-height);
+    padding: 0 18px;
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
 }
@@ -103,6 +133,7 @@ body {
     font-size: 14px;
     font-weight: 600;
     color: var(--text-primary);
+    flex: 1;
 }
 
 .sidebar-logo {
@@ -110,10 +141,38 @@ body {
     flex-shrink: 0;
 }
 
+.theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: color var(--duration), background var(--duration), border-color var(--duration);
+}
+
+.theme-toggle:hover {
+    color: var(--text-primary);
+    background: var(--bg-card-hover);
+}
+
+/* Show sun in dark mode, moon in light mode */
+.theme-icon--light { display: none; }
+.theme-icon--dark { display: block; }
+[data-theme="light"] .theme-icon--light { display: block; }
+[data-theme="light"] .theme-icon--dark { display: none; }
+
+
 .sidebar-body {
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
-    padding: 16px 18px;
+    padding: 18px;
     display: flex;
     flex-direction: column;
     gap: 18px;
@@ -155,6 +214,7 @@ body {
     padding: 12px 18px;
     border-top: 1px solid var(--border);
     flex-shrink: 0;
+    margin-top: auto;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -211,6 +271,42 @@ body {
 
 .sponsor-btn:hover svg {
     color: #f02eaa;
+}
+
+[data-theme="light"] .card {
+    border-color: var(--border);
+}
+
+[data-theme="light"] .card--inactive {
+    border-color: transparent;
+}
+
+[data-theme="light"] .card--success {
+    border-color: rgba(26, 127, 55, 0.3);
+}
+
+[data-theme="light"] .card--fail {
+    border-color: rgba(207, 34, 46, 0.3);
+}
+
+[data-theme="light"] .card--merged {
+    border-color: rgba(26, 127, 55, 0.25);
+}
+
+[data-theme="light"] .card--rejected {
+    border-color: rgba(207, 34, 46, 0.25);
+}
+
+[data-theme="light"] .sponsor-btn {
+    color: #24292f;
+    background: #f6f8fa;
+    border-color: rgba(219, 97, 162, 0.5);
+}
+
+[data-theme="light"] .sponsor-btn:hover {
+    background: #f3f4f6;
+    border-color: #bf3989;
+    color: #1f2328;
 }
 
 .sidebar-help-btn {
@@ -359,7 +455,6 @@ body {
 .optimal-chart-wrap {
     position: relative;
     margin-top: 4px;
-    overflow: visible;
 }
 
 #optimal-chart {

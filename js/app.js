@@ -1651,6 +1651,8 @@ function renderOptimalChart() {
     const colMuted =
         styles.getPropertyValue("--text-muted").trim() || "#484f58";
     const colBg = styles.getPropertyValue("--bg-card").trim() || "#1c2128";
+    const colText =
+        styles.getPropertyValue("--text-primary").trim() || "#e6edf3";
 
     // Clear and fill background
     ctx.clearRect(0, 0, w, h);
@@ -1715,7 +1717,7 @@ function renderOptimalChart() {
     // Current batch size vertical solid line + dots
     const current = config.batchSize;
     const curX = bx(current);
-    ctx.strokeStyle = "rgba(255,255,255,0.25)";
+    ctx.strokeStyle = colBorder;
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(curX, pad.top);
@@ -1737,7 +1739,7 @@ function renderOptimalChart() {
     ctx.fill();
 
     // Batch number label at current position
-    ctx.fillStyle = "rgba(255,255,255,0.6)";
+    ctx.fillStyle = colMuted;
     ctx.font =
         "9px " + (styles.getPropertyValue("--font-mono").trim() || "monospace");
     ctx.textAlign = "center";
@@ -2151,7 +2153,22 @@ function initWelcome() {
 
 // ── Initialize ─────────────────────────────────
 
+function initTheme() {
+    const saved = localStorage.getItem('mq-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+
+    document.getElementById('btn-theme').addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('mq-theme', next);
+        // Redraw the chart with new theme colors
+        renderOptimalChart();
+    });
+}
+
 function init() {
+    initTheme();
     bindEvents();
     initSummary();
     initGlossary();
