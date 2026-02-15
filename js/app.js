@@ -383,7 +383,10 @@ function evaluateQueue() {
             state.queue.shift();
             shifted++;
             state.rejected.push(id);
+            // The failed commit's CI time is useful — it identified a bad commit
+            state.successCITime += c.ciDuration;
             state.sequentialCITime += c.firstRunDuration;
+            usefulDelta += c.ciDuration;
             moved = true;
             // Restart remaining active window (pass how many were already removed)
             wastedDelta += restartActiveWindow(shifted);
@@ -451,7 +454,10 @@ function evaluateQueueStep() {
             state.queue.shift();
             shifted++;
             state.rejected.push(c.id);
+            // The failed commit's CI time is useful — it identified a bad commit
+            state.successCITime += c.ciDuration;
             state.sequentialCITime += c.firstRunDuration;
+            usefulDelta += c.ciDuration;
             moved = true;
             // Wasted time tracked inside restartActiveWindow (pass how many were already removed)
             wastedDelta = restartActiveWindow(shifted);

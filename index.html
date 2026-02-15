@@ -459,7 +459,7 @@
                         <div class="stat-divider stat--compact-hide"></div>
                         <div
                             class="stat stat--narrow-hide"
-                            title="CI time spent on commits that were successfully merged."
+                            title="CI time spent on commits that advanced the queue, including successful merges and failed commits that were identified and removed."
                         >
                             <span class="stat-label">Useful CI</span>
                             <span
@@ -470,7 +470,7 @@
                         </div>
                         <div
                             class="stat stat--narrow-hide"
-                            title="CI time wasted on failed commits and restarted runs that were thrown away."
+                            title="CI time thrown away when remaining batch items are restarted after a failure at the head."
                         >
                             <span class="stat-label">Wasted CI</span>
                             <span
@@ -1066,10 +1066,7 @@
                                     Useful CI / Wasted CI
                                 </dt>
                                 <dd class="glossary-def">
-                                    Useful CI is time spent on runs that led to
-                                    a successful merge. Wasted CI is time spent
-                                    on runs that were thrown away due to
-                                    failures or restarts.
+                                    Useful CI is time spent on commits that advanced the queue, including both successful merges and failed commits that were identified and removed. Wasted CI is time thrown away when remaining batch items are restarted after a failure at the head.
                                 </dd>
                             </div>
                             <div class="glossary-entry">
