@@ -1768,6 +1768,7 @@ function initOptimalChart() {
         document.getElementById("cfg-batch-size").value = batch;
         readConfigFromUI();
         syncUIValues();
+        if (!state.isRunning) doReset();
     }
 
     canvas.addEventListener("mousedown", (e) => {
@@ -1781,10 +1782,7 @@ function initOptimalChart() {
     });
 
     window.addEventListener("mouseup", () => {
-        if (dragging) {
-            dragging = false;
-            if (!state.isRunning) doReset();
-        }
+        dragging = false;
     });
 
     canvas.addEventListener("mousemove", (e) => {
