@@ -1623,7 +1623,7 @@ function renderOptimalChart() {
 
     const w = rect.width;
     const h = rect.height;
-    const pad = { top: 8, right: 8, bottom: 8, left: 44 };
+    const pad = { top: 8, right: 8, bottom: 38, left: 44 };
     const plotW = w - pad.left - pad.right;
     const plotH = h - pad.top - pad.bottom;
 
@@ -1805,11 +1805,18 @@ function renderOptimalChart() {
     ctx.fill();
 
     // Batch number label at current position
+    ctx.fillStyle = colText;
+    ctx.font =
+        "bold 13px " + (styles.getPropertyValue("--font-mono").trim() || "monospace");
+    ctx.textAlign = "center";
+    ctx.fillText(current, curX, pad.top + plotH + 12);
+
+    // X-axis label
     ctx.fillStyle = colMuted;
     ctx.font =
-        "9px " + (styles.getPropertyValue("--font-mono").trim() || "monospace");
+        "12px " + (styles.getPropertyValue("--font-mono").trim() || "monospace");
     ctx.textAlign = "center";
-    ctx.fillText(current, curX, pad.top + plotH + pad.bottom);
+    ctx.fillText("Batch Size", pad.left + plotW / 2, h - 10);
 }
 
 function initOptimalChart() {
@@ -1908,7 +1915,7 @@ function initOptimalChart() {
         const multStr = mult < 10 ? mult.toFixed(1) : Math.round(mult).toString();
 
         tooltip.innerHTML =
-            "<strong>Batch " +
+            "<strong>Batch Size " +
             batch +
             "</strong><br>" +
             "Wall clock: ~" +

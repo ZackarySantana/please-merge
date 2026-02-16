@@ -469,7 +469,7 @@ body {
 
 #optimal-chart {
     width: 100%;
-    height: 220px;
+    height: 260px;
     cursor: pointer;
     border-radius: var(--radius);
     border: 1px solid var(--border);
