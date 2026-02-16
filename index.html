@@ -258,65 +258,77 @@
                                     >Wall Clock</button
                                 >
                             </div>
-                            <p class="optimal-chart-desc">
-                                <strong>Throughput</strong> is the expected
-                                merges per cycle before a failure.
-                                <strong>Est. Cost</strong> is CI runs per merged
-                                commit.
-                                <strong>Wall Clock</strong> is estimated total
-                                time. Click to set batch size.
-                            </p>
-                            <div
-                                class="optimal-chart-estimates"
-                                id="optimal-chart-estimates"
-                            >
-                                <div class="optimal-estimate-row">
-                                    <span class="optimal-estimate-label"
-                                        >Wall Clock
-                                        <span
-                                            class="optimal-info"
-                                            title="Lower-bound estimate. Actual wall clock may be slightly higher due to CI jitter and queue dynamics."
-                                            >?</span
-                                        ></span
-                                    >
-                                    <span
-                                        class="optimal-estimate-value"
-                                        id="est-wall-clock"
-                                        >--</span
-                                    >
+                            <div class="optimal-chart-desc">
+                                <div class="optimal-desc-row">
+                                    <span class="optimal-desc-dot" style="background: var(--blue)"></span>
+                                    <span><strong>Throughput</strong> Expected merges before a failure</span>
                                 </div>
-                                <div class="optimal-estimate-row">
-                                    <span class="optimal-estimate-label"
-                                        >Est. Cost
-                                        <span
-                                            class="optimal-info"
-                                            title="Upper-bound estimate. Actual cost may be slightly lower due to partial final batches and queue efficiency."
-                                            >?</span
-                                        ></span
-                                    >
-                                    <span
-                                        class="optimal-estimate-value"
-                                        id="est-cost"
-                                        >--</span
-                                    >
+                                <div class="optimal-desc-row">
+                                    <span class="optimal-desc-dot" style="background: var(--red)"></span>
+                                    <span><strong>Est. Cost</strong> Cost multiplier vs sequential (1x)</span>
                                 </div>
+                                <div class="optimal-desc-row">
+                                    <span class="optimal-desc-dot" style="background: var(--purple)"></span>
+                                    <span><strong>Wall Clock</strong> Total time to process all commits</span>
+                                </div>
+                                <div class="optimal-desc-hint">Click or drag the chart to set batch size</div>
                             </div>
-                            <div class="optimal-hint">
-                                <button
-                                    class="optimal-btn"
-                                    id="btn-optimal-batch"
-                                    title="Set batch size to the mathematically optimal value"
-                                >
-                                    Optimal Batch Size: ~<span
-                                        id="val-optimal-batch"
-                                        >3</span
+                            <div class="optimal-estimates-section">
+                                <div class="optimal-estimates-header">
+                                    Estimates for Current Settings
+                                </div>
+                                <div class="optimal-hint">
+                                    <button
+                                        class="optimal-btn"
+                                        id="btn-optimal-batch"
+                                        title="Set batch size to the mathematically optimal value based on your CI success rate"
                                     >
-                                </button>
-                                <span
-                                    class="optimal-info"
-                                    title="Calculated as 1/(1-p) where p is your CI success rate. This is the expected number of commits before a failure, the sweet spot between parallelism and wasted CI."
-                                    >?</span
+                                        Apply Optimal Batch Size (~<span
+                                            id="val-optimal-batch"
+                                            >3</span
+                                        >)
+                                    </button>
+                                    <span
+                                        class="optimal-info"
+                                        title="Calculated as 1/(1-p) where p is your CI success rate. This is the expected number of commits before a failure, the sweet spot between parallelism and wasted CI."
+                                        >?</span
+                                    >
+                                </div>
+                                <div
+                                    class="optimal-chart-estimates"
+                                    id="optimal-chart-estimates"
                                 >
+                                    <div class="optimal-estimate-row">
+                                        <span class="optimal-estimate-label"
+                                            >Wall Clock
+                                            <span
+                                                class="optimal-info"
+                                                title="Lower-bound estimate. Actual wall clock may be slightly higher due to CI jitter and queue dynamics."
+                                                >?</span
+                                            ></span
+                                        >
+                                        <span
+                                            class="optimal-estimate-value"
+                                            id="est-wall-clock"
+                                            >--</span
+                                        >
+                                    </div>
+                                    <div class="optimal-estimate-row">
+                                        <span class="optimal-estimate-label"
+                                            >Est. Cost
+                                            <span
+                                                class="optimal-info"
+                                                title="Upper-bound estimate. Actual cost may be slightly lower due to partial final batches and queue efficiency."
+                                                >?</span
+                                            ></span
+                                        >
+                                        <span
+                                            class="optimal-estimate-value"
+                                            id="est-cost"
+                                            >--</span
+                                        >
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
