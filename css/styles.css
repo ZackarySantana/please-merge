@@ -348,6 +348,72 @@ body {
     margin: 4px 0;
 }
 
+/* ─── Collapsible Sections ─── */
+.collapsible-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.section-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 4px 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: inherit;
+    font: inherit;
+}
+
+.section-toggle:hover .section-heading {
+    color: var(--blue);
+}
+
+.section-chevron {
+    width: 12px;
+    height: 12px;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.section-chevron::before {
+    content: "";
+    display: block;
+    width: 7px;
+    height: 7px;
+    border-right: 2px solid var(--text-muted);
+    border-bottom: 2px solid var(--text-muted);
+    transform: rotate(45deg);
+    transition: transform 0.2s ease;
+    position: absolute;
+    top: 1px;
+    left: 2px;
+}
+
+.collapsible-section.collapsed .section-chevron::before {
+    transform: rotate(-45deg);
+    top: 4px;
+}
+
+.collapsible-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.2s ease;
+    max-height: 2000px;
+    opacity: 1;
+    padding-top: 4px;
+}
+
+.collapsible-section.collapsed .collapsible-body {
+    max-height: 0;
+    opacity: 0;
+    padding-top: 0;
+}
+
 .control-group {
     display: flex;
     flex-direction: column;
@@ -370,7 +436,7 @@ body {
     font-weight: 700;
     color: var(--text-primary);
     letter-spacing: 0.06em;
-    padding-bottom: 2px;
+    text-transform: uppercase;
 }
 
 .control-value {

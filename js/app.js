@@ -2301,9 +2301,39 @@ function initTheme() {
     if (welcomeThemeBtn) welcomeThemeBtn.addEventListener("click", toggleTheme);
 }
 
+function initCollapsible() {
+    const STORAGE_KEY = "ghmq-collapsed";
+    let saved = {};
+    try {
+        saved = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    } catch (_) {}
+
+    document.querySelectorAll(".collapsible-section").forEach((section) => {
+        const key = section.dataset.section;
+        if (saved[key]) section.classList.add("collapsed");
+
+        section.querySelector(".section-toggle").addEventListener("click", () => {
+            section.classList.toggle("collapsed");
+            const allState = {};
+            document.querySelectorAll(".collapsible-section").forEach((s) => {
+                if (s.classList.contains("collapsed")) allState[s.dataset.section] = true;
+            });
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(allState));
+            } catch (_) {}
+
+            // Re-render chart if analysis section was just expanded
+            if (key === "analysis" && !section.classList.contains("collapsed")) {
+                requestAnimationFrame(() => renderOptimalChart());
+            }
+        });
+    });
+}
+
 function init() {
     initTheme();
     bindEvents();
+    initCollapsible();
     initSummary();
     initGlossary();
     initOptimalChart();
