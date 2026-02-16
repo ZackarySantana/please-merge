@@ -811,12 +811,6 @@ button.optimal-legend-toggle.optimal-legend-toggle--on {
     gap: 6px;
 }
 
-.preset-icon {
-    font-size: 13px;
-    line-height: 1;
-    flex-shrink: 0;
-}
-
 .preset-btn {
     display: flex;
     align-items: center;
@@ -848,46 +842,46 @@ button.optimal-legend-toggle.optimal-legend-toggle--on {
     border-left-color: var(--green);
 }
 .preset-green:hover {
-    background: rgba(63, 185, 80, 0.08);
     border-color: var(--green);
+    background: rgba(63, 185, 80, 0.08);
 }
 
 .preset-flaky {
     border-left-color: var(--yellow);
 }
 .preset-flaky:hover {
-    background: rgba(210, 153, 34, 0.08);
     border-color: var(--yellow);
+    background: rgba(210, 153, 34, 0.08);
 }
 
 .preset-disaster {
     border-left-color: var(--red);
 }
 .preset-disaster:hover {
-    background: rgba(248, 81, 73, 0.08);
     border-color: var(--red);
+    background: rgba(248, 81, 73, 0.08);
 }
 
 .preset-fast {
     border-left-color: var(--blue);
 }
 .preset-fast:hover {
-    background: rgba(56, 139, 253, 0.08);
     border-color: var(--blue);
+    background: rgba(56, 139, 253, 0.08);
 }
 
-/* Light mode: slightly stronger hover backgrounds */
+/* Light mode: stronger hover backgrounds */
 [data-theme="light"] .preset-green:hover {
-    background: rgba(63, 185, 80, 0.12);
+    background: rgba(46, 160, 67, 0.12);
 }
 [data-theme="light"] .preset-flaky:hover {
-    background: rgba(210, 153, 34, 0.12);
+    background: rgba(154, 103, 0, 0.12);
 }
 [data-theme="light"] .preset-disaster:hover {
-    background: rgba(248, 81, 73, 0.10);
+    background: rgba(207, 34, 46, 0.10);
 }
 [data-theme="light"] .preset-fast:hover {
-    background: rgba(56, 139, 253, 0.10);
+    background: rgba(9, 105, 218, 0.10);
 }
 
 /* ─── Main Area ─── */
