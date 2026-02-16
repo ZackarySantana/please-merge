@@ -1602,8 +1602,10 @@ function updateChartEstimate() {
         totalCost >= 1
             ? "~$" + Math.round(totalCost)
             : "~$" + totalCost.toFixed(2);
+    const multiplier = Math.max(1, totalRuns / config.totalCommits);
+    const multStr = multiplier < 10 ? multiplier.toFixed(1) : Math.round(multiplier).toString();
     wallEl.textContent = wallStr;
-    costEl.textContent = costStr;
+    costEl.textContent = costStr + " (" + multStr + "x)";
 }
 
 function renderOptimalChart() {
@@ -1635,17 +1637,20 @@ function renderOptimalChart() {
         const pb = Math.pow(p, b);
         throughput.push(b * pb); // expected merges per cycle
 
-        // Cost per merged commit: b / E[merged per cycle]
         // E[merged] = sum_{k=0}^{b-1} k * p^k * (1-p)  +  b * p^b
-        // At p=1 this equals b, so cost = 1 (flat line). ✓
         let em = 0;
         for (let k = 0; k < b; k++) em += k * Math.pow(p, k) * (1 - p);
         em += b * pb;
-        cost.push(em > 0.0001 ? b / em : b * 100);
 
-        // Wall clock: cycles * ciDuration (lower = better)
+        // Items removed per cycle = merged + rejected
         const removed = em + (1 - pb);
         const cycles = removed > 0.0001 ? config.totalCommits / removed : 9999;
+
+        // Cost multiplier: total CI runs / totalCommits (vs sequential = 1x)
+        const totalRuns = Math.max(1, cycles - 0.5) * b;
+        cost.push(Math.max(1, totalRuns / config.totalCommits));
+
+        // Wall clock: cycles * ciDuration (lower = better)
         wallClock.push(cycles * config.ciDuration);
     }
 
@@ -1896,6 +1901,8 @@ function initOptimalChart() {
             totalCost >= 1
                 ? "$" + Math.round(totalCost)
                 : "$" + totalCost.toFixed(2);
+        const mult = Math.max(1, totalRuns / config.totalCommits);
+        const multStr = mult < 10 ? mult.toFixed(1) : Math.round(mult).toString();
 
         tooltip.innerHTML =
             "<strong>Batch " +
@@ -1905,7 +1912,8 @@ function initOptimalChart() {
             wallStr +
             "<br>" +
             "Est. cost: ~" +
-            costStr;
+            costStr +
+            " (" + multStr + "x)";
 
         const wrapRect = canvas.parentElement.getBoundingClientRect();
         const relX = e.clientX - wrapRect.left;
