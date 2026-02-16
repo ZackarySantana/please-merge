@@ -1844,6 +1844,27 @@ function initOptimalChart() {
     });
 
     canvas.addEventListener("mousemove", (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const relCanvasX = e.clientX - rect.left;
+        const padL = 44;
+
+        // If hovering over the y-axis label area, show context tooltip
+        if (relCanvasX < padL && (chartActiveSeries === "cost" || chartActiveSeries === "wall")) {
+            const msg = chartActiveSeries === "cost"
+                ? "Cost multiplier compared to<br>running CI sequentially (1x)"
+                : "Estimated total wall clock<br>time to process all commits";
+            tooltip.innerHTML = msg;
+
+            const wrapRect = canvas.parentElement.getBoundingClientRect();
+            const relY = e.clientY - wrapRect.top;
+            tooltip.hidden = false;
+            const tw = tooltip.offsetWidth;
+            tooltip.style.left = Math.max(2, Math.min(padL, wrapRect.width - tw - 2)) + "px";
+            tooltip.style.top = relY - 36 + "px";
+            tooltip.style.transform = "";
+            return;
+        }
+
         const batch = batchFromEvent(e);
         const p = config.successRate / 100;
         const pb = Math.pow(p, batch);
