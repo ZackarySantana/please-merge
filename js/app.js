@@ -1688,9 +1688,10 @@ function renderOptimalChart() {
     // Normalize each series to 0-1 (linear scale for both)
     const maxT = Math.max(...throughput, 0.001);
     const normT = throughput.map((v) => v / maxT);
-    // Ensure flat lines (e.g. 100% success) sit at mid-height, not the top
-    const maxC = Math.max(...cost, cost[0] * 2, 0.001);
-    const normC = cost.map((v) => v / maxC);
+    // Scale cost from 1x (bottom) to max (top)
+    const minC = 1;
+    const maxC = Math.max(...cost, minC + 0.001);
+    const normC = cost.map((v) => (v - minC) / (maxC - minC));
     // Wall clock: sqrt scale — between linear and log for a balanced view
     const maxW = Math.max(...wallClock, 0.001);
     const sqrtMax = Math.sqrt(maxW);
@@ -1749,9 +1750,12 @@ function renderOptimalChart() {
         for (let i = 0; i <= 4; i++) {
             const normVal = i / 4;
             const y = pad.top + plotH * (1 - normVal);
-            const actual = chartActiveSeries === "wall"
-                ? (normVal * sqrtMax) * (normVal * sqrtMax)
-                : normVal * maxC;
+            let actual;
+            if (chartActiveSeries === "wall") {
+                actual = (normVal * sqrtMax) * (normVal * sqrtMax);
+            } else {
+                actual = minC + normVal * (maxC - minC);
+            }
             ctx.fillText(formatVal(actual), pad.left - 4, y);
         }
     }
