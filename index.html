@@ -50,6 +50,165 @@
                     </button>
                 </div>
                 <div class="sidebar-body">
+                    <!-- Speed Multiplier -->
+                    <div class="control-group">
+                        <label class="control-label">
+                            Speed
+                            <span class="control-value" id="val-speed"
+                                >60×</span
+                            >
+                        </label>
+                        <input
+                            type="range"
+                            id="cfg-speed"
+                            min="60"
+                            max="3600"
+                            value="60"
+                            step="60"
+                            class="slider"
+                        />
+                        <div class="slider-hints">
+                            <span>60×</span><span>3600×</span>
+                        </div>
+                    </div>
+
+                    <!-- Step Mode -->
+                    <div class="control-group">
+                        <label class="control-label">
+                            Step Mode
+                            <span class="control-value" id="val-step-mode"
+                                >On</span
+                            >
+                        </label>
+                        <label class="toggle-row">
+                            <span class="toggle">
+                                <input
+                                    type="checkbox"
+                                    id="cfg-step-mode"
+                                    checked
+                                />
+                                <span class="toggle-track"></span>
+                            </span>
+                            <span class="toggle-hint"
+                                >Pause before each merge/reject</span
+                            >
+                        </label>
+                    </div>
+
+                    <hr class="sidebar-divider" />
+
+                    <!-- Batch Size Analysis -->
+                    <div class="control-group">
+                        <label class="control-label section-heading">Batch Size Analysis</label>
+                        <div class="optimal-chart-wrap">
+                            <canvas id="optimal-chart" height="150"></canvas>
+                            <div
+                                id="optimal-chart-tooltip"
+                                class="optimal-chart-tooltip"
+                                hidden
+                            ></div>
+                            <div class="optimal-chart-legend">
+                                <button
+                                    class="optimal-legend-item optimal-legend-throughput optimal-legend-toggle"
+                                    data-series="throughput"
+                                    title="Expected merges per CI cycle before a failure"
+                                    >Throughput</button
+                                >
+                                <button
+                                    class="optimal-legend-item optimal-legend-cost optimal-legend-item--active"
+                                    data-series="cost"
+                                    title="Cost multiplier compared to running CI sequentially (1x)"
+                                    >Est. Cost</button
+                                >
+                                <button
+                                    class="optimal-legend-item optimal-legend-wall"
+                                    data-series="wall"
+                                    title="Estimated total wall clock time to process all commits"
+                                    >Wall Clock</button
+                                >
+                            </div>
+                            <div class="optimal-chart-desc">
+                                <div class="optimal-desc-row">
+                                    <span class="optimal-desc-dot" style="background: var(--blue)"></span>
+                                    <span><strong>Throughput</strong> Expected merges before a failure</span>
+                                </div>
+                                <div class="optimal-desc-row">
+                                    <span class="optimal-desc-dot" style="background: var(--red)"></span>
+                                    <span><strong>Est. Cost</strong> Cost multiplier vs sequential (1x)</span>
+                                </div>
+                                <div class="optimal-desc-row">
+                                    <span class="optimal-desc-dot" style="background: var(--purple)"></span>
+                                    <span><strong>Wall Clock</strong> Total time to process all commits</span>
+                                </div>
+                                <div class="optimal-desc-hint">Click or drag the chart to set batch size</div>
+                            </div>
+                            <div class="optimal-estimates-section">
+                                <div class="optimal-estimates-header">
+                                    Estimates for Current Settings
+                                </div>
+                                <div class="optimal-hint">
+                                    <button
+                                        class="optimal-btn"
+                                        id="btn-optimal-batch"
+                                        title="Set batch size to the mathematically optimal value based on your CI success rate"
+                                    >
+                                        Apply Optimal Batch Size (~<span
+                                            id="val-optimal-batch"
+                                            >3</span
+                                        >)
+                                    </button>
+                                    <span
+                                        class="optimal-info"
+                                        title="Calculated as 1/(1-p) where p is your CI success rate. This is the expected number of commits before a failure, the sweet spot between parallelism and wasted CI."
+                                        >?</span
+                                    >
+                                </div>
+                                <div
+                                    class="optimal-chart-estimates"
+                                    id="optimal-chart-estimates"
+                                >
+                                    <div class="optimal-estimate-row">
+                                        <span class="optimal-estimate-label"
+                                            >Wall Clock
+                                            <span
+                                                class="optimal-info"
+                                                title="Lower-bound estimate. Actual wall clock may be slightly higher due to CI jitter and queue dynamics."
+                                                >?</span
+                                            ></span
+                                        >
+                                        <span
+                                            class="optimal-estimate-value"
+                                            id="est-wall-clock"
+                                            >--</span
+                                        >
+                                    </div>
+                                    <div class="optimal-estimate-row">
+                                        <span class="optimal-estimate-label"
+                                            >Est. Cost
+                                            <span
+                                                class="optimal-info"
+                                                title="Upper-bound estimate. Actual cost may be slightly lower due to partial final batches and queue efficiency."
+                                                >?</span
+                                            ></span
+                                        >
+                                        <span
+                                            class="optimal-estimate-value"
+                                            id="est-cost"
+                                            >--</span
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="sidebar-divider" />
+
+                    <!-- Configuration -->
+                    <div class="control-group">
+                        <label class="control-label section-heading">Configuration</label>
+                    </div>
+
                     <!-- Success Rate -->
                     <div class="control-group">
                         <label class="control-label">
@@ -156,54 +315,11 @@
                         </div>
                     </div>
 
-                    <!-- Speed Multiplier -->
-                    <div class="control-group">
-                        <label class="control-label">
-                            Speed
-                            <span class="control-value" id="val-speed"
-                                >60×</span
-                            >
-                        </label>
-                        <input
-                            type="range"
-                            id="cfg-speed"
-                            min="60"
-                            max="3600"
-                            value="60"
-                            step="60"
-                            class="slider"
-                        />
-                        <div class="slider-hints">
-                            <span>60×</span><span>3600×</span>
-                        </div>
-                    </div>
-
-                    <!-- Step Mode -->
-                    <div class="control-group">
-                        <label class="control-label">
-                            Step Mode
-                            <span class="control-value" id="val-step-mode"
-                                >On</span
-                            >
-                        </label>
-                        <label class="toggle-row">
-                            <span class="toggle">
-                                <input
-                                    type="checkbox"
-                                    id="cfg-step-mode"
-                                    checked
-                                />
-                                <span class="toggle-track"></span>
-                            </span>
-                            <span class="toggle-hint"
-                                >Pause before each merge/reject</span
-                            >
-                        </label>
-                    </div>
+                    <hr class="sidebar-divider" />
 
                     <!-- Presets -->
                     <div class="control-group presets-group">
-                        <label class="control-label">Presets</label>
+                        <label class="control-label section-heading">Presets</label>
                         <div class="presets">
                             <button
                                 class="preset-btn"
@@ -223,113 +339,6 @@
                             >
                                 Fast &amp; Furious
                             </button>
-                        </div>
-                    </div>
-
-                    <hr class="sidebar-divider" />
-
-                    <!-- Batch Size Analysis -->
-                    <div class="control-group">
-                        <label class="control-label">Batch Size Analysis</label>
-                        <div class="optimal-chart-wrap">
-                            <canvas id="optimal-chart" height="150"></canvas>
-                            <div
-                                id="optimal-chart-tooltip"
-                                class="optimal-chart-tooltip"
-                                hidden
-                            ></div>
-                            <div class="optimal-chart-legend">
-                                <button
-                                    class="optimal-legend-item optimal-legend-throughput optimal-legend-toggle"
-                                    data-series="throughput"
-                                    title="Expected merges per CI cycle before a failure"
-                                    >Throughput</button
-                                >
-                                <button
-                                    class="optimal-legend-item optimal-legend-cost optimal-legend-item--active"
-                                    data-series="cost"
-                                    title="Cost multiplier compared to running CI sequentially (1x)"
-                                    >Est. Cost</button
-                                >
-                                <button
-                                    class="optimal-legend-item optimal-legend-wall"
-                                    data-series="wall"
-                                    title="Estimated total wall clock time to process all commits"
-                                    >Wall Clock</button
-                                >
-                            </div>
-                            <div class="optimal-chart-desc">
-                                <div class="optimal-desc-row">
-                                    <span class="optimal-desc-dot" style="background: var(--blue)"></span>
-                                    <span><strong>Throughput</strong> Expected merges before a failure</span>
-                                </div>
-                                <div class="optimal-desc-row">
-                                    <span class="optimal-desc-dot" style="background: var(--red)"></span>
-                                    <span><strong>Est. Cost</strong> Cost multiplier vs sequential (1x)</span>
-                                </div>
-                                <div class="optimal-desc-row">
-                                    <span class="optimal-desc-dot" style="background: var(--purple)"></span>
-                                    <span><strong>Wall Clock</strong> Total time to process all commits</span>
-                                </div>
-                                <div class="optimal-desc-hint">Click or drag the chart to set batch size</div>
-                            </div>
-                            <div class="optimal-estimates-section">
-                                <div class="optimal-estimates-header">
-                                    Estimates for Current Settings
-                                </div>
-                                <div class="optimal-hint">
-                                    <button
-                                        class="optimal-btn"
-                                        id="btn-optimal-batch"
-                                        title="Set batch size to the mathematically optimal value based on your CI success rate"
-                                    >
-                                        Apply Optimal Batch Size (~<span
-                                            id="val-optimal-batch"
-                                            >3</span
-                                        >)
-                                    </button>
-                                    <span
-                                        class="optimal-info"
-                                        title="Calculated as 1/(1-p) where p is your CI success rate. This is the expected number of commits before a failure, the sweet spot between parallelism and wasted CI."
-                                        >?</span
-                                    >
-                                </div>
-                                <div
-                                    class="optimal-chart-estimates"
-                                    id="optimal-chart-estimates"
-                                >
-                                    <div class="optimal-estimate-row">
-                                        <span class="optimal-estimate-label"
-                                            >Wall Clock
-                                            <span
-                                                class="optimal-info"
-                                                title="Lower-bound estimate. Actual wall clock may be slightly higher due to CI jitter and queue dynamics."
-                                                >?</span
-                                            ></span
-                                        >
-                                        <span
-                                            class="optimal-estimate-value"
-                                            id="est-wall-clock"
-                                            >--</span
-                                        >
-                                    </div>
-                                    <div class="optimal-estimate-row">
-                                        <span class="optimal-estimate-label"
-                                            >Est. Cost
-                                            <span
-                                                class="optimal-info"
-                                                title="Upper-bound estimate. Actual cost may be slightly lower due to partial final batches and queue efficiency."
-                                                >?</span
-                                            ></span
-                                        >
-                                        <span
-                                            class="optimal-estimate-value"
-                                            id="est-cost"
-                                            >--</span
-                                        >
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>

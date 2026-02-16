@@ -365,6 +365,14 @@ body {
     letter-spacing: 0.04em;
 }
 
+.section-heading {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: 0.06em;
+    padding-bottom: 2px;
+}
+
 .control-value {
     color: var(--text-primary);
     font-weight: 600;
