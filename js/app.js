@@ -95,7 +95,7 @@ const PRESETS = {
         totalCommits: 100,
         ciDuration: 10,
         ciJitter: 5,
-        speed: 300,
+        speed: 60,
         label: "Mostly Green",
     },
     "flaky-ci": {
@@ -104,7 +104,7 @@ const PRESETS = {
         totalCommits: 100,
         ciDuration: 15,
         ciJitter: 10,
-        speed: 300,
+        speed: 60,
         label: "Flaky CI",
     },
     disaster: {
@@ -113,7 +113,7 @@ const PRESETS = {
         totalCommits: 60,
         ciDuration: 20,
         ciJitter: 10,
-        speed: 600,
+        speed: 3600,
         label: "Disaster Mode",
     },
     "fast-and-furious": {
@@ -122,7 +122,7 @@ const PRESETS = {
         totalCommits: 200,
         ciDuration: 5,
         ciJitter: 3,
-        speed: 1200,
+        speed: 10800,
         label: "Fast & Furious",
     },
 };
@@ -1564,7 +1564,37 @@ function readConfigFromUI() {
     config.totalCommits = +document.getElementById("cfg-total-commits").value;
     config.ciDuration = +document.getElementById("cfg-ci-duration").value;
     config.ciJitter = +document.getElementById("cfg-ci-jitter").value;
-    config.speed = +document.getElementById("cfg-speed").value;
+    saveConfig();
+}
+
+const CONFIG_STORAGE_KEY = "ghmq-config";
+
+function saveConfig() {
+    try {
+        localStorage.setItem(CONFIG_STORAGE_KEY, JSON.stringify({
+            successRate: config.successRate,
+            batchSize: config.batchSize,
+            totalCommits: config.totalCommits,
+            ciDuration: config.ciDuration,
+            ciJitter: config.ciJitter,
+            speed: config.speed,
+            stepMode: config.stepMode,
+        }));
+    } catch (_) {}
+}
+
+function loadConfig() {
+    try {
+        const saved = JSON.parse(localStorage.getItem(CONFIG_STORAGE_KEY));
+        if (!saved) return;
+        if (saved.successRate != null) config.successRate = saved.successRate;
+        if (saved.batchSize != null) config.batchSize = saved.batchSize;
+        if (saved.totalCommits != null) config.totalCommits = saved.totalCommits;
+        if (saved.ciDuration != null) config.ciDuration = saved.ciDuration;
+        if (saved.ciJitter != null) config.ciJitter = saved.ciJitter;
+        if (saved.speed != null) config.speed = saved.speed;
+        if (saved.stepMode != null) config.stepMode = saved.stepMode;
+    } catch (_) {}
 }
 
 function getOptimalBatch() {
@@ -1972,6 +2002,12 @@ function initOptimalChart() {
     updateChartEstimate();
 }
 
+function syncSpeedButtons() {
+    document.querySelectorAll(".speed-btn").forEach((btn) => {
+        btn.classList.toggle("speed-btn--active", +btn.dataset.speed === config.speed);
+    });
+}
+
 function syncUIValues() {
     document.getElementById("val-success-rate").textContent =
         config.successRate + "%";
@@ -1982,7 +2018,6 @@ function syncUIValues() {
         config.ciDuration + " m";
     document.getElementById("val-ci-jitter").textContent =
         "± " + config.ciJitter + " m";
-    document.getElementById("val-speed").textContent = config.speed + "×";
     document.getElementById("val-optimal-batch").textContent =
         getOptimalBatch();
     renderOptimalChart();
@@ -1995,7 +2030,7 @@ function writeConfigToUI() {
     document.getElementById("cfg-total-commits").value = config.totalCommits;
     document.getElementById("cfg-ci-duration").value = config.ciDuration;
     document.getElementById("cfg-ci-jitter").value = config.ciJitter;
-    document.getElementById("cfg-speed").value = config.speed;
+    syncSpeedButtons();
     syncUIValues();
 }
 
@@ -2009,6 +2044,7 @@ function applyPreset(name) {
     config.ciJitter = p.ciJitter;
     config.speed = p.speed;
     writeConfigToUI();
+    saveConfig();
     doReset();
 }
 
@@ -2020,12 +2056,13 @@ function bindEvents() {
     document.getElementById("btn-pause").addEventListener("click", doPause);
     document.getElementById("btn-reset").addEventListener("click", doReset);
 
-    // Step mode
-    document.getElementById("cfg-step-mode").addEventListener("change", (e) => {
-        config.stepMode = e.target.checked;
-        document.getElementById("val-step-mode").textContent = config.stepMode
-            ? "On"
-            : "Off";
+    // Step mode toggle button
+    document.getElementById("btn-step-mode").addEventListener("click", () => {
+        config.stepMode = !config.stepMode;
+        const btn = document.getElementById("btn-step-mode");
+        btn.classList.toggle("btn-step-active", config.stepMode);
+        btn.classList.toggle("btn-ghost", !config.stepMode);
+        saveConfig();
         // If step mode is turned off while waiting, execute the pending evaluation instantly
         if (!config.stepMode && state.stepWaiting && !state.animating) {
             hideStepBanner();
@@ -2062,8 +2099,17 @@ function bindEvents() {
             if (!state.isRunning) doReset();
         });
 
+    // Speed buttons
+    document.querySelectorAll(".speed-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            config.speed = +btn.dataset.speed;
+            syncSpeedButtons();
+            saveConfig();
+        });
+    });
+
     // Sidebar sliders — live update labels; some require reset
-    const liveSliders = ["cfg-success-rate", "cfg-speed"];
+    const liveSliders = ["cfg-success-rate"];
     const resetSliders = [
         "cfg-batch-size",
         "cfg-total-commits",
@@ -2334,6 +2380,12 @@ function initCollapsible() {
 
 function init() {
     initTheme();
+    loadConfig();
+    writeConfigToUI();
+    // Sync step mode button with loaded config
+    const stepBtn = document.getElementById("btn-step-mode");
+    stepBtn.classList.toggle("btn-step-active", config.stepMode);
+    stepBtn.classList.toggle("btn-ghost", !config.stepMode);
     bindEvents();
     initCollapsible();
     initSummary();

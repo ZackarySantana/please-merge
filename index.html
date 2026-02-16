@@ -50,49 +50,14 @@
                     </button>
                 </div>
                 <div class="sidebar-body">
-                    <!-- Speed Multiplier -->
+                    <!-- Speed -->
                     <div class="control-group">
-                        <label class="control-label">
-                            Speed
-                            <span class="control-value" id="val-speed"
-                                >60×</span
-                            >
-                        </label>
-                        <input
-                            type="range"
-                            id="cfg-speed"
-                            min="60"
-                            max="3600"
-                            value="60"
-                            step="60"
-                            class="slider"
-                        />
-                        <div class="slider-hints">
-                            <span>60×</span><span>3600×</span>
+                        <label class="control-label">Speed</label>
+                        <div class="speed-btns">
+                            <button class="speed-btn speed-btn--active" data-speed="60">Normal</button>
+                            <button class="speed-btn" data-speed="3600">Fast</button>
+                            <button class="speed-btn" data-speed="10800">Very Fast</button>
                         </div>
-                    </div>
-
-                    <!-- Step Mode -->
-                    <div class="control-group">
-                        <label class="control-label">
-                            Step Mode
-                            <span class="control-value" id="val-step-mode"
-                                >On</span
-                            >
-                        </label>
-                        <label class="toggle-row">
-                            <span class="toggle">
-                                <input
-                                    type="checkbox"
-                                    id="cfg-step-mode"
-                                    checked
-                                />
-                                <span class="toggle-track"></span>
-                            </span>
-                            <span class="toggle-hint"
-                                >Pause before each merge/reject</span
-                            >
-                        </label>
                     </div>
 
                     <hr class="sidebar-divider" />
@@ -469,6 +434,13 @@
                             title="Run the entire simulation instantly"
                         >
                             <span class="btn-icon">⚡</span> Instant
+                        </button>
+                        <button
+                            id="btn-step-mode"
+                            class="btn btn-step-active"
+                            title="Pause before each merge/reject action"
+                        >
+                            <span class="btn-icon">⏭</span> Step
                         </button>
                     </div>
                     <div class="topbar-right">

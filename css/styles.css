@@ -487,6 +487,37 @@ body {
     font-family: var(--font-mono);
 }
 
+/* Speed buttons */
+.speed-btns {
+    display: flex;
+    gap: 6px;
+}
+
+.speed-btn {
+    flex: 1;
+    padding: 5px 8px;
+    font-size: 11px;
+    font-family: var(--font-sans);
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.speed-btn:hover {
+    color: var(--text-primary);
+    border-color: var(--text-muted);
+}
+
+.speed-btn.speed-btn--active {
+    color: var(--blue);
+    border-color: var(--blue);
+    background: var(--blue-dim);
+}
+
 /* Optimal batch hint */
 .optimal-hint {
     display: flex;
@@ -976,6 +1007,16 @@ button.optimal-legend-toggle.optimal-legend-toggle--on {
 .btn-ghost:hover:not(:disabled) {
     background: var(--bg-card);
     color: var(--text-primary);
+}
+
+.btn-step-active {
+    background: var(--green-dim);
+    color: var(--green-bright);
+    border-color: var(--green);
+}
+.btn-step-active:hover {
+    background: var(--green);
+    color: #fff;
 }
 
 /* Stats */
