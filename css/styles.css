@@ -548,6 +548,15 @@ button.optimal-legend-item.optimal-legend-item--active {
     background: rgba(0, 0, 0, 0.08);
 }
 
+button.optimal-legend-toggle {
+    text-decoration: none;
+}
+
+button.optimal-legend-toggle.optimal-legend-toggle--on {
+    opacity: 1;
+    color: var(--text);
+}
+
 .optimal-legend-item::before {
     content: "";
     display: inline-block;
@@ -557,7 +566,14 @@ button.optimal-legend-item.optimal-legend-item--active {
 }
 
 .optimal-legend-throughput::before {
+    background: transparent;
+    border: 1.5px solid var(--blue);
+    box-sizing: border-box;
+}
+
+.optimal-legend-throughput.optimal-legend-toggle--on::before {
     background: var(--blue);
+    border-color: var(--blue);
 }
 
 .optimal-legend-cost::before {

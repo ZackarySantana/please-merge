@@ -168,6 +168,7 @@ const render = {
 let animFrameId = null;
 let lastTimestamp = 0;
 let chartActiveSeries = "cost";
+let chartShowThroughput = false;
 
 // ── Commit Generation ──────────────────────────
 
@@ -1749,8 +1750,8 @@ function renderOptimalChart() {
         ctx.stroke();
     }
 
-    // Draw throughput line (blue)
-    drawLine(normT, colBlue);
+    // Draw throughput line (blue) — only if toggled on
+    if (chartShowThroughput) drawLine(normT, colBlue);
 
     // Draw cost line (red)
     drawLine(normC, colRed);
@@ -1780,12 +1781,14 @@ function renderOptimalChart() {
     ctx.lineTo(curX, pad.top + plotH);
     ctx.stroke();
 
-    // Dot on throughput line at current batch
-    const curTY = by(normT[current - 1] || 0);
-    ctx.fillStyle = colBlue;
-    ctx.beginPath();
-    ctx.arc(curX, curTY, 3.5, 0, Math.PI * 2);
-    ctx.fill();
+    // Dot on throughput line at current batch (only if toggled on)
+    if (chartShowThroughput) {
+        const curTY = by(normT[current - 1] || 0);
+        ctx.fillStyle = colBlue;
+        ctx.beginPath();
+        ctx.arc(curX, curTY, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+    }
 
     // Dot on cost line at current batch
     const curCY = by(normC[current - 1] || 0);
@@ -1935,12 +1938,22 @@ function initOptimalChart() {
         tooltip.hidden = true;
     });
 
-    // Legend click to select series
-    const legendBtns = document.querySelectorAll("button.optimal-legend-item");
-    legendBtns.forEach((btn) => {
+    // Throughput toggle
+    const throughputBtn = document.querySelector(".optimal-legend-toggle");
+    if (throughputBtn) {
+        throughputBtn.addEventListener("click", () => {
+            chartShowThroughput = !chartShowThroughput;
+            throughputBtn.classList.toggle("optimal-legend-toggle--on", chartShowThroughput);
+            renderOptimalChart();
+        });
+    }
+
+    // Y-axis series selection (cost / wall clock)
+    const seriesBtns = document.querySelectorAll("button.optimal-legend-item:not(.optimal-legend-toggle)");
+    seriesBtns.forEach((btn) => {
         btn.addEventListener("click", () => {
             chartActiveSeries = btn.dataset.series;
-            legendBtns.forEach((b) =>
+            seriesBtns.forEach((b) =>
                 b.classList.toggle("optimal-legend-item--active", b === btn),
             );
             renderOptimalChart();
