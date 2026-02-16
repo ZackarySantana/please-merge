@@ -2303,14 +2303,16 @@ function initTheme() {
 
 function initCollapsible() {
     const STORAGE_KEY = "ghmq-collapsed";
-    let saved = {};
+    const DEFAULTS = { "ci-env": true, "presets": true };
+    let saved = null;
     try {
-        saved = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+        saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
     } catch (_) {}
+    const collapsed = saved !== null ? saved : DEFAULTS;
 
     document.querySelectorAll(".collapsible-section").forEach((section) => {
         const key = section.dataset.section;
-        if (saved[key]) section.classList.add("collapsed");
+        if (collapsed[key]) section.classList.add("collapsed");
 
         section.querySelector(".section-toggle").addEventListener("click", () => {
             section.classList.toggle("collapsed");
