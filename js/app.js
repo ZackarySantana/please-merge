@@ -167,6 +167,7 @@ const render = {
 
 let animFrameId = null;
 let lastTimestamp = 0;
+let chartActiveSeries = "cost";
 
 // ── Commit Generation ──────────────────────────
 
@@ -1619,7 +1620,7 @@ function renderOptimalChart() {
 
     const w = rect.width;
     const h = rect.height;
-    const pad = { top: 8, right: 8, bottom: 8, left: 8 };
+    const pad = { top: 8, right: 8, bottom: 8, left: 44 };
     const plotW = w - pad.left - pad.right;
     const plotH = h - pad.top - pad.bottom;
 
@@ -1687,6 +1688,36 @@ function renderOptimalChart() {
         ctx.moveTo(pad.left, y);
         ctx.lineTo(pad.left + plotW, y);
         ctx.stroke();
+    }
+
+    // Y-axis tick labels for cost and wall clock series
+    if (chartActiveSeries === "cost" || chartActiveSeries === "wall") {
+        let seriesColor, formatVal;
+        if (chartActiveSeries === "cost") {
+            seriesColor = colRed;
+            formatVal = (v) => (v < 10 ? v.toFixed(1) : Math.round(v).toString()) + "x";
+        } else {
+            seriesColor = colPurple;
+            formatVal = (v) => {
+                if (v < 60) return Math.round(v) + "m";
+                if (v < 1440) return (v / 60).toFixed(1) + "h";
+                return (v / 1440).toFixed(1) + "d";
+            };
+        }
+
+        ctx.fillStyle = seriesColor;
+        ctx.font = "11px " + (styles.getPropertyValue("--font-mono").trim() || "monospace");
+        ctx.textAlign = "right";
+        ctx.textBaseline = "middle";
+
+        for (let i = 0; i <= 4; i++) {
+            const normVal = i / 4;
+            const y = pad.top + plotH * (1 - normVal);
+            const actual = chartActiveSeries === "wall"
+                ? (normVal * sqrtMax) * (normVal * sqrtMax)
+                : normVal * maxC;
+            ctx.fillText(formatVal(actual), pad.left - 4, y);
+        }
     }
 
     // Helper: batch index to x
@@ -1781,9 +1812,9 @@ function initOptimalChart() {
 
     function batchFromEvent(e) {
         const rect = canvas.getBoundingClientRect();
-        const pad = 8;
-        const plotW = rect.width - pad * 2;
-        const relX = e.clientX - rect.left - pad;
+        const padL = 44, padR = 8;
+        const plotW = rect.width - padL - padR;
+        const relX = e.clientX - rect.left - padL;
         const ratio = Math.max(0, Math.min(1, relX / plotW));
         return Math.round(ratio * 49) + 1; // 1-50
     }
@@ -1873,6 +1904,18 @@ function initOptimalChart() {
 
     canvas.addEventListener("mouseleave", () => {
         tooltip.hidden = true;
+    });
+
+    // Legend click to select series
+    const legendBtns = document.querySelectorAll("button.optimal-legend-item");
+    legendBtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+            chartActiveSeries = btn.dataset.series;
+            legendBtns.forEach((b) =>
+                b.classList.toggle("optimal-legend-item--active", b === btn),
+            );
+            renderOptimalChart();
+        });
     });
 
     // Initial render

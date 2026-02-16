@@ -506,6 +506,46 @@ body {
     display: flex;
     align-items: center;
     gap: 4px;
+    padding: 2px 6px;
+    color: var(--text-muted);
+    font-size: 10px;
+    opacity: 0.85;
+}
+
+button.optimal-legend-item {
+    cursor: pointer;
+    background: none;
+    border: none;
+    border-radius: 4px;
+    font: inherit;
+    font-size: 10px;
+    transition: opacity 0.15s, background 0.15s;
+    opacity: 0.65;
+    text-decoration: underline dashed;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+    text-decoration-color: var(--text-muted);
+}
+
+button.optimal-legend-item:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.06);
+    text-decoration-color: var(--text);
+}
+
+button.optimal-legend-item.optimal-legend-item--active {
+    opacity: 1;
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.14);
+    text-decoration: none;
+}
+
+[data-theme="light"] button.optimal-legend-item:hover {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] button.optimal-legend-item.optimal-legend-item--active {
+    background: rgba(0, 0, 0, 0.08);
 }
 
 .optimal-legend-item::before {
