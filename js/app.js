@@ -1654,9 +1654,10 @@ function renderOptimalChart() {
     // Ensure flat lines (e.g. 100% success) sit at mid-height, not the top
     const maxC = Math.max(...cost, cost[0] * 2, 0.001);
     const normC = cost.map((v) => v / maxC);
-    // Wall clock: normalize like cost (higher on chart = more time)
+    // Wall clock: sqrt scale — between linear and log for a balanced view
     const maxW = Math.max(...wallClock, 0.001);
-    const normW = wallClock.map((v) => v / maxW);
+    const sqrtMax = Math.sqrt(maxW);
+    const normW = wallClock.map((v) => Math.sqrt(v) / sqrtMax);
 
     // Read CSS colors
     const styles = getComputedStyle(document.documentElement);
