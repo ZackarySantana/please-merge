@@ -89,13 +89,22 @@ const SUBJECTS = [
 ];
 
 const PRESETS = {
+    "default": {
+        successRate: 70,
+        batchSize: 10,
+        totalCommits: 100,
+        ciDuration: 15,
+        ciJitter: 10,
+        speed: 240,
+        label: "Default",
+    },
     "mostly-green": {
         successRate: 95,
         batchSize: 10,
         totalCommits: 100,
         ciDuration: 10,
         ciJitter: 5,
-        speed: 60,
+        speed: 240,
         label: "Mostly Green",
     },
     "flaky-ci": {
@@ -104,7 +113,7 @@ const PRESETS = {
         totalCommits: 100,
         ciDuration: 15,
         ciJitter: 10,
-        speed: 60,
+        speed: 240,
         label: "Flaky CI",
     },
     disaster: {
@@ -135,7 +144,7 @@ const config = {
     totalCommits: 100,
     ciDuration: 15, // minutes — base CI duration
     ciJitter: 10, // minutes — ± variance around ciDuration
-    speed: 60,
+    speed: 240,
     stepMode: true,
 };
 
@@ -168,7 +177,6 @@ const render = {
 let animFrameId = null;
 let lastTimestamp = 0;
 let chartActiveSeries = "cost";
-let chartShowThroughput = false;
 
 // ── Commit Generation ──────────────────────────
 
@@ -1661,12 +1669,10 @@ function renderOptimalChart() {
     const maxBatch = 50;
 
     // Compute data series
-    const throughput = [];
     const cost = [];
     const wallClock = [];
     for (let b = 1; b <= maxBatch; b++) {
         const pb = Math.pow(p, b);
-        throughput.push(b * pb); // expected merges per cycle
 
         // E[merged] = sum_{k=0}^{b-1} k * p^k * (1-p)  +  b * p^b
         let em = 0;
@@ -1685,9 +1691,6 @@ function renderOptimalChart() {
         wallClock.push(cycles * config.ciDuration);
     }
 
-    // Normalize each series to 0-1 (linear scale for both)
-    const maxT = Math.max(...throughput, 0.001);
-    const normT = throughput.map((v) => v / maxT);
     // Scale cost from 1x (bottom) to max (top)
     const minC = 1;
     const maxC = Math.max(...cost, minC + 0.001);
@@ -1784,9 +1787,6 @@ function renderOptimalChart() {
         ctx.stroke();
     }
 
-    // Draw throughput line (blue) — only if toggled on
-    if (chartShowThroughput) drawLine(normT, colBlue);
-
     // Draw cost line (red)
     drawLine(normC, colRed);
 
@@ -1814,15 +1814,6 @@ function renderOptimalChart() {
     ctx.moveTo(curX, pad.top);
     ctx.lineTo(curX, pad.top + plotH);
     ctx.stroke();
-
-    // Dot on throughput line at current batch (only if toggled on)
-    if (chartShowThroughput) {
-        const curTY = by(normT[current - 1] || 0);
-        ctx.fillStyle = colBlue;
-        ctx.beginPath();
-        ctx.arc(curX, curTY, 3.5, 0, Math.PI * 2);
-        ctx.fill();
-    }
 
     // Dot on cost line at current batch
     const curCY = by(normC[current - 1] || 0);
@@ -1979,18 +1970,8 @@ function initOptimalChart() {
         tooltip.hidden = true;
     });
 
-    // Throughput toggle
-    const throughputBtn = document.querySelector(".optimal-legend-toggle");
-    if (throughputBtn) {
-        throughputBtn.addEventListener("click", () => {
-            chartShowThroughput = !chartShowThroughput;
-            throughputBtn.classList.toggle("optimal-legend-toggle--on", chartShowThroughput);
-            renderOptimalChart();
-        });
-    }
-
     // Y-axis series selection (cost / wall clock)
-    const seriesBtns = document.querySelectorAll("button.optimal-legend-item:not(.optimal-legend-toggle)");
+    const seriesBtns = document.querySelectorAll("button.optimal-legend-item");
     seriesBtns.forEach((btn) => {
         btn.addEventListener("click", () => {
             chartActiveSeries = btn.dataset.series;

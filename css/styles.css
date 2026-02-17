@@ -519,34 +519,56 @@ body {
 }
 
 /* Optimal batch hint */
-.optimal-hint {
+.optimal-batch-row {
     display: flex;
     align-items: center;
-    gap: 6px;
-}
-
-.optimal-btn {
-    flex: 1;
-    padding: 5px 10px;
-    font-size: 11px;
-    font-family: var(--font-sans);
-    color: var(--text-muted);
-    background: transparent;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 10px;
+    background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    cursor: pointer;
-    transition: all var(--duration) var(--ease-out);
 }
 
-.optimal-btn span {
-    font-family: var(--font-mono);
+.optimal-batch-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.optimal-batch-value-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.optimal-batch-value {
+    font-size: 16px;
     font-weight: 700;
+    font-family: var(--font-mono);
+    color: var(--text-primary);
 }
 
-.optimal-btn:hover {
+.optimal-apply-btn {
+    padding: 3px 10px;
+    font-size: 11px;
+    font-family: var(--font-sans);
+    font-weight: 500;
     color: var(--blue);
-    border-color: var(--blue);
     background: var(--blue-dim);
+    border: 1px solid var(--blue);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.optimal-apply-btn:hover {
+    background: var(--blue);
+    color: #fff;
 }
 
 .optimal-info {
@@ -652,32 +674,12 @@ button.optimal-legend-item.optimal-legend-item--active {
     background: rgba(0, 0, 0, 0.08);
 }
 
-button.optimal-legend-toggle {
-    text-decoration: none;
-}
-
-button.optimal-legend-toggle.optimal-legend-toggle--on {
-    opacity: 1;
-    color: var(--text);
-}
-
 .optimal-legend-item::before {
     content: "";
     display: inline-block;
     width: 8px;
     height: 8px;
     border-radius: 50%;
-}
-
-.optimal-legend-throughput::before {
-    background: transparent;
-    border: 1.5px solid var(--blue);
-    box-sizing: border-box;
-}
-
-.optimal-legend-throughput.optimal-legend-toggle--on::before {
-    background: var(--blue);
-    border-color: var(--blue);
 }
 
 .optimal-legend-cost::before {
@@ -746,7 +748,7 @@ button.optimal-legend-toggle.optimal-legend-toggle--on {
 
 .optimal-estimate-row {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     justify-content: space-between;
     gap: 8px;
 }
@@ -755,19 +757,17 @@ button.optimal-legend-toggle.optimal-legend-toggle--on {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    font-size: 12px;
+    font-size: 11px;
     color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
 }
 
 .optimal-estimate-value {
-    font-size: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: var(--font-mono);
     color: var(--text-primary);
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 3px 8px;
-    min-width: 70px;
-    text-align: right;
 }
 
 /* Toggle switch */
@@ -869,6 +869,22 @@ button.optimal-legend-toggle.optimal-legend-toggle--on {
 }
 
 /* Colored left borders and hover effects */
+.preset-default {
+    border-left-color: var(--text-primary);
+    border-style: dashed;
+    border-left-style: solid;
+    background: transparent;
+}
+.preset-default:hover {
+    border-color: var(--text-primary);
+    border-style: solid;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="light"] .preset-default:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
 .preset-green {
     border-left-color: var(--green);
 }
