@@ -1719,6 +1719,20 @@ function renderOptimalChart() {
     ctx.roundRect(0, 0, w, h, 6);
     ctx.fill();
 
+    // X and Y axis lines
+    ctx.strokeStyle = colBorder;
+    ctx.lineWidth = 1;
+    // Y-axis
+    ctx.beginPath();
+    ctx.moveTo(pad.left, pad.top);
+    ctx.lineTo(pad.left, pad.top + plotH);
+    ctx.stroke();
+    // X-axis
+    ctx.beginPath();
+    ctx.moveTo(pad.left, pad.top + plotH);
+    ctx.lineTo(pad.left + plotW, pad.top + plotH);
+    ctx.stroke();
+
     // Subtle grid lines
     ctx.strokeStyle = colBorder;
     ctx.lineWidth = 0.5;
@@ -1793,18 +1807,6 @@ function renderOptimalChart() {
     // Draw wall clock line (purple)
     drawLine(normW, colPurple);
 
-    // Optimal batch vertical dashed line
-    const optimal = getOptimalBatch();
-    const optX = bx(optimal);
-    ctx.strokeStyle = colMuted;
-    ctx.lineWidth = 1;
-    ctx.setLineDash([3, 3]);
-    ctx.beginPath();
-    ctx.moveTo(optX, pad.top);
-    ctx.lineTo(optX, pad.top + plotH);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
     // Current batch size vertical solid line + dots
     const current = config.batchSize;
     const curX = bx(current);
@@ -1829,19 +1831,47 @@ function renderOptimalChart() {
     ctx.arc(curX, curWY, 3.5, 0, Math.PI * 2);
     ctx.fill();
 
-    // Batch number label at current position
+    // X-axis tick marks and labels
+    const xTicks = [1, 10, 20, 30, 40, 50];
+    ctx.strokeStyle = colBorder;
+    ctx.lineWidth = 0.5;
+    xTicks.forEach((b) => {
+        const x = bx(b);
+        ctx.beginPath();
+        ctx.moveTo(x, pad.top);
+        ctx.lineTo(x, pad.top + plotH);
+        ctx.stroke();
+    });
+    ctx.fillStyle = colMuted;
+    ctx.font =
+        "9px " + (styles.getPropertyValue("--font-mono").trim() || "monospace");
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    xTicks.forEach((b) => {
+        const x = bx(b);
+        ctx.fillText(b, x, pad.top + plotH + 3);
+    });
+
+    // Batch number label at current position (layered on top)
     ctx.fillStyle = colText;
     ctx.font =
         "bold 13px " + (styles.getPropertyValue("--font-mono").trim() || "monospace");
     ctx.textAlign = "center";
-    ctx.fillText(current, curX, pad.top + plotH + 12);
+    ctx.textBaseline = "top";
+    // Background to cover tick labels underneath
+    const label = String(current);
+    const labelW = ctx.measureText(label).width + 6;
+    ctx.fillStyle = colBg;
+    ctx.fillRect(curX - labelW / 2, pad.top + plotH + 1, labelW, 15);
+    ctx.fillStyle = colText;
+    ctx.fillText(current, curX, pad.top + plotH + 2);
 
     // X-axis label
     ctx.fillStyle = colMuted;
     ctx.font =
         "12px " + (styles.getPropertyValue("--font-mono").trim() || "monospace");
     ctx.textAlign = "center";
-    ctx.fillText("Batch Size", pad.left + plotW / 2, h - 10);
+    ctx.fillText("Batch Size", pad.left + plotW / 2, h - 14);
 }
 
 function initOptimalChart() {
@@ -2051,6 +2081,7 @@ function bindEvents() {
         const btn = document.getElementById("btn-step-mode");
         btn.classList.toggle("btn-step-active", config.stepMode);
         btn.classList.toggle("btn-ghost", !config.stepMode);
+        btn.innerHTML = '<span class="btn-icon">⏭</span> Step: ' + (config.stepMode ? "On" : "Off");
         saveConfig();
         // If step mode is turned off while waiting, execute the pending evaluation instantly
         if (!config.stepMode && state.stepWaiting && !state.animating) {
@@ -2389,6 +2420,7 @@ function init() {
     const stepBtn = document.getElementById("btn-step-mode");
     stepBtn.classList.toggle("btn-step-active", config.stepMode);
     stepBtn.classList.toggle("btn-ghost", !config.stepMode);
+    stepBtn.innerHTML = '<span class="btn-icon">⏭</span> Step: ' + (config.stepMode ? "On" : "Off");
     bindEvents();
     initCollapsible();
     initSummary();
