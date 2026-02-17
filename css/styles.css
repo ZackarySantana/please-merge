@@ -1067,6 +1067,11 @@ button.optimal-legend-item.optimal-legend-item--active {
     color: var(--text-primary);
 }
 
+#btn-speed-topbar {
+    min-width: 136px;
+    justify-content: center;
+}
+
 .btn-step-active {
     background: var(--green-dim);
     color: var(--green-bright);
@@ -2534,34 +2539,30 @@ button.optimal-legend-item.optimal-legend-item--active {
 }
 
 /* ─── Responsive tweaks ─── */
-@media (max-width: 1600px) {
+@media (max-width: 1650px) {
     .stat--compact-hide {
         display: none;
     }
 }
 
-@media (max-width: 1350px) {
+@media (max-width: 1400px) {
     .stat--narrow-hide {
         display: none;
     }
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1150px) {
     :root {
         --sidebar-width: 340px;
+    }
+    .stat--small-hide {
+        display: none;
     }
     .stat-label {
         font-size: 8px;
     }
     .stat-value {
         font-size: 12px;
-    }
-    .stat-ci-useful,
-    .stat-ci-wasted,
-    .stat-ci-ratio,
-    .stat-wall-clock,
-    .stat-time-saved {
-        font-size: 11px;
     }
     .stat-divider {
         height: 20px;

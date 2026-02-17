@@ -442,11 +442,11 @@
                             <span class="btn-icon">↺</span>
                         </button>
                         <button
-                            id="btn-instant"
+                            id="btn-speed-topbar"
                             class="btn btn-ghost"
-                            title="Run the entire simulation instantly"
+                            title="Click to cycle: Normal → Fast → Very Fast"
                         >
-                            <span class="btn-icon">⚡</span> Instant
+                            <span class="btn-icon">⏱</span> Speed: <span id="val-speed-topbar">Normal</span>
                         </button>
                         <button
                             id="btn-step-mode"
@@ -456,11 +456,11 @@
                             <span class="btn-icon">⏭</span> Step: On
                         </button>
                         <button
-                            id="btn-speed-topbar"
+                            id="btn-instant"
                             class="btn btn-ghost"
-                            title="Click to cycle: Normal → Fast → Very Fast"
+                            title="Run the entire simulation instantly"
                         >
-                            <span class="btn-icon">⏱</span> Speed: <span id="val-speed-topbar">Normal</span>
+                            <span class="btn-icon">⚡</span> Instant
                         </button>
                     </div>
                     <div class="topbar-right">
@@ -542,7 +542,7 @@
                         </div>
                         <div class="stat-divider stat--narrow-hide"></div>
                         <div
-                            class="stat"
+                            class="stat stat--small-hide"
                             title="Total simulated wall-clock time elapsed since the simulation started."
                         >
                             <span class="stat-label">Wall Clock</span>
@@ -553,7 +553,7 @@
                             >
                         </div>
                         <div
-                            class="stat"
+                            class="stat stat--small-hide"
                             title="Time saved by batching CI runs in parallel vs. running every commit one at a time."
                         >
                             <span class="stat-label">Time Saved</span>
@@ -563,7 +563,7 @@
                                 >0 s</span
                             >
                         </div>
-                        <div class="stat-divider"></div>
+                        <div class="stat-divider stat--small-hide"></div>
                         <button
                             class="summary-trigger-btn"
                             id="btn-summary"
