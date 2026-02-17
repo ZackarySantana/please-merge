@@ -1033,6 +1033,10 @@ button.optimal-legend-item.optimal-legend-item--active {
     font-size: 11px;
 }
 
+.btn-icon-only {
+    padding: 6px 10px;
+}
+
 .btn-primary {
     background: var(--green);
     color: #fff;
