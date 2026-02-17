@@ -1916,21 +1916,38 @@ function initOptimalChart() {
     canvas.addEventListener("mousemove", (e) => {
         const rect = canvas.getBoundingClientRect();
         const relCanvasX = e.clientX - rect.left;
+        const relCanvasY = e.clientY - rect.top;
         const padL = 44;
+        const padBottom = 38;
+        const inXAxisArea = relCanvasY > rect.height - padBottom;
+
+        const wrapRect = canvas.parentElement.getBoundingClientRect();
+        const relY = e.clientY - wrapRect.top;
+        const tooltipAbove = relY > 50;
+
+        // If hovering over the x-axis label area, show context tooltip
+        if (inXAxisArea) {
+            tooltip.innerHTML = "Number of commits processed<br>in parallel per CI cycle";
+            const relX = e.clientX - wrapRect.left;
+            tooltip.hidden = false;
+            const tw = tooltip.offsetWidth;
+            tooltip.style.left = Math.max(2, Math.min(relX - tw / 2, wrapRect.width - tw - 2)) + "px";
+            tooltip.style.top = (rect.height - 80) + "px";
+            tooltip.style.transform = "";
+            return;
+        }
 
         // If hovering over the y-axis label area, show context tooltip
         if (relCanvasX < padL && (chartActiveSeries === "cost" || chartActiveSeries === "wall")) {
             const msg = chartActiveSeries === "cost"
-                ? "Cost multiplier compared to<br>running CI sequentially (1x)"
+                ? "How much more CI you pay as<br>batches grow. 1x = one commit at a time."
                 : "Estimated total wall clock<br>time to process all commits";
             tooltip.innerHTML = msg;
 
-            const wrapRect = canvas.parentElement.getBoundingClientRect();
-            const relY = e.clientY - wrapRect.top;
             tooltip.hidden = false;
             const tw = tooltip.offsetWidth;
             tooltip.style.left = Math.max(2, Math.min(padL, wrapRect.width - tw - 2)) + "px";
-            tooltip.style.top = relY - 36 + "px";
+            tooltip.style.top = (tooltipAbove ? relY - 36 : relY + 12) + "px";
             tooltip.style.transform = "";
             return;
         }
@@ -1980,19 +1997,16 @@ function initOptimalChart() {
             costStr +
             " (" + multStr + "x)";
 
-        const wrapRect = canvas.parentElement.getBoundingClientRect();
         const relX = e.clientX - wrapRect.left;
-        const relY = e.clientY - wrapRect.top;
-        // Unhide first so we can measure the tooltip width
+        const mainTooltipAbove = relY > 60;
         tooltip.hidden = false;
         const tw = tooltip.offsetWidth;
-        // Position centered on cursor, clamped within wrapper
         const left = Math.max(
             2,
             Math.min(relX - tw / 2, wrapRect.width - tw - 2),
         );
         tooltip.style.left = left + "px";
-        tooltip.style.top = relY - 52 + "px";
+        tooltip.style.top = (mainTooltipAbove ? relY - 52 : relY + 12) + "px";
         tooltip.style.transform = "";
     });
 

@@ -81,7 +81,7 @@
                                         <button
                                             class="optimal-legend-item optimal-legend-cost optimal-legend-item--active"
                                             data-series="cost"
-                                            title="Cost multiplier compared to running CI sequentially (1x)"
+                                            title="How much more CI you pay as batches grow (1x = run one commit at a time)"
                                             >Est. Cost</button
                                         >
                                         <button
@@ -1432,9 +1432,9 @@
                                     >C</span
                                 >
                                 <p>
-                                    <strong>Est. Cost</strong> (red) shows the
-                                    cost multiplier vs running CI sequentially.
-                                    At 100% success rate it's a flat 1x. As
+                                    <strong>Est. Cost</strong> (red) shows how
+                                    much more CI you pay as batches grow.
+                                    1x means running one commit at a time. As
                                     success rate drops, larger batches waste
                                     more CI.
                                 </p>
