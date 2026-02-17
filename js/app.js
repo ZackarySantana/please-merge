@@ -2031,10 +2031,24 @@ function initOptimalChart() {
     updateChartEstimate();
 }
 
+const SPEED_OPTIONS = [
+    { speed: 240, label: "Normal" },
+    { speed: 3600, label: "Fast" },
+    { speed: 10800, label: "Very Fast" },
+];
+
+function syncSpeedTopbar() {
+    const el = document.getElementById("val-speed-topbar");
+    if (!el) return;
+    const opt = SPEED_OPTIONS.find((o) => o.speed === config.speed);
+    el.textContent = opt ? opt.label : "Normal";
+}
+
 function syncSpeedButtons() {
     document.querySelectorAll(".speed-btn").forEach((btn) => {
         btn.classList.toggle("speed-btn--active", +btn.dataset.speed === config.speed);
     });
+    syncSpeedTopbar();
 }
 
 function syncUIValues() {
@@ -2105,6 +2119,16 @@ function bindEvents() {
             lastTimestamp = 0;
         }
     });
+
+    // Topbar speed cycle button
+    document.getElementById("btn-speed-topbar").addEventListener("click", () => {
+        const idx = SPEED_OPTIONS.findIndex((o) => o.speed === config.speed);
+        const next = SPEED_OPTIONS[(idx + 1) % SPEED_OPTIONS.length];
+        config.speed = next.speed;
+        syncSpeedButtons();
+        saveConfig();
+    });
+
     document
         .getElementById("btn-step-continue")
         .addEventListener("click", doStepContinue);
