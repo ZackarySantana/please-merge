@@ -1072,6 +1072,16 @@ button.optimal-legend-item.optimal-legend-item--active {
     justify-content: center;
 }
 
+#btn-start {
+    min-width: 90px;
+    justify-content: center;
+}
+
+#btn-step-mode {
+    min-width: 92px;
+    justify-content: center;
+}
+
 .btn-step-active {
     background: var(--green-dim);
     color: var(--green-bright);
