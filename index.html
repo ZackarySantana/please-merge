@@ -184,9 +184,17 @@
                             <div class="control-group">
                                 <label class="control-label">
                                     CI Success Rate
-                                    <span class="control-value" id="val-success-rate"
-                                        >70%</span
-                                    >
+                                    <span class="control-value-input-wrap">
+                                        <input
+                                            type="number"
+                                            id="val-success-rate-input"
+                                            class="control-value-input"
+                                            value="70"
+                                            min="0"
+                                            max="100"
+                                            step="0.1"
+                                        /><span class="control-value-suffix">%</span>
+                                    </span>
                                 </label>
                                 <input
                                     type="range"
@@ -194,6 +202,7 @@
                                     min="0"
                                     max="100"
                                     value="70"
+                                    step="0.1"
                                     class="slider"
                                 />
                                 <div class="slider-hints">

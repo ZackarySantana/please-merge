@@ -1567,7 +1567,7 @@ function getCostRunners() {
 // ── Sidebar Bindings ───────────────────────────
 
 function readConfigFromUI() {
-    config.successRate = +document.getElementById("cfg-success-rate").value;
+    config.successRate = parseFloat(document.getElementById("cfg-success-rate").value);
     config.batchSize = +document.getElementById("cfg-batch-size").value;
     config.totalCommits = +document.getElementById("cfg-total-commits").value;
     config.ciDuration = +document.getElementById("cfg-ci-duration").value;
@@ -1994,8 +1994,12 @@ function syncSpeedButtons() {
 }
 
 function syncUIValues() {
-    document.getElementById("val-success-rate").textContent =
-        config.successRate + "%";
+    const srInput = document.getElementById("val-success-rate-input");
+    if (document.activeElement !== srInput) {
+        srInput.value = Number.isInteger(config.successRate)
+            ? config.successRate.toFixed(1)
+            : parseFloat(config.successRate.toFixed(1));
+    }
     document.getElementById("val-batch-size").textContent = config.batchSize;
     document.getElementById("val-total-commits").textContent =
         config.totalCommits;
@@ -2107,6 +2111,20 @@ function bindEvents() {
             readConfigFromUI();
             syncUIValues();
         });
+    });
+
+    // Success rate number input — syncs with slider
+    const srInput = document.getElementById("val-success-rate-input");
+    srInput.addEventListener("input", () => {
+        let val = parseFloat(srInput.value);
+        if (isNaN(val)) return;
+        val = Math.max(0, Math.min(100, val));
+        document.getElementById("cfg-success-rate").value = val;
+        readConfigFromUI();
+        syncUIValues();
+    });
+    srInput.addEventListener("blur", () => {
+        srInput.value = config.successRate.toFixed(1);
     });
 
     resetSliders.forEach((id) => {

@@ -446,6 +446,44 @@ body {
     font-size: 12px;
 }
 
+.control-value-input-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 1px;
+}
+
+.control-value-input {
+    width: 48px;
+    padding: 1px 4px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: var(--font-mono);
+    color: var(--text-primary);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    text-align: right;
+    -moz-appearance: textfield;
+}
+
+.control-value-input::-webkit-inner-spin-button,
+.control-value-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.control-value-input:focus {
+    outline: none;
+    border-color: var(--blue);
+}
+
+.control-value-suffix {
+    font-size: 12px;
+    font-weight: 600;
+    font-family: var(--font-mono);
+    color: var(--text-primary);
+}
+
 /* Range slider */
 .slider {
     -webkit-appearance: none;
