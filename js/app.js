@@ -1711,6 +1711,8 @@ function renderOptimalChart() {
     const colText =
         styles.getPropertyValue("--text-primary").trim() || "#e6edf3";
     const colPurple = styles.getPropertyValue("--purple").trim() || "#a371f7";
+    const colCurrentLine =
+        styles.getPropertyValue("--chart-current-line").trim() || colMuted;
 
     // Clear and fill background
     ctx.clearRect(0, 0, w, h);
@@ -1807,15 +1809,17 @@ function renderOptimalChart() {
     // Draw wall clock line (purple)
     drawLine(normW, colPurple);
 
-    // Current batch size vertical solid line + dots
+    // Current batch size vertical dashed line + dots
     const current = config.batchSize;
     const curX = bx(current);
-    ctx.strokeStyle = colBorder;
+    ctx.strokeStyle = colCurrentLine;
     ctx.lineWidth = 1;
+    ctx.setLineDash([6, 5]);
     ctx.beginPath();
     ctx.moveTo(curX, pad.top);
     ctx.lineTo(curX, pad.top + plotH);
     ctx.stroke();
+    ctx.setLineDash([]);
 
     // Dot on cost line at current batch
     const curCY = by(normC[current - 1] || 0);

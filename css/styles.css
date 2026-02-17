@@ -24,6 +24,7 @@
     /* Borders */
     --border: #30363d;
     --border-light: #21262d;
+    --chart-current-line: #6e7681;
 
     /* Text */
     --text-primary: #e6edf3;
@@ -74,6 +75,7 @@
 
     --border: #d0d7de;
     --border-light: #e1e4e8;
+    --chart-current-line: #656d76;
 
     --text-primary: #1f2328;
     --text-secondary: #656d76;
