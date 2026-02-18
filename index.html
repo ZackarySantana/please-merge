@@ -1276,7 +1276,7 @@
                     <div class="welcome-step" data-step="1" hidden>
                         <h2 class="welcome-heading">The Three Lanes</h2>
                         <div class="welcome-lanes">
-                            <div class="welcome-lane-card">
+                            <div class="welcome-lane-card welcome-card-blue">
                                 <div
                                     class="welcome-lane-dot"
                                     style="background: var(--blue)"
@@ -1291,7 +1291,7 @@
                                     </p>
                                 </div>
                             </div>
-                            <div class="welcome-lane-card">
+                            <div class="welcome-lane-card welcome-card-red">
                                 <div
                                     class="welcome-lane-dot"
                                     style="background: var(--red)"
@@ -1307,7 +1307,7 @@
                                     </p>
                                 </div>
                             </div>
-                            <div class="welcome-lane-card">
+                            <div class="welcome-lane-card welcome-card-green">
                                 <div
                                     class="welcome-lane-dot"
                                     style="background: var(--green-bright)"
@@ -1328,7 +1328,7 @@
                     <div class="welcome-step" data-step="2" hidden>
                         <h2 class="welcome-heading">How the Queue Works</h2>
                         <div class="welcome-rules">
-                            <div class="welcome-rule">
+                            <div class="welcome-rule welcome-rule-blue">
                                 <span class="welcome-rule-num">1</span>
                                 <p>
                                     The first <strong>N commits</strong> (batch
@@ -1336,14 +1336,14 @@
                                     durations.
                                 </p>
                             </div>
-                            <div class="welcome-rule">
+                            <div class="welcome-rule welcome-rule-blue">
                                 <span class="welcome-rule-num">2</span>
                                 <p>
                                     When CI finishes, the queue evaluates from
                                     the <strong>head</strong> (oldest) down.
                                 </p>
                             </div>
-                            <div class="welcome-rule">
+                            <div class="welcome-rule welcome-rule-green">
                                 <span class="welcome-rule-num">3</span>
                                 <p>
                                     Consecutive
@@ -1353,7 +1353,7 @@
                                     from the head are merged together.
                                 </p>
                             </div>
-                            <div class="welcome-rule">
+                            <div class="welcome-rule welcome-rule-red">
                                 <span class="welcome-rule-num">4</span>
                                 <p>
                                     If the head
@@ -1418,7 +1418,7 @@
                             configuration.
                         </p>
                         <div class="welcome-rules">
-                            <div class="welcome-rule">
+                            <div class="welcome-rule welcome-rule-red">
                                 <span
                                     class="welcome-rule-num"
                                     style="
@@ -1435,7 +1435,7 @@
                                     more CI.
                                 </p>
                             </div>
-                            <div class="welcome-rule">
+                            <div class="welcome-rule welcome-rule-purple">
                                 <span
                                     class="welcome-rule-num"
                                     style="
@@ -1475,7 +1475,7 @@
                             commits sequentially.
                         </p>
                         <div class="welcome-rules">
-                            <div class="welcome-rule">
+                            <div class="welcome-rule welcome-rule-green">
                                 <span
                                     class="welcome-rule-num"
                                     style="
@@ -1493,7 +1493,7 @@
                                     estimate real-world costs.
                                 </p>
                             </div>
-                            <div class="welcome-rule">
+                            <div class="welcome-rule welcome-rule-yellow">
                                 <span
                                     class="welcome-rule-num"
                                     style="
@@ -1521,6 +1521,38 @@
                             explains all key terms.
                         </p>
                     </div>
+
+                    <!-- Step 7: Try a Preset -->
+                    <div class="welcome-step" data-step="6" hidden>
+                        <h2 class="welcome-heading">Try a Preset</h2>
+                        <p class="welcome-text welcome-text--muted" style="margin-bottom: 16px">
+                            Click a preset to load it and close this guide. Or click <strong>Next</strong> to finish without changing settings.
+                        </p>
+                        <div class="welcome-presets-section">
+                        <div class="welcome-presets">
+                            <button class="welcome-preset-card preset-default" data-preset="default">
+                                <strong>Default</strong>
+                                <span>Baseline settings: 70% success, batch of 10, 100 commits. A good starting point.</span>
+                            </button>
+                            <button class="welcome-preset-card preset-green" data-preset="mostly-green">
+                                <strong>Mostly Green</strong>
+                                <span>95% success rate. CI rarely fails. See how the queue behaves when almost everything passes.</span>
+                            </button>
+                            <button class="welcome-preset-card preset-flaky" data-preset="flaky-ci">
+                                <strong>Flaky CI</strong>
+                                <span>50% success. Half your commits fail. Realistic for teams with unstable tests.</span>
+                            </button>
+                            <button class="welcome-preset-card preset-disaster" data-preset="disaster">
+                                <strong>Disaster Mode</strong>
+                                <span>15% success, few commits, fast speed. Watch the queue struggle with constant failures and restarts.</span>
+                            </button>
+                            <button class="welcome-preset-card preset-fast" data-preset="fast-and-furious">
+                                <strong>Fast &amp; Furious</strong>
+                                <span>80% success, large batches, 200 commits, short CI. Stresses the queue under load.</span>
+                            </button>
+                        </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Footer -->
@@ -1535,6 +1567,7 @@
                         <button class="welcome-dot-btn" data-dot="3"></button>
                         <button class="welcome-dot-btn" data-dot="4"></button>
                         <button class="welcome-dot-btn" data-dot="5"></button>
+                        <button class="welcome-dot-btn" data-dot="6"></button>
                     </div>
                     <div class="welcome-actions">
                         <button

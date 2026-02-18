@@ -1573,6 +1573,7 @@ function readConfigFromUI() {
     config.ciDuration = +document.getElementById("cfg-ci-duration").value;
     config.ciJitter = +document.getElementById("cfg-ci-jitter").value;
     saveConfig();
+    updatePresetButtonStates();
 }
 
 const CONFIG_STORAGE_KEY = "ghmq-config";
@@ -2075,6 +2076,29 @@ function syncUIValues() {
     updateChartEstimate();
 }
 
+function getActivePreset() {
+    for (const [name, p] of Object.entries(PRESETS)) {
+        if (
+            config.successRate === p.successRate &&
+            config.batchSize === p.batchSize &&
+            config.totalCommits === p.totalCommits &&
+            config.ciDuration === p.ciDuration &&
+            config.ciJitter === p.ciJitter &&
+            config.speed === p.speed
+        ) {
+            return name;
+        }
+    }
+    return null;
+}
+
+function updatePresetButtonStates() {
+    const active = getActivePreset();
+    document.querySelectorAll(".preset-btn").forEach((btn) => {
+        btn.classList.toggle("preset-btn--selected", btn.dataset.preset === active);
+    });
+}
+
 function writeConfigToUI() {
     document.getElementById("cfg-success-rate").value = config.successRate;
     document.getElementById("cfg-batch-size").value = config.batchSize;
@@ -2083,6 +2107,7 @@ function writeConfigToUI() {
     document.getElementById("cfg-ci-jitter").value = config.ciJitter;
     syncSpeedButtons();
     syncUIValues();
+    updatePresetButtonStates();
 }
 
 function applyPreset(name) {
@@ -2131,6 +2156,7 @@ function bindEvents() {
         config.speed = next.speed;
         syncSpeedButtons();
         saveConfig();
+        updatePresetButtonStates();
     });
 
     document
@@ -2151,15 +2177,15 @@ function bindEvents() {
     });
 
     // Optimal batch size button
-    document
-        .getElementById("btn-optimal-batch")
-        .addEventListener("click", () => {
-            const optimal = getOptimalBatch();
-            document.getElementById("cfg-batch-size").value = optimal;
-            readConfigFromUI();
-            syncUIValues();
-            if (!state.isRunning) doReset();
-        });
+        document
+            .getElementById("btn-optimal-batch")
+            .addEventListener("click", () => {
+                const optimal = getOptimalBatch();
+                document.getElementById("cfg-batch-size").value = optimal;
+                readConfigFromUI();
+                syncUIValues();
+                if (!state.isRunning) doReset();
+            });
 
     // Speed buttons
     document.querySelectorAll(".speed-btn").forEach((btn) => {
@@ -2167,6 +2193,7 @@ function bindEvents() {
             config.speed = +btn.dataset.speed;
             syncSpeedButtons();
             saveConfig();
+            updatePresetButtonStates();
         });
     });
 
@@ -2252,7 +2279,7 @@ const welcome = {
     dots: null,
     nextBtn: null,
     currentStep: 0,
-    totalSteps: 6,
+    totalSteps: 7,
 };
 
 function openWelcome() {
@@ -2394,6 +2421,11 @@ function initWelcome() {
 
     overlay.addEventListener("click", (e) => {
         if (e.target === overlay) closeWelcome();
+        const presetCard = e.target.closest(".welcome-preset-card[data-preset]");
+        if (presetCard) {
+            applyPreset(presetCard.dataset.preset);
+            closeWelcome();
+        }
     });
 
     // Help button in sidebar
