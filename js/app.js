@@ -44,7 +44,7 @@ const SUBJECTS = [
     "SSL renewal",
     "rate limiter",
     "retry logic",
-    "batch jobs",
+    "queue jobs",
     "data export",
     "user roles",
     "audit log",
@@ -670,7 +670,7 @@ function animateStepTransition(preview, onComplete) {
     }
 
     const targetRect = targetBody.getBoundingClientRect();
-    const stagger = Math.min(60, 300 / sourceCards.length); // tighter stagger for large batches
+    const stagger = Math.min(60, 300 / sourceCards.length); // tighter stagger for large groups
 
     // Create fixed-position clones that will fly to the target lane
     const clones = sourceCards.map((card, i) => {
@@ -1780,7 +1780,7 @@ function renderOptimalChart() {
         }
     }
 
-    // Helper: batch index to x
+    // Helper: concurrency value to x
     function bx(b) {
         return pad.left + ((b - 1) / (maxBatch - 1)) * plotW;
     }
@@ -1810,7 +1810,7 @@ function renderOptimalChart() {
     // Draw wall clock line (purple)
     drawLine(normW, colPurple);
 
-    // Current batch size vertical dashed line + dots
+    // Current build concurrency vertical dashed line + dots
     const current = config.batchSize;
     const curX = bx(current);
     ctx.strokeStyle = colCurrentLine;
@@ -1857,7 +1857,7 @@ function renderOptimalChart() {
         ctx.fillText(b, x, pad.top + plotH + 3);
     });
 
-    // Batch number label at current position (layered on top)
+    // Concurrency value label at current position (layered on top)
     ctx.fillStyle = colText;
     ctx.font =
         "bold 13px " + (styles.getPropertyValue("--font-mono").trim() || "monospace");
@@ -1876,7 +1876,7 @@ function renderOptimalChart() {
     ctx.font =
         "12px " + (styles.getPropertyValue("--font-mono").trim() || "monospace");
     ctx.textAlign = "center";
-    ctx.fillText("Batch Size", pad.left + plotW / 2, h - 14);
+    ctx.fillText("Build Concurrency", pad.left + plotW / 2, h - 14);
 }
 
 function initOptimalChart() {
@@ -1945,7 +1945,7 @@ function initOptimalChart() {
         // If hovering over the y-axis label area, show context tooltip
         if (relCanvasX < padL && (chartActiveSeries === "cost" || chartActiveSeries === "wall")) {
             const msg = chartActiveSeries === "cost"
-                ? "How much more CI you pay as<br>batches grow. 1x = one commit at a time."
+                ? "How much more CI you pay as<br>concurrency grows. 1x = one commit at a time."
                 : "Estimated total wall clock<br>time to process all commits";
             tooltip.innerHTML = msg;
 
@@ -1992,7 +1992,7 @@ function initOptimalChart() {
         const multStr = mult < 10 ? mult.toFixed(1) : Math.round(mult).toString();
 
         tooltip.innerHTML =
-            "<strong>Batch Size " +
+            "<strong>Concurrent Builds: " +
             batch +
             "</strong><br>" +
             "Wall clock: ~" +
@@ -2176,7 +2176,7 @@ function bindEvents() {
         runInstant();
     });
 
-    // Optimal batch size button
+    // Optimal concurrency button
         document
             .getElementById("btn-optimal-batch")
             .addEventListener("click", () => {

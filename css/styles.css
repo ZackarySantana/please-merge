@@ -563,7 +563,7 @@ body {
     background: var(--blue-dim);
 }
 
-/* Optimal batch hint */
+/* Optimal concurrency hint */
 .optimal-batch-row {
     display: flex;
     align-items: center;
@@ -1577,7 +1577,7 @@ button.optimal-legend-item.optimal-legend-item--active {
     }
 }
 
-/* Lane-header flash on batch merge */
+/* Lane-header flash on concurrent merge */
 @keyframes flash-green {
     0% {
         background: var(--green-dim);

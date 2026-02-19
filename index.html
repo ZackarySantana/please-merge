@@ -50,10 +50,10 @@
                     </button>
                 </div>
                 <div class="sidebar-body">
-                    <!-- Batch Size Analysis -->
+                    <!-- Build Concurrency Analysis -->
                     <div class="collapsible-section" data-section="analysis">
                         <button class="section-toggle">
-                            <span class="section-heading">Batch Size Analysis</span>
+                            <span class="section-heading">Build Concurrency Analysis</span>
                             <span class="section-chevron"></span>
                         </button>
                         <div class="collapsible-body">
@@ -69,7 +69,7 @@
                                         <button
                                             class="optimal-legend-item optimal-legend-cost optimal-legend-item--active"
                                             data-series="cost"
-                                            title="How much more CI you pay as batches grow (1x = run one commit at a time)"
+                                            title="How much more CI you pay as concurrency grows (1x = run one commit at a time)"
                                             >Est. Cost</button
                                         >
                                         <button
@@ -82,13 +82,13 @@
                                     <div class="optimal-chart-desc">
                                         <div class="optimal-desc-row">
                                             <span class="optimal-desc-dot" style="background: var(--red)"></span>
-                                            <span><strong>Est. Cost</strong> How much more CI you pay as batches grow (1x = run one commit at a time)</span>
+                                            <span><strong>Est. Cost</strong> How much more CI you pay as concurrency grows (1x = run one commit at a time)</span>
                                         </div>
                                         <div class="optimal-desc-row">
                                             <span class="optimal-desc-dot" style="background: var(--purple)"></span>
                                             <span><strong>Wall Clock</strong> Total time to process all commits</span>
                                         </div>
-                                        <div class="optimal-desc-hint">Click or drag the chart to set batch size</div>
+                                        <div class="optimal-desc-hint">Click or drag the chart to set build concurrency</div>
                                     </div>
                                     <div class="optimal-estimates-section">
                                         <div class="optimal-estimates-header">
@@ -96,7 +96,7 @@
                                         </div>
                                         <div class="optimal-batch-row">
                                             <div class="optimal-batch-label">
-                                                Optimal Batch Size
+                                                Optimal Concurrency
                                                 <span
                                                     class="optimal-info"
                                                     title="Calculated as 1/(1-p) where p is your CI success rate. This is the expected number of commits before a failure, the sweet spot between parallelism and wasted CI."
@@ -112,7 +112,7 @@
                                                 <button
                                                     class="optimal-apply-btn"
                                                     id="btn-optimal-batch"
-                                                    title="Set batch size to the optimal value"
+                                                    title="Set build concurrency to the optimal value"
                                                 >
                                                     Apply
                                                 </button>
@@ -142,7 +142,7 @@
                                                     >Est. Cost
                                                     <span
                                                         class="optimal-info"
-                                                        title="Upper-bound estimate. Actual cost may be slightly lower due to partial final batches and queue efficiency."
+                                                        title="Upper-bound estimate. Actual cost may be slightly lower due to partial final concurrent runs and queue efficiency."
                                                         >?</span
                                                     ></span
                                                 >
@@ -198,10 +198,10 @@
                                 </div>
                             </div>
 
-                            <!-- Batch Size -->
+                            <!-- Build Concurrency -->
                             <div class="control-group">
                                 <label class="control-label">
-                                    Batch Size
+                                    Build Concurrency
                                     <span class="control-value" id="val-batch-size"
                                         >10</span
                                     >
@@ -508,7 +508,7 @@
                         </div>
                         <div
                             class="stat stat--narrow-hide"
-                            title="CI time thrown away when remaining batch items are restarted after a failure at the head."
+                            title="CI time thrown away when remaining concurrent builds are restarted after a failure at the head."
                         >
                             <span class="stat-label">Wasted CI</span>
                             <span
@@ -542,7 +542,7 @@
                         </div>
                         <div
                             class="stat stat--small-hide"
-                            title="Time saved by batching CI runs in parallel vs. running every commit one at a time."
+                            title="Time saved by running CI in parallel vs. running every commit one at a time."
                         >
                             <span class="stat-label">Time Saved</span>
                             <span
@@ -683,7 +683,7 @@
                             <div class="summary-rows">
                                 <div class="summary-row">
                                     <span class="summary-row-label"
-                                        >Batch Size</span
+                                        >Build Concurrency</span
                                     >
                                     <span
                                         class="summary-row-prev"
@@ -1044,12 +1044,12 @@
                             </div>
                             <div class="glossary-entry">
                                 <dt class="glossary-term">
-                                    Batch / Active Window
+                                    Concurrent Builds / Active Window
                                 </dt>
                                 <dd class="glossary-def">
                                     The group of commits at the front of the
                                     queue that run CI in parallel. Controlled by
-                                    the "Batch Size" slider.
+                                    the "Build Concurrency" slider.
                                 </dd>
                             </div>
                             <div class="glossary-entry">
@@ -1095,7 +1095,7 @@
                                 <dt class="glossary-term">Wall Clock Time</dt>
                                 <dd class="glossary-def">
                                     Total simulated time elapsed from start to
-                                    finish. Batching reduces this compared to
+                                    finish. Running CI in parallel reduces this compared to
                                     running commits one at a time.
                                 </dd>
                             </div>
@@ -1104,7 +1104,7 @@
                                     Useful CI / Wasted CI
                                 </dt>
                                 <dd class="glossary-def">
-                                    Useful CI is time spent on commits that advanced the queue, including both successful merges and failed commits that were identified and removed. Wasted CI is time thrown away when remaining batch items are restarted after a failure at the head.
+                                    Useful CI is time spent on commits that advanced the queue, including both successful merges and failed commits that were identified and removed. Wasted CI is time thrown away when remaining concurrent builds are restarted after a failure at the head.
                                 </dd>
                             </div>
                             <div class="glossary-entry">
@@ -1120,13 +1120,13 @@
                                 <dd class="glossary-def">
                                     The ratio of wasted CI time to useful CI
                                     time. Lower is better. A high waste
-                                    percentage suggests the batch size may be
-                                    too large for the success rate.
+                                    percentage suggests the build concurrency may be
+                                    too high for the success rate.
                                 </dd>
                             </div>
                             <div class="glossary-entry">
                                 <dt class="glossary-term">
-                                    Optimal Batch Size
+                                    Optimal Concurrency
                                 </dt>
                                 <dd class="glossary-def">
                                     Calculated as 1/(1-p) where p is the CI
@@ -1182,11 +1182,11 @@
                             </div>
                             <div class="glossary-entry">
                                 <dt class="glossary-term">
-                                    All commits in batch succeed
+                                    All commits in active window succeed
                                 </dt>
                                 <dd class="glossary-def">
                                     The entire active window merges and the next
-                                    batch of commits from the queue begins CI.
+                                    group of commits from the queue begins CI.
                                     This represents maximum efficiency with zero
                                     waste.
                                 </dd>
@@ -1258,17 +1258,18 @@
                             <h1 class="welcome-title">Merge Queue Simulator</h1>
                         </div>
                         <p class="welcome-text">
-                            GitHub's <strong>merge queue</strong> batches pull
-                            requests and tests them together before merging into
+                            GitHub's <strong>merge queue</strong> runs pull
+                            requests with concurrent builds and tests them
+                            together before merging into
                             <code>main</code>. This saves time by running CI in
-                            parallel, but when a commit fails, the entire batch
-                            restarts.
+                            parallel, but when a commit fails, the entire
+                            active window restarts.
                         </p>
                         <p class="welcome-text welcome-text--muted">
                             This interactive simulator lets you experiment with
                             different configurations and see how merge queue
                             behavior changes with varying CI success rates,
-                            batch sizes, and durations.
+                            build concurrency, and durations.
                         </p>
                     </div>
 
@@ -1316,8 +1317,8 @@
                                     <strong>Merged</strong>
                                     <p>
                                         Commits that passed CI and were merged
-                                        into main. Consecutive successes at the
-                                        head are batched together in one merge.
+                                        into main.                                         Consecutive successes at the
+                                        head are merged together in one step.
                                     </p>
                                 </div>
                             </div>
@@ -1331,8 +1332,8 @@
                             <div class="welcome-rule welcome-rule-blue">
                                 <span class="welcome-rule-num">1</span>
                                 <p>
-                                    The first <strong>N commits</strong> (batch
-                                    size) run CI simultaneously with random
+                                    The first <strong>N commits</strong> (build
+                                    concurrency) run CI simultaneously with random
                                     durations.
                                 </p>
                             </div>
@@ -1371,7 +1372,7 @@
                             class="welcome-text welcome-text--muted"
                             style="margin-top: 12px"
                         >
-                            This is why a low success rate with a large batch is
+                            This is why a low success rate with high concurrency is
                             so expensive. One failure can waste the CI time of
                             many commits.
                         </p>
@@ -1384,7 +1385,7 @@
                         </h2>
                         <p class="welcome-text">
                             Use the <strong>sidebar</strong> on the left to
-                            configure success rate, batch size, CI duration, and
+                            configure success rate, build concurrency, CI duration, and
                             speed. Try the <strong>presets</strong> for quick
                             scenarios.
                         </p>
@@ -1408,12 +1409,12 @@
                         </p>
                     </div>
 
-                    <!-- Step 5: Batch Size Analysis -->
+                    <!-- Step 5: Build Concurrency Analysis -->
                     <div class="welcome-step" data-step="4" hidden>
-                        <h2 class="welcome-heading">Batch Size Analysis</h2>
+                        <h2 class="welcome-heading">Build Concurrency Analysis</h2>
                         <p class="welcome-text">
                             The sidebar includes an interactive
-                            <strong>Batch Size Analysis</strong> chart that
+                            <strong>Build Concurrency Analysis</strong> chart that
                             helps you find the sweet spot for your
                             configuration.
                         </p>
@@ -1429,9 +1430,9 @@
                                 >
                                 <p>
                                     <strong>Est. Cost</strong> (red) shows how
-                                    much more CI you pay as batches grow.
+                                    much more CI you pay as concurrency grows.
                                     1x means running one commit at a time. As
-                                    success rate drops, larger batches waste
+                                    success rate drops, higher concurrency wastes
                                     more CI.
                                 </p>
                             </div>
@@ -1447,7 +1448,7 @@
                                 <p>
                                     <strong>Wall Clock</strong> (purple) shows
                                     estimated total time to process all commits.
-                                    Larger batches reduce wall clock time
+                                    Higher concurrency reduces wall clock time
                                     through parallelism.
                                 </p>
                             </div>
@@ -1457,7 +1458,7 @@
                             style="margin-top: 12px"
                         >
                             <strong>Click or drag</strong> on the chart to set
-                            your batch size. The <strong>Wall Clock</strong> and
+                            your build concurrency. The <strong>Wall Clock</strong> and
                             <strong>Est. Cost</strong> values below it update in
                             real time based on your settings.
                         </p>
@@ -1532,7 +1533,7 @@
                         <div class="welcome-presets">
                             <button class="welcome-preset-card preset-default" data-preset="default">
                                 <strong>Default</strong>
-                                <span>Baseline settings: 70% success, batch of 10, 100 commits. A good starting point.</span>
+                                <span>Baseline settings: 70% success, 10 concurrent builds, 100 commits. A good starting point.</span>
                             </button>
                             <button class="welcome-preset-card preset-green" data-preset="mostly-green">
                                 <strong>Mostly Green</strong>
@@ -1548,7 +1549,7 @@
                             </button>
                             <button class="welcome-preset-card preset-fast" data-preset="fast-and-furious">
                                 <strong>Fast &amp; Furious</strong>
-                                <span>80% success, large batches, 200 commits, short CI. Stresses the queue under load.</span>
+                                <span>80% success, high concurrency, 200 commits, short CI. Stresses the queue under load.</span>
                             </button>
                         </div>
                         </div>
