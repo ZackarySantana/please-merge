@@ -91,7 +91,7 @@ const SUBJECTS = [
 const PRESETS = {
     "default": {
         successRate: 70,
-        batchSize: 10,
+        buildConcurrency: 10,
         totalCommits: 100,
         ciDuration: 15,
         ciJitter: 10,
@@ -100,7 +100,7 @@ const PRESETS = {
     },
     "mostly-green": {
         successRate: 95,
-        batchSize: 10,
+        buildConcurrency: 10,
         totalCommits: 100,
         ciDuration: 10,
         ciJitter: 5,
@@ -109,7 +109,7 @@ const PRESETS = {
     },
     "flaky-ci": {
         successRate: 50,
-        batchSize: 10,
+        buildConcurrency: 10,
         totalCommits: 100,
         ciDuration: 15,
         ciJitter: 10,
@@ -118,7 +118,7 @@ const PRESETS = {
     },
     disaster: {
         successRate: 15,
-        batchSize: 10,
+        buildConcurrency: 10,
         totalCommits: 60,
         ciDuration: 20,
         ciJitter: 10,
@@ -127,7 +127,7 @@ const PRESETS = {
     },
     "fast-and-furious": {
         successRate: 80,
-        batchSize: 20,
+        buildConcurrency: 20,
         totalCommits: 200,
         ciDuration: 5,
         ciJitter: 3,
@@ -140,7 +140,7 @@ const PRESETS = {
 
 const config = {
     successRate: 70,
-    batchSize: 10,
+    buildConcurrency: 10,
     totalCommits: 100,
     ciDuration: 15, // minutes — base CI duration
     ciJitter: 10, // minutes — ± variance around ciDuration
@@ -274,7 +274,7 @@ function restartActiveWindow(alreadyRemoved) {
     // Reconstruct the original queue length (before items were shifted out)
     // so we correctly identify which remaining items were in the active window.
     const originalQueueLen = state.queue.length + alreadyRemoved;
-    const originalActiveSize = Math.min(config.batchSize, originalQueueLen);
+    const originalActiveSize = Math.min(config.buildConcurrency, originalQueueLen);
     const remaining = Math.max(0, originalActiveSize - alreadyRemoved);
     let wasted = 0;
     for (let i = 0; i < remaining; i++) {
@@ -316,7 +316,7 @@ function update(dt) {
     // Track wall clock time
     state.wallClockTime += dt;
 
-    const activeSize = Math.min(config.batchSize, state.queue.length);
+    const activeSize = Math.min(config.buildConcurrency, state.queue.length);
 
     // 1. Start CI for idle active commits
     let anyStarted = false;
@@ -505,7 +505,7 @@ function previewEvaluation() {
         const remaining = state.queue.slice(1);
         const windowSize = Math.max(
             0,
-            Math.min(config.batchSize, state.queue.length) - 1,
+            Math.min(config.buildConcurrency, state.queue.length) - 1,
         );
         let wastedPreview = 0;
         for (let i = 0; i < windowSize; i++) {
@@ -736,7 +736,7 @@ function animateStepTransition(preview, onComplete) {
 
 function animateQueueReflow(onComplete) {
     const queueBody = document.getElementById("lane-queue");
-    const limit = Math.min(config.batchSize + 5, queueBody.children.length);
+    const limit = Math.min(config.buildConcurrency + 5, queueBody.children.length);
 
     for (let i = 0; i < limit; i++) {
         const card = queueBody.children[i];
@@ -795,11 +795,11 @@ function runInstant() {
 
     // Safety limit to prevent infinite loops
     let iterations = 0;
-    const maxIterations = config.totalCommits * config.batchSize * 10;
+    const maxIterations = config.totalCommits * config.buildConcurrency * 10;
 
     while (state.queue.length > 0 && iterations < maxIterations) {
         iterations++;
-        const activeSize = Math.min(config.batchSize, state.queue.length);
+        const activeSize = Math.min(config.buildConcurrency, state.queue.length);
 
         // Start CI for idle active commits
         for (let i = 0; i < activeSize; i++) {
@@ -903,7 +903,7 @@ function doReset() {
             merged: state.merged.length,
             rejected: state.rejected.length,
             processed: state.merged.length + state.rejected.length,
-            batchSize: config.batchSize,
+            buildConcurrency: config.buildConcurrency,
             reruns: state.totalReruns,
             wallClockTime: state.wallClockTime,
             sequentialCITime: state.sequentialCITime,
@@ -980,7 +980,7 @@ function updateButtons() {
 
 function renderQueue() {
     const container = document.getElementById("lane-queue");
-    const activeSize = Math.min(config.batchSize, state.queue.length);
+    const activeSize = Math.min(config.buildConcurrency, state.queue.length);
 
     // Build all cards as HTML string (fast for bulk rendering)
     const fragments = [];
@@ -1106,7 +1106,7 @@ function renderRejectedIncremental() {
 
 function updateProgressBars() {
     const container = document.getElementById("lane-queue");
-    const activeSize = Math.min(config.batchSize, state.queue.length);
+    const activeSize = Math.min(config.buildConcurrency, state.queue.length);
 
     for (let i = 0; i < activeSize; i++) {
         const c = state.commits.get(state.queue[i]);
@@ -1263,7 +1263,7 @@ function updateSummaryPanel() {
     );
 
     // Queue stats rows
-    document.getElementById("sum-batch").textContent = config.batchSize;
+    document.getElementById("sum-build-concurrency").textContent = config.buildConcurrency;
     document.getElementById("sum-processed").textContent = total;
     document.getElementById("sum-merged-cmp").textContent = state.merged.length;
     document.getElementById("sum-rejected-cmp").textContent =
@@ -1366,9 +1366,9 @@ function updateSummaryPanel() {
 
         // Queue stats
         setCompare(
-            "sum-batch",
-            config.batchSize,
-            prev.batchSize,
+            "sum-build-concurrency",
+            config.buildConcurrency,
+            prev.buildConcurrency,
             fmtInt,
             false,
         );
@@ -1448,7 +1448,7 @@ function updateSummaryPanel() {
     } else {
         // Clear all prev/diff fields
         [
-            "sum-batch",
+            "sum-build-concurrency",
             "sum-processed",
             "sum-merged-cmp",
             "sum-rejected-cmp",
@@ -1568,7 +1568,7 @@ function getCostRunners() {
 
 function readConfigFromUI() {
     config.successRate = parseFloat(document.getElementById("cfg-success-rate").value);
-    config.batchSize = +document.getElementById("cfg-batch-size").value;
+    config.buildConcurrency = +document.getElementById("cfg-build-concurrency").value;
     config.totalCommits = +document.getElementById("cfg-total-commits").value;
     config.ciDuration = +document.getElementById("cfg-ci-duration").value;
     config.ciJitter = +document.getElementById("cfg-ci-jitter").value;
@@ -1582,7 +1582,7 @@ function saveConfig() {
     try {
         localStorage.setItem(CONFIG_STORAGE_KEY, JSON.stringify({
             successRate: config.successRate,
-            batchSize: config.batchSize,
+            buildConcurrency: config.buildConcurrency,
             totalCommits: config.totalCommits,
             ciDuration: config.ciDuration,
             ciJitter: config.ciJitter,
@@ -1597,7 +1597,7 @@ function loadConfig() {
         const saved = JSON.parse(localStorage.getItem(CONFIG_STORAGE_KEY));
         if (!saved) return;
         if (saved.successRate != null) config.successRate = saved.successRate;
-        if (saved.batchSize != null) config.batchSize = saved.batchSize;
+        if (saved.buildConcurrency != null) config.buildConcurrency = saved.buildConcurrency;
         if (saved.totalCommits != null) config.totalCommits = saved.totalCommits;
         if (saved.ciDuration != null) config.ciDuration = saved.ciDuration;
         if (saved.ciJitter != null) config.ciJitter = saved.ciJitter;
@@ -1606,10 +1606,10 @@ function loadConfig() {
     } catch (_) {}
 }
 
-function getOptimalBatch() {
+function getOptimalConcurrency() {
     const p = config.successRate / 100;
     if (p >= 1) return 50; // 100% success → max parallelism
-    if (p <= 0) return 1; // 0% success → no point batching
+    if (p <= 0) return 1; // 0% success → no point in parallel runs
     return Math.max(1, Math.min(50, Math.round(1 / (1 - p))));
 }
 
@@ -1619,7 +1619,7 @@ function updateChartEstimate() {
     const wallEl = document.getElementById("est-wall-clock");
     const costEl = document.getElementById("est-cost");
     if (!wallEl || !costEl) return;
-    const b = config.batchSize;
+    const b = config.buildConcurrency;
     const p = config.successRate / 100;
     const pb = Math.pow(p, b);
     let em = 0;
@@ -1629,7 +1629,7 @@ function updateChartEstimate() {
     const removed = em + (1 - pb);
     const cycles = removed > 0.0001 ? config.totalCommits / removed : 9999;
     const wallMin = cycles * config.ciDuration;
-    // Last cycle is typically a partial batch; subtract ~0.5 cycles for CI runs
+    // Last cycle is typically a partial run; subtract ~0.5 cycles for CI runs
     const totalRuns = Math.max(1, cycles - 0.5) * b;
     const runners = getCostRunners();
     const rate = getCostRate();
@@ -1667,12 +1667,12 @@ function renderOptimalChart() {
     const plotH = h - pad.top - pad.bottom;
 
     const p = config.successRate / 100;
-    const maxBatch = 50;
+    const maxConcurrency = 50;
 
     // Compute data series
     const cost = [];
     const wallClock = [];
-    for (let b = 1; b <= maxBatch; b++) {
+    for (let b = 1; b <= maxConcurrency; b++) {
         const pb = Math.pow(p, b);
 
         // E[merged] = sum_{k=0}^{b-1} k * p^k * (1-p)  +  b * p^b
@@ -1782,7 +1782,7 @@ function renderOptimalChart() {
 
     // Helper: concurrency value to x
     function bx(b) {
-        return pad.left + ((b - 1) / (maxBatch - 1)) * plotW;
+        return pad.left + ((b - 1) / (maxConcurrency - 1)) * plotW;
     }
     // Helper: normalized value to y (0 = bottom, 1 = top)
     function by(v) {
@@ -1811,7 +1811,7 @@ function renderOptimalChart() {
     drawLine(normW, colPurple);
 
     // Current build concurrency vertical dashed line + dots
-    const current = config.batchSize;
+    const current = config.buildConcurrency;
     const curX = bx(current);
     ctx.strokeStyle = colCurrentLine;
     ctx.lineWidth = 1;
@@ -1822,14 +1822,14 @@ function renderOptimalChart() {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Dot on cost line at current batch
+    // Dot on cost line at current concurrency
     const curCY = by(normC[current - 1] || 0);
     ctx.fillStyle = colRed;
     ctx.beginPath();
     ctx.arc(curX, curCY, 3.5, 0, Math.PI * 2);
     ctx.fill();
 
-    // Dot on wall clock line at current batch
+    // Dot on wall clock line at current concurrency
     const curWY = by(normW[current - 1] || 0);
     ctx.fillStyle = colPurple;
     ctx.beginPath();
@@ -1885,7 +1885,7 @@ function initOptimalChart() {
 
     const tooltip = document.getElementById("optimal-chart-tooltip");
 
-    function batchFromEvent(e) {
+    function concurrencyFromEvent(e) {
         const rect = canvas.getBoundingClientRect();
         const padL = 44, padR = 8;
         const plotW = rect.width - padL - padR;
@@ -1896,9 +1896,9 @@ function initOptimalChart() {
 
     let dragging = false;
 
-    function applyBatch(e) {
-        const batch = batchFromEvent(e);
-        document.getElementById("cfg-batch-size").value = batch;
+    function applyConcurrency(e) {
+        const n = concurrencyFromEvent(e);
+        document.getElementById("cfg-build-concurrency").value = n;
         readConfigFromUI();
         syncUIValues();
         if (!state.isRunning) doReset();
@@ -1906,12 +1906,12 @@ function initOptimalChart() {
 
     canvas.addEventListener("mousedown", (e) => {
         dragging = true;
-        applyBatch(e);
+        applyConcurrency(e);
         e.preventDefault();
     });
 
     window.addEventListener("mousemove", (e) => {
-        if (dragging) applyBatch(e);
+        if (dragging) applyConcurrency(e);
     });
 
     window.addEventListener("mouseup", () => {
@@ -1957,22 +1957,22 @@ function initOptimalChart() {
             return;
         }
 
-        const batch = batchFromEvent(e);
+        const n = concurrencyFromEvent(e);
         const p = config.successRate / 100;
-        const pb = Math.pow(p, batch);
+        const pb = Math.pow(p, n);
 
         // Expected merges per cycle
         let em = 0;
-        for (let k = 0; k < batch; k++) em += k * Math.pow(p, k) * (1 - p);
-        em += batch * pb;
+        for (let k = 0; k < n; k++) em += k * Math.pow(p, k) * (1 - p);
+        em += n * pb;
 
         // Items removed per cycle = merged + rejected (failed items also leave the queue)
         const removed = em + (1 - pb);
         const cycles = removed > 0.0001 ? config.totalCommits / removed : 9999;
         const wallMin = cycles * config.ciDuration;
 
-        // Last cycle is typically a partial batch; subtract ~0.5 cycles for CI runs
-        const totalRuns = Math.max(1, cycles - 0.5) * batch;
+        // Last cycle is typically a partial run; subtract ~0.5 cycles for CI runs
+        const totalRuns = Math.max(1, cycles - 0.5) * n;
         const runners = getCostRunners();
         const rate = getCostRate();
         const totalCost = totalRuns * config.ciDuration * runners * rate;
@@ -1993,7 +1993,7 @@ function initOptimalChart() {
 
         tooltip.innerHTML =
             "<strong>Concurrent Builds: " +
-            batch +
+            n +
             "</strong><br>" +
             "Wall clock: ~" +
             wallStr +
@@ -2063,15 +2063,15 @@ function syncUIValues() {
             ? config.successRate.toFixed(1)
             : parseFloat(config.successRate.toFixed(1));
     }
-    document.getElementById("val-batch-size").textContent = config.batchSize;
+    document.getElementById("val-build-concurrency").textContent = config.buildConcurrency;
     document.getElementById("val-total-commits").textContent =
         config.totalCommits;
     document.getElementById("val-ci-duration").textContent =
         config.ciDuration + " m";
     document.getElementById("val-ci-jitter").textContent =
         "± " + config.ciJitter + " m";
-    document.getElementById("val-optimal-batch").textContent =
-        getOptimalBatch();
+    document.getElementById("val-optimal-concurrency").textContent =
+        getOptimalConcurrency();
     renderOptimalChart();
     updateChartEstimate();
 }
@@ -2080,7 +2080,7 @@ function getActivePreset() {
     for (const [name, p] of Object.entries(PRESETS)) {
         if (
             config.successRate === p.successRate &&
-            config.batchSize === p.batchSize &&
+            config.buildConcurrency === p.buildConcurrency &&
             config.totalCommits === p.totalCommits &&
             config.ciDuration === p.ciDuration &&
             config.ciJitter === p.ciJitter &&
@@ -2101,7 +2101,7 @@ function updatePresetButtonStates() {
 
 function writeConfigToUI() {
     document.getElementById("cfg-success-rate").value = config.successRate;
-    document.getElementById("cfg-batch-size").value = config.batchSize;
+    document.getElementById("cfg-build-concurrency").value = config.buildConcurrency;
     document.getElementById("cfg-total-commits").value = config.totalCommits;
     document.getElementById("cfg-ci-duration").value = config.ciDuration;
     document.getElementById("cfg-ci-jitter").value = config.ciJitter;
@@ -2114,7 +2114,7 @@ function applyPreset(name) {
     const p = PRESETS[name];
     if (!p) return;
     config.successRate = p.successRate;
-    config.batchSize = p.batchSize;
+    config.buildConcurrency = p.buildConcurrency;
     config.totalCommits = p.totalCommits;
     config.ciDuration = p.ciDuration;
     config.ciJitter = p.ciJitter;
@@ -2178,10 +2178,10 @@ function bindEvents() {
 
     // Optimal concurrency button
         document
-            .getElementById("btn-optimal-batch")
+            .getElementById("btn-optimal-concurrency")
             .addEventListener("click", () => {
-                const optimal = getOptimalBatch();
-                document.getElementById("cfg-batch-size").value = optimal;
+                const optimal = getOptimalConcurrency();
+                document.getElementById("cfg-build-concurrency").value = optimal;
                 readConfigFromUI();
                 syncUIValues();
                 if (!state.isRunning) doReset();
@@ -2200,7 +2200,7 @@ function bindEvents() {
     // Sidebar sliders — live update labels; some require reset
     const liveSliders = ["cfg-success-rate"];
     const resetSliders = [
-        "cfg-batch-size",
+        "cfg-build-concurrency",
         "cfg-total-commits",
         "cfg-ci-duration",
         "cfg-ci-jitter",

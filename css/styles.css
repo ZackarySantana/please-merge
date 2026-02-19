@@ -564,7 +564,7 @@ body {
 }
 
 /* Optimal concurrency hint */
-.optimal-batch-row {
+.optimal-concurrency-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -575,7 +575,7 @@ body {
     border-radius: var(--radius);
 }
 
-.optimal-batch-label {
+.optimal-concurrency-label {
     display: flex;
     align-items: center;
     gap: 5px;
@@ -585,13 +585,13 @@ body {
     letter-spacing: 0.03em;
 }
 
-.optimal-batch-value-row {
+.optimal-concurrency-value-row {
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
-.optimal-batch-value {
+.optimal-concurrency-value {
     font-size: 16px;
     font-weight: 700;
     font-family: var(--font-mono);

@@ -94,8 +94,8 @@
                                         <div class="optimal-estimates-header">
                                             Estimates for Current Settings
                                         </div>
-                                        <div class="optimal-batch-row">
-                                            <div class="optimal-batch-label">
+                                        <div class="optimal-concurrency-row">
+                                            <div class="optimal-concurrency-label">
                                                 Optimal Concurrency
                                                 <span
                                                     class="optimal-info"
@@ -103,15 +103,15 @@
                                                     >?</span
                                                 >
                                             </div>
-                                            <div class="optimal-batch-value-row">
+                                            <div class="optimal-concurrency-value-row">
                                                 <span
-                                                    class="optimal-batch-value"
-                                                    id="val-optimal-batch"
+                                                    class="optimal-concurrency-value"
+                                                    id="val-optimal-concurrency"
                                                     >3</span
                                                 >
                                                 <button
                                                     class="optimal-apply-btn"
-                                                    id="btn-optimal-batch"
+                                                    id="btn-optimal-concurrency"
                                                     title="Set build concurrency to the optimal value"
                                                 >
                                                     Apply
@@ -202,13 +202,13 @@
                             <div class="control-group">
                                 <label class="control-label">
                                     Build Concurrency
-                                    <span class="control-value" id="val-batch-size"
+                                    <span class="control-value" id="val-build-concurrency"
                                         >10</span
                                     >
                                 </label>
                                 <input
                                     type="range"
-                                    id="cfg-batch-size"
+                                    id="cfg-build-concurrency"
                                     min="1"
                                     max="50"
                                     value="10"
@@ -687,16 +687,16 @@
                                     >
                                     <span
                                         class="summary-row-prev"
-                                        id="sum-batch-prev"
+                                        id="sum-build-concurrency-prev"
                                     ></span>
                                     <span
                                         class="summary-row-value"
-                                        id="sum-batch"
+                                        id="sum-build-concurrency"
                                         >—</span
                                     >
                                     <span
                                         class="summary-row-diff"
-                                        id="sum-batch-diff"
+                                        id="sum-build-concurrency-diff"
                                     ></span>
                                 </div>
                                 <div class="summary-row">
