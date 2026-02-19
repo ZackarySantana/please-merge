@@ -1,5 +1,5 @@
 /* ============================================
-   GitHub Merge Queue Simulator — Styles
+   GitHub Merge Queue Simulator Styles
    ============================================ */
 
 /* ─── Reset & Tokens ─── */
@@ -1417,7 +1417,7 @@ button.optimal-legend-item.optimal-legend-item--active {
     letter-spacing: -0.02em;
 }
 
-/* Progress bar — full width, always visible on active cards */
+/* Progress bar: full width, always visible on active cards */
 .card-progress {
     height: 3px;
     margin-top: 5px;
@@ -1458,12 +1458,12 @@ button.optimal-legend-item.optimal-legend-item--active {
     font-size: 11px;
 }
 
-/* Active — idle (just entered window, CI not started) */
+/* Active, idle: just entered window, CI not started */
 .card--idle .card-dot {
     background: var(--text-muted);
 }
 
-/* Active — running */
+/* Active, running */
 .card--running {
     background: var(--bg-card);
     border-color: var(--border-light);
@@ -1477,7 +1477,7 @@ button.optimal-legend-item.optimal-legend-item--active {
     background: var(--blue);
 }
 
-/* Active — success (CI passed, waiting in queue) */
+/* Active, success: CI passed, waiting in queue */
 .card--success {
     background: var(--green-dim);
     border-color: rgba(46, 160, 67, 0.25);
@@ -1492,7 +1492,7 @@ button.optimal-legend-item.optimal-legend-item--active {
     color: var(--green-bright);
 }
 
-/* Active — fail (CI failed, waiting in queue) */
+/* Active, fail: CI failed, waiting in queue */
 .card--fail {
     background: var(--red-dim);
     border-color: rgba(248, 81, 73, 0.25);
@@ -2045,8 +2045,8 @@ button.optimal-legend-item.optimal-legend-item--active {
     background: var(--bg-sidebar);
     border: 1px solid var(--border);
     border-radius: 12px;
-    width: 500px;
-    max-width: 90vw;
+    width: 720px;
+    max-width: 95vw;
     max-height: 90vh;
     display: flex;
     flex-direction: column;
@@ -2096,11 +2096,88 @@ button.optimal-legend-item.optimal-legend-item--active {
     color: var(--text-primary);
 }
 
+.glossary-search-wrap {
+    flex-shrink: 0;
+    padding: 12px 20px 0;
+}
+
+.glossary-search {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-family: var(--font-sans);
+    color: var(--text-primary);
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    outline: none;
+    transition: border-color var(--duration) var(--ease-out);
+}
+
+.glossary-search::placeholder {
+    color: var(--text-muted);
+}
+
+.glossary-search:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px var(--blue-dim);
+}
+
+.glossary-content {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.glossary-nav {
+    flex-shrink: 0;
+    width: 180px;
+    padding: 16px 12px 16px 20px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.glossary-nav-item {
+    padding: 8px 10px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-radius: var(--radius);
+    transition: color var(--duration) var(--ease-out),
+                background var(--duration) var(--ease-out);
+}
+
+.glossary-nav-item:hover {
+    color: var(--text-primary);
+    background: var(--bg-card-hover);
+}
+
+.glossary-nav-item--active {
+    color: var(--blue);
+    font-weight: 600;
+    background: var(--blue-dim);
+}
+
 .glossary-body {
     flex: 1;
     overflow-y: auto;
     min-height: 0;
-    padding: 16px 20px 20px;
+    padding: 16px 20px 24px;
+}
+
+.glossary-section-group {
+    margin-bottom: 28px;
+}
+
+.glossary-section-group:last-child {
+    margin-bottom: 0;
+}
+
+.glossary-section-group--hidden {
+    display: none;
 }
 
 .glossary-section {
@@ -2109,17 +2186,21 @@ button.optimal-legend-item.optimal-legend-item--active {
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: var(--text-muted);
-    margin: 0 0 10px;
+    margin: 0 0 12px;
     padding-bottom: 6px;
     border-bottom: 1px solid var(--border);
 }
 
-.glossary-section:not(:first-child) {
-    margin-top: 20px;
+.glossary-section-group:not(:first-child) .glossary-section {
+    margin-top: 0;
 }
 
 .glossary-entry {
-    margin-bottom: 12px;
+    margin-bottom: 14px;
+}
+
+.glossary-entry--hidden {
+    display: none;
 }
 
 .glossary-term {
@@ -2134,6 +2215,46 @@ button.optimal-legend-item.optimal-legend-item--active {
     line-height: 1.55;
     color: var(--text-secondary);
     margin: 0;
+}
+
+.glossary-def code {
+    font-size: 11px;
+    font-family: var(--font-mono);
+    padding: 2px 5px;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+}
+
+.glossary-no-results {
+    padding: 24px;
+    font-size: 14px;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+@media (max-width: 600px) {
+    .glossary-dialog {
+        width: 100%;
+        max-height: 100vh;
+    }
+    .glossary-content {
+        flex-direction: column;
+    }
+    .glossary-nav {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 12px 16px;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        gap: 4px;
+    }
+    .glossary-nav-item {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
 }
 
 /* ─── Welcome Dialog ─── */

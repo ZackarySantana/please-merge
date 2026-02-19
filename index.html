@@ -525,7 +525,7 @@
                             <span
                                 class="stat-value stat-ci-ratio"
                                 id="stat-ci-ratio"
-                                >—</span
+                                >-</span
                             >
                         </div>
                         <div class="stat-divider stat--narrow-hide"></div>
@@ -646,7 +646,7 @@
                                     <span
                                         class="summary-stat-value"
                                         id="sum-hero-waste-ratio"
-                                        >—</span
+                                        >-</span
                                     >
                                     <span class="summary-stat-label"
                                         >Waste %</span
@@ -692,7 +692,7 @@
                                     <span
                                         class="summary-row-value"
                                         id="sum-build-concurrency"
-                                        >—</span
+                                        >-</span
                                     >
                                     <span
                                         class="summary-row-diff"
@@ -769,7 +769,7 @@
                                     <span
                                         class="summary-row-value"
                                         id="sum-wall-clock"
-                                        >—</span
+                                        >-</span
                                     >
                                     <span
                                         class="summary-row-diff"
@@ -787,7 +787,7 @@
                                     <span
                                         class="summary-row-value"
                                         id="sum-sequential"
-                                        >—</span
+                                        >-</span
                                     >
                                     <span
                                         class="summary-row-diff"
@@ -805,7 +805,7 @@
                                     <span
                                         class="summary-row-value"
                                         id="sum-time-saved"
-                                        >—</span
+                                        >-</span
                                     >
                                     <span
                                         class="summary-row-diff"
@@ -828,7 +828,7 @@
                                     <span
                                         class="summary-row-value summary-row-value--green"
                                         id="sum-useful-ci"
-                                        >—</span
+                                        >-</span
                                     >
                                     <span
                                         class="summary-row-diff"
@@ -846,7 +846,7 @@
                                     <span
                                         class="summary-row-value summary-row-value--red"
                                         id="sum-wasted-ci"
-                                        >—</span
+                                        >-</span
                                     >
                                     <span
                                         class="summary-row-diff"
@@ -864,7 +864,7 @@
                                     <span
                                         class="summary-row-value"
                                         id="sum-waste-ratio"
-                                        >—</span
+                                        >-</span
                                     >
                                     <span
                                         class="summary-row-diff"
@@ -968,7 +968,7 @@
                                     <span
                                         class="summary-row-value"
                                         id="sum-total-cost"
-                                        >—</span
+                                        >-</span
                                     >
                                     <span
                                         class="summary-row-diff"
@@ -986,7 +986,7 @@
                                     <span
                                         class="summary-row-value summary-row-value--red"
                                         id="sum-wasted-cost"
-                                        >—</span
+                                        >-</span
                                     >
                                     <span
                                         class="summary-row-diff"
@@ -1030,174 +1030,180 @@
                                 &#10005;
                             </button>
                         </div>
-                        <div class="glossary-body">
-                            <h3 class="glossary-section">Terms</h3>
-
-                            <div class="glossary-entry">
-                                <dt class="glossary-term">Merge Queue</dt>
-                                <dd class="glossary-def">
-                                    A FIFO queue of commits waiting to be
-                                    validated by CI and merged into the main
-                                    branch. Commits are processed in order from
-                                    the HEAD.
-                                </dd>
-                            </div>
-                            <div class="glossary-entry">
-                                <dt class="glossary-term">
-                                    Concurrent Builds / Active Window
-                                </dt>
-                                <dd class="glossary-def">
-                                    The group of commits at the front of the
-                                    queue that run CI in parallel. Controlled by
-                                    the "Build Concurrency" slider.
-                                </dd>
-                            </div>
-                            <div class="glossary-entry">
-                                <dt class="glossary-term">HEAD</dt>
-                                <dd class="glossary-def">
-                                    The first (oldest) commit in the queue. Only
-                                    the HEAD commit can be merged or rejected.
-                                    All evaluation starts here.
-                                </dd>
-                            </div>
-                            <div class="glossary-entry">
-                                <dt class="glossary-term">
-                                    CI (Continuous Integration)
-                                </dt>
-                                <dd class="glossary-def">
-                                    The automated test/build process each commit
-                                    goes through. Duration and outcome are
-                                    randomized in the simulator based on your
-                                    configuration.
-                                </dd>
-                            </div>
-                            <div class="glossary-entry">
-                                <dt class="glossary-term">Rebase / Restart</dt>
-                                <dd class="glossary-def">
-                                    When a commit ahead of you fails, your CI
-                                    results are invalidated and must be re-run
-                                    from scratch. This is the primary source of
-                                    wasted CI time.
-                                </dd>
-                            </div>
-                            <div class="glossary-entry">
-                                <dt class="glossary-term">
-                                    Speculative Execution
-                                </dt>
-                                <dd class="glossary-def">
-                                    Running CI on multiple commits
-                                    simultaneously, betting they will all pass.
-                                    If one fails, the work done on later commits
-                                    is wasted.
-                                </dd>
-                            </div>
-                            <div class="glossary-entry">
-                                <dt class="glossary-term">Wall Clock Time</dt>
-                                <dd class="glossary-def">
-                                    Total simulated time elapsed from start to
-                                    finish. Running CI in parallel reduces this compared to
-                                    running commits one at a time.
-                                </dd>
-                            </div>
-                            <div class="glossary-entry">
-                                <dt class="glossary-term">
-                                    Useful CI / Wasted CI
-                                </dt>
-                                <dd class="glossary-def">
-                                    Useful CI is time spent on commits that advanced the queue, including both successful merges and failed commits that were identified and removed. Wasted CI is time thrown away when remaining concurrent builds are restarted after a failure at the head.
-                                </dd>
-                            </div>
-                            <div class="glossary-entry">
-                                <dt class="glossary-term">Reruns</dt>
-                                <dd class="glossary-def">
-                                    The number of duplicate CI runs caused by
-                                    failures forcing the active window to
-                                    restart. Each rerun adds to wasted CI time.
-                                </dd>
-                            </div>
-                            <div class="glossary-entry">
-                                <dt class="glossary-term">Waste %</dt>
-                                <dd class="glossary-def">
-                                    The ratio of wasted CI time to useful CI
-                                    time. Lower is better. A high waste
-                                    percentage suggests the build concurrency may be
-                                    too high for the success rate.
-                                </dd>
-                            </div>
-                            <div class="glossary-entry">
-                                <dt class="glossary-term">
-                                    Optimal Concurrency
-                                </dt>
-                                <dd class="glossary-def">
-                                    Calculated as 1/(1-p) where p is the CI
-                                    success rate. This is the expected number of
-                                    commits before a failure, balancing
-                                    parallelism with waste risk.
-                                </dd>
-                            </div>
-
-                            <h3 class="glossary-section">Scenarios</h3>
-
-                            <div class="glossary-entry">
-                                <dt class="glossary-term">
-                                    HEAD commit succeeds
-                                </dt>
-                                <dd class="glossary-def">
-                                    The commit is merged into main and removed
-                                    from the queue. The next commit becomes the
-                                    new HEAD.
-                                </dd>
-                            </div>
-                            <div class="glossary-entry">
-                                <dt class="glossary-term">
-                                    Consecutive successes at HEAD
-                                </dt>
-                                <dd class="glossary-def">
-                                    Multiple commits at the front of the queue
-                                    that all passed CI are merged together in
-                                    one step. This is the best-case scenario for
-                                    throughput.
-                                </dd>
-                            </div>
-                            <div class="glossary-entry">
-                                <dt class="glossary-term">HEAD commit fails</dt>
-                                <dd class="glossary-def">
-                                    The commit is rejected and moved to the
-                                    Rejected lane. All remaining commits in the
-                                    active window have their CI restarted, since
-                                    their runs were based on the failed commit
-                                    being present.
-                                </dd>
-                            </div>
-                            <div class="glossary-entry">
-                                <dt class="glossary-term">
-                                    Mid-window failure
-                                </dt>
-                                <dd class="glossary-def">
-                                    A commit fails CI but is not yet at HEAD. It
-                                    waits in the queue showing its red status
-                                    until all commits before it are processed.
-                                    When it reaches HEAD, it is rejected.
-                                </dd>
-                            </div>
-                            <div class="glossary-entry">
-                                <dt class="glossary-term">
-                                    All commits in active window succeed
-                                </dt>
-                                <dd class="glossary-def">
-                                    The entire active window merges and the next
-                                    group of commits from the queue begins CI.
-                                    This represents maximum efficiency with zero
-                                    waste.
-                                </dd>
-                            </div>
-                            <div class="glossary-entry">
-                                <dt class="glossary-term">Queue empty</dt>
-                                <dd class="glossary-def">
-                                    All commits have been processed (merged or
-                                    rejected). The simulation ends and the
-                                    summary is displayed.
-                                </dd>
+                        <div class="glossary-search-wrap">
+                            <input
+                                type="search"
+                                class="glossary-search"
+                                id="glossary-search"
+                                placeholder="Search terms..."
+                                autocomplete="off"
+                            />
+                        </div>
+                        <div class="glossary-content">
+                            <nav class="glossary-nav">
+                                <a href="#section-github" class="glossary-nav-item" data-section="section-github">GitHub Merge Queue</a>
+                                <a href="#section-queue" class="glossary-nav-item" data-section="section-queue">Queue &amp; Ordering</a>
+                                <a href="#section-ci" class="glossary-nav-item" data-section="section-ci">CI &amp; Execution</a>
+                                <a href="#section-metrics" class="glossary-nav-item" data-section="section-metrics">Metrics</a>
+                                <a href="#section-scenarios" class="glossary-nav-item" data-section="section-scenarios">Scenarios</a>
+                            </nav>
+                            <div class="glossary-body" id="glossary-body">
+                                <section class="glossary-section-group" id="section-github">
+                                    <h3 class="glossary-section">GitHub Merge Queue</h3>
+                                    <div class="glossary-entry" data-term="merge queue github">
+                                        <dt class="glossary-term">Merge Queue (GitHub)</dt>
+                                        <dd class="glossary-def">
+                                            A GitHub feature that automates PR merges into busy branches. Once a PR passes required checks, it can be added to the queue. GitHub validates each PR against the latest target branch and other queued PRs before merging.
+                                        </dd>
+                                    </div>
+                                    <div class="glossary-entry" data-term="merge_group">
+                                        <dt class="glossary-term">merge_group event</dt>
+                                        <dd class="glossary-def">
+                                            Fired by GitHub when a PR enters the merge queue. Your CI system must run on this event for queued validation, whether via webhooks, API polling, or another integration. Required checks won't run for queued PRs unless CI is configured to respond.
+                                        </dd>
+                                    </div>
+                                    <div class="glossary-entry" data-term="build concurrency">
+                                        <dt class="glossary-term">Build Concurrency (GitHub)</dt>
+                                        <dd class="glossary-def">
+                                            The maximum number of merge_group events GitHub dispatches to CI at once (1–100). Higher values allow more parallel CI runs and faster merges, but consume more CI resources. Works with any CI system that receives merge_group webhooks.
+                                        </dd>
+                                    </div>
+                                    <div class="glossary-entry" data-term="merge limits">
+                                        <dt class="glossary-term">Merge Limits</dt>
+                                        <dd class="glossary-def">
+                                            Min and max number of PRs merged together to the base branch once CI passes. Does not combine merge_group builds; only affects how many PRs merge in one step after validation.
+                                        </dd>
+                                    </div>
+                                    <div class="glossary-entry" data-term="gh-readonly-queue">
+                                        <dt class="glossary-term">gh-readonly-queue branches</dt>
+                                        <dd class="glossary-def">
+                                            Temporary branches created by GitHub's merge queue for validation. CI must trigger on pushes to branches prefixed with <code>gh-readonly-queue/{base_branch}</code>. Works with Jenkins, Buildkite, CircleCI, or any CI that can run on branch pushes.
+                                        </dd>
+                                    </div>
+                                </section>
+                                <section class="glossary-section-group" id="section-queue">
+                                    <h3 class="glossary-section">Queue &amp; Ordering</h3>
+                                    <div class="glossary-entry" data-term="queue fifo">
+                                        <dt class="glossary-term">Queue</dt>
+                                        <dd class="glossary-def">
+                                            A FIFO queue of commits waiting to be validated by CI and merged into main. Commits are processed in order from the HEAD.
+                                        </dd>
+                                    </div>
+                                    <div class="glossary-entry" data-term="concurrent builds active window">
+                                        <dt class="glossary-term">Concurrent Builds / Active Window</dt>
+                                        <dd class="glossary-def">
+                                            The group of commits at the front of the queue that run CI in parallel. Controlled by the Build Concurrency slider.
+                                        </dd>
+                                    </div>
+                                    <div class="glossary-entry" data-term="head">
+                                        <dt class="glossary-term">HEAD</dt>
+                                        <dd class="glossary-def">
+                                            The first (oldest) commit in the queue. Only the HEAD commit can be merged or rejected. All evaluation starts here.
+                                        </dd>
+                                    </div>
+                                </section>
+                                <section class="glossary-section-group" id="section-ci">
+                                    <h3 class="glossary-section">CI &amp; Execution</h3>
+                                    <div class="glossary-entry" data-term="ci continuous integration">
+                                        <dt class="glossary-term">CI (Continuous Integration)</dt>
+                                        <dd class="glossary-def">
+                                            The automated test/build process each commit goes through. Duration and outcome are randomized in the simulator based on your configuration.
+                                        </dd>
+                                    </div>
+                                    <div class="glossary-entry" data-term="rebase restart">
+                                        <dt class="glossary-term">Rebase / Restart</dt>
+                                        <dd class="glossary-def">
+                                            When a commit ahead of you fails, your CI results are invalidated and must be re-run from scratch. This is the primary source of wasted CI time.
+                                        </dd>
+                                    </div>
+                                    <div class="glossary-entry" data-term="speculative execution">
+                                        <dt class="glossary-term">Speculative Execution</dt>
+                                        <dd class="glossary-def">
+                                            Running CI on multiple commits simultaneously, betting they will all pass. If one fails, the work done on later commits is wasted.
+                                        </dd>
+                                    </div>
+                                </section>
+                                <section class="glossary-section-group" id="section-metrics">
+                                    <h3 class="glossary-section">Metrics</h3>
+                                    <div class="glossary-entry" data-term="wall clock">
+                                        <dt class="glossary-term">Wall Clock Time</dt>
+                                        <dd class="glossary-def">
+                                            Total simulated time elapsed from start to finish. Running CI in parallel reduces this compared to running commits one at a time.
+                                        </dd>
+                                    </div>
+                                    <div class="glossary-entry" data-term="useful ci">
+                                        <dt class="glossary-term">Useful CI</dt>
+                                        <dd class="glossary-def">
+                                            Time spent on commits that advanced the queue, including both successful merges and failed commits that were identified and removed.
+                                        </dd>
+                                    </div>
+                                    <div class="glossary-entry" data-term="wasted ci">
+                                        <dt class="glossary-term">Wasted CI</dt>
+                                        <dd class="glossary-def">
+                                            Time thrown away when remaining concurrent builds are restarted after a failure at the head.
+                                        </dd>
+                                    </div>
+                                    <div class="glossary-entry" data-term="reruns">
+                                        <dt class="glossary-term">Reruns</dt>
+                                        <dd class="glossary-def">
+                                            The number of duplicate CI runs caused by failures forcing the active window to restart. Each rerun adds to wasted CI time.
+                                        </dd>
+                                    </div>
+                                    <div class="glossary-entry" data-term="waste percent">
+                                        <dt class="glossary-term">Waste %</dt>
+                                        <dd class="glossary-def">
+                                            The ratio of wasted CI time to useful CI time. Lower is better. A high waste percentage suggests build concurrency may be too high for the success rate.
+                                        </dd>
+                                    </div>
+                                    <div class="glossary-entry" data-term="optimal concurrency">
+                                        <dt class="glossary-term">Optimal Concurrency</dt>
+                                        <dd class="glossary-def">
+                                            Calculated as 1/(1-p) where p is the CI success rate. This is the expected number of commits before a failure, balancing parallelism with waste risk.
+                                        </dd>
+                                    </div>
+                                </section>
+                                <section class="glossary-section-group" id="section-scenarios">
+                                    <h3 class="glossary-section">Scenarios</h3>
+                                    <div class="glossary-entry" data-term="head succeeds">
+                                        <dt class="glossary-term">HEAD commit succeeds</dt>
+                                        <dd class="glossary-def">
+                                            The commit is merged into main and removed from the queue. The next commit becomes the new HEAD.
+                                        </dd>
+                                    </div>
+                                    <div class="glossary-entry" data-term="consecutive successes">
+                                        <dt class="glossary-term">Consecutive successes at HEAD</dt>
+                                        <dd class="glossary-def">
+                                            Multiple commits at the front of the queue that all passed CI are merged together in one step. This is the best-case scenario for throughput.
+                                        </dd>
+                                    </div>
+                                    <div class="glossary-entry" data-term="head fails">
+                                        <dt class="glossary-term">HEAD commit fails</dt>
+                                        <dd class="glossary-def">
+                                            The commit is rejected and moved to the Rejected lane. All remaining commits in the active window have their CI restarted, since their runs were based on the failed commit being present.
+                                        </dd>
+                                    </div>
+                                    <div class="glossary-entry" data-term="mid-window failure">
+                                        <dt class="glossary-term">Mid-window failure</dt>
+                                        <dd class="glossary-def">
+                                            A commit fails CI but is not yet at HEAD. It waits in the queue showing its red status until all commits before it are processed. When it reaches HEAD, it is rejected.
+                                        </dd>
+                                    </div>
+                                    <div class="glossary-entry" data-term="all succeed">
+                                        <dt class="glossary-term">All commits in active window succeed</dt>
+                                        <dd class="glossary-def">
+                                            The entire active window merges and the next group of commits from the queue begins CI. This represents maximum efficiency with zero waste.
+                                        </dd>
+                                    </div>
+                                    <div class="glossary-entry" data-term="queue empty">
+                                        <dt class="glossary-term">Queue empty</dt>
+                                        <dd class="glossary-def">
+                                            All commits have been processed (merged or rejected). The simulation ends and the summary is displayed.
+                                        </dd>
+                                    </div>
+                                </section>
+                                <div class="glossary-no-results" id="glossary-no-results" hidden>
+                                    No matching terms. Try a different search.
+                                </div>
                             </div>
                         </div>
                     </div>

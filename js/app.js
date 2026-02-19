@@ -142,8 +142,8 @@ const config = {
     successRate: 70,
     buildConcurrency: 10,
     totalCommits: 100,
-    ciDuration: 15, // minutes — base CI duration
-    ciJitter: 10, // minutes — ± variance around ciDuration
+    ciDuration: 15, // base CI duration in minutes
+    ciJitter: 10, // ± variance around ciDuration in minutes
     speed: 240,
     stepMode: true,
 };
@@ -156,10 +156,10 @@ const state = {
     merged: [], // ids, newest push()ed last
     rejected: [], // ids, newest push()ed last
     totalReruns: 0, // total duplicate CI runs across all commits
-    wastedCITime: 0, // ms — CI time lost to restarts + failures
-    successCITime: 0, // ms — CI time spent on successful merges
-    wallClockTime: 0, // ms — total simulated time elapsed
-    sequentialCITime: 0, // ms — sum of all CI durations ever assigned (sequential baseline)
+    wastedCITime: 0, // CI time lost to restarts + failures (ms)
+    successCITime: 0, // CI time spent on successful merges (ms)
+    wallClockTime: 0, // total simulated time elapsed (ms)
+    sequentialCITime: 0, // sum of all CI durations ever assigned, sequential baseline (ms)
     isRunning: false,
     isPaused: false,
     stepWaiting: false, // true when step mode has paused before evaluation
@@ -198,11 +198,11 @@ function generateCommits(count) {
             name: commitName(i),
             dateAdded: new Date(now - (count - i) * 12000), // ~12s apart
             ciStatus: "idle", // idle | running | success | fail
-            ciDuration: 0, // ms — assigned when CI starts
+            ciDuration: 0, // assigned when CI starts (ms)
             ciElapsed: 0, // ms
             ciOutcome: null, // predetermined: 'success' | 'fail'
             ciRuns: 0, // how many times CI has been started
-            firstRunDuration: 0, // ms — duration from the very first CI run (for sequential baseline)
+            firstRunDuration: 0, // duration from the very first CI run, for sequential baseline (ms)
         });
         queue.push(id);
     }
@@ -393,17 +393,17 @@ function evaluateQueue() {
             state.queue.shift();
             shifted++;
             state.rejected.push(id);
-            // The failed commit's CI time is useful — it identified a bad commit
+            // The failed commit's CI time is useful; it identified a bad commit
             state.successCITime += c.ciDuration;
             state.sequentialCITime += c.firstRunDuration;
             usefulDelta += c.ciDuration;
             moved = true;
             // Restart remaining active window (pass how many were already removed)
             wastedDelta += restartActiveWindow(shifted);
-            break; // stop — new CIs will start next frame
+            break; // stop; new CIs will start next frame
         }
 
-        // Still running or idle — can't proceed
+        // Still running or idle; can't proceed
         break;
     }
 
@@ -454,7 +454,7 @@ function evaluateQueueStep() {
             moved = true;
             continue;
         }
-        break; // stop at first non-success — don't process a failure here
+        break; // stop at first non-success; don't process a failure here
     }
 
     // If no successes were processed, try a single failure
@@ -464,7 +464,7 @@ function evaluateQueueStep() {
             state.queue.shift();
             shifted++;
             state.rejected.push(c.id);
-            // The failed commit's CI time is useful — it identified a bad commit
+            // The failed commit's CI time is useful; it identified a bad commit
             state.successCITime += c.ciDuration;
             state.sequentialCITime += c.firstRunDuration;
             usefulDelta += c.ciDuration;
@@ -626,7 +626,7 @@ function doStepContinue() {
         animateQueueReflow(() => {
             state.animating = false;
 
-            // Check if the new head is also ready — if so, pause again (only if step mode still on)
+            // Check if the new head is also ready; if so, pause again (only if step mode still on)
             if (config.stepMode && state.queue.length > 0) {
                 const newHead = state.commits.get(state.queue[0]);
                 if (
@@ -639,7 +639,7 @@ function doStepContinue() {
                 }
             }
 
-            // Nothing more to evaluate right now — resume simulation
+            // Nothing more to evaluate right now; resume simulation
             state.stepWaiting = false;
             lastTimestamp = 0;
         });
@@ -1030,7 +1030,7 @@ function buildQueueCard(commit, isActive) {
         timeStr = `<span class="card-time">${formatCardTime(commit.ciDuration)}</span>`;
     }
 
-    // Progress bar always visible — fill class varies by status
+    // Progress bar always visible; fill class varies by status
     const fillClass =
         commit.ciStatus === "success"
             ? "card-progress-fill card-progress-fill--success"
@@ -1209,7 +1209,7 @@ function updateStats() {
     } else if (state.wastedCITime > 0) {
         ratioEl.textContent = "∞";
     } else {
-        ratioEl.textContent = "—";
+        ratioEl.textContent = "-";
     }
 
     // Wall clock & time saved
@@ -1257,7 +1257,7 @@ function updateSummaryPanel() {
     document.getElementById("sum-hero-time-saved").textContent =
         timeSaved > 0 ? formatCITime(timeSaved) : "0 s";
     document.getElementById("sum-hero-waste-ratio").textContent =
-        wasteRatio === Infinity ? "∞" : wasteRatio ? wasteRatio + "%" : "—";
+        wasteRatio === Infinity ? "∞" : wasteRatio ? wasteRatio + "%" : "-";
     document.getElementById("sum-hero-wasted-ci").textContent = formatCITime(
         state.wastedCITime,
     );
@@ -1287,7 +1287,7 @@ function updateSummaryPanel() {
         state.wastedCITime,
     );
     document.getElementById("sum-waste-ratio").textContent =
-        wasteRatio === Infinity ? "∞" : wasteRatio ? wasteRatio + "%" : "—";
+        wasteRatio === Infinity ? "∞" : wasteRatio ? wasteRatio + "%" : "-";
 
     // Cost rows
     const rate = getCostRate();
@@ -1696,7 +1696,7 @@ function renderOptimalChart() {
     const minC = 1;
     const maxC = Math.max(...cost, minC + 0.001);
     const normC = cost.map((v) => (v - minC) / (maxC - minC));
-    // Wall clock: sqrt scale — between linear and log for a balanced view
+    // Wall clock: sqrt scale, between linear and log for a balanced view
     const maxW = Math.max(...wallClock, 0.001);
     const sqrtMax = Math.sqrt(maxW);
     const normW = wallClock.map((v) => Math.sqrt(v) / sqrtMax);
@@ -2197,7 +2197,7 @@ function bindEvents() {
         });
     });
 
-    // Sidebar sliders — live update labels; some require reset
+    // Sidebar sliders: live update labels; some require reset
     const liveSliders = ["cfg-success-rate"];
     const resetSliders = [
         "cfg-build-concurrency",
@@ -2213,7 +2213,7 @@ function bindEvents() {
         });
     });
 
-    // Success rate number input — syncs with slider
+    // Success rate number input: syncs with slider
     const srInput = document.getElementById("val-success-rate-input");
     srInput.addEventListener("input", () => {
         let val = parseFloat(srInput.value);
@@ -2340,13 +2340,102 @@ function initGlossary() {
     const overlay = document.getElementById("glossary-overlay");
     const closeBtn = document.getElementById("glossary-close");
     const openBtn = document.getElementById("btn-glossary");
+    const searchInput = document.getElementById("glossary-search");
+    const body = document.getElementById("glossary-body");
+    const noResults = document.getElementById("glossary-no-results");
     if (!overlay) return;
+
+    const entries = overlay.querySelectorAll(".glossary-entry");
+    const sectionGroups = overlay.querySelectorAll(".glossary-section-group");
+    const navItems = overlay.querySelectorAll(".glossary-nav-item");
+
+    function getSearchableText(entry) {
+        const term = entry.querySelector(".glossary-term");
+        const def = entry.querySelector(".glossary-def");
+        const extra = entry.getAttribute("data-term") || "";
+        return [(term?.textContent || ""), (def?.textContent || ""), extra].join(" ").toLowerCase();
+    }
+
+    function filterGlossary() {
+        const q = (searchInput?.value || "").trim().toLowerCase();
+        let visibleCount = 0;
+
+        entries.forEach((entry) => {
+            const text = getSearchableText(entry);
+            const matches = !q || text.includes(q);
+            entry.classList.toggle("glossary-entry--hidden", !matches);
+            if (matches) visibleCount++;
+        });
+
+        sectionGroups.forEach((group) => {
+            const hasVisible = group.querySelectorAll(".glossary-entry:not(.glossary-entry--hidden)").length > 0;
+            group.classList.toggle("glossary-section-group--hidden", !hasVisible && !!q);
+        });
+
+        if (noResults) {
+            noResults.hidden = visibleCount > 0 || !q;
+        }
+    }
+
+    function scrollToSection(sectionId) {
+        const section = document.getElementById(sectionId);
+        if (section && body) {
+            section.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+    }
+
+    function setActiveNav(sectionId) {
+        navItems.forEach((item) => {
+            item.classList.toggle("glossary-nav-item--active", item.getAttribute("data-section") === sectionId);
+        });
+    }
 
     function showGlossary() {
         overlay.hidden = false;
+        if (searchInput) {
+            searchInput.value = "";
+            filterGlossary();
+            searchInput.focus();
+        }
+        setActiveNav("section-github");
     }
+
     function hideGlossary() {
         overlay.hidden = true;
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener("input", filterGlossary);
+        searchInput.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+                searchInput.value = "";
+                filterGlossary();
+                searchInput.blur();
+            }
+        });
+    }
+
+    navItems.forEach((item) => {
+        item.addEventListener("click", (e) => {
+            e.preventDefault();
+            const sectionId = item.getAttribute("data-section");
+            scrollToSection(sectionId);
+            setActiveNav(sectionId);
+        });
+    });
+
+    if (body) {
+        body.addEventListener("scroll", () => {
+            const sections = body.querySelectorAll(".glossary-section-group:not(.glossary-section-group--hidden)");
+            for (const section of sections) {
+                const rect = section.getBoundingClientRect();
+                const bodyRect = body.getBoundingClientRect();
+                if (rect.top <= bodyRect.top + 80 && rect.bottom > bodyRect.top + 80) {
+                    setActiveNav(section.id);
+                    break;
+                }
+            }
+        });
     }
 
     if (openBtn) openBtn.addEventListener("click", showGlossary);
