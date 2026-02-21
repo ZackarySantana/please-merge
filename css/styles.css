@@ -1492,10 +1492,7 @@ button.optimal-legend-item.optimal-legend-item--active {
 }
 
 .card-date {
-    font-size: 10px;
-    color: var(--text-muted);
-    white-space: nowrap;
-    flex-shrink: 0;
+    display: none;
 }
 
 .card-badge {
