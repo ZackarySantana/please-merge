@@ -873,6 +873,14 @@ function doPause() {
     updateButtons();
 }
 
+function toggleRun() {
+    if (state.isRunning && !state.isPaused) {
+        doPause();
+    } else {
+        doStart();
+    }
+}
+
 function doReset() {
     state.isRunning = false;
     state.isPaused = false;
@@ -940,37 +948,27 @@ function doReset() {
 
 function updateButtons() {
     const startBtn = document.getElementById("btn-start");
-    const pauseBtn = document.getElementById("btn-pause");
     const sumStartBtn = document.getElementById("summary-start");
-    const sumPauseBtn = document.getElementById("summary-pause");
+
+    function setButton(btn, icon, label, disabled, isPause) {
+        if (!btn) return;
+        const iconEl = btn.querySelector(".btn-icon");
+        if (iconEl) iconEl.textContent = icon;
+        const labelEl = btn.querySelector(".btn-start-label");
+        if (labelEl) labelEl.textContent = label;
+        btn.disabled = disabled;
+        btn.classList.toggle("btn--paused", !!isPause);
+    }
 
     if (state.isRunning && !state.isPaused) {
-        startBtn.disabled = true;
-        pauseBtn.disabled = false;
-        if (sumStartBtn) sumStartBtn.disabled = true;
-        if (sumPauseBtn) sumPauseBtn.disabled = false;
+        setButton(startBtn, "⏸", "Pause", false, true);
+        setButton(sumStartBtn, "⏸", "Pause", false, true);
     } else if (state.isRunning && state.isPaused) {
-        startBtn.disabled = false;
-        startBtn.querySelector(".btn-icon").textContent = "▶";
-        startBtn.lastChild.textContent = " Resume";
-        pauseBtn.disabled = true;
-        if (sumStartBtn) {
-            sumStartBtn.disabled = false;
-            sumStartBtn.querySelector(".btn-icon").textContent = "▶";
-            sumStartBtn.lastChild.textContent = " Resume";
-        }
-        if (sumPauseBtn) sumPauseBtn.disabled = true;
+        setButton(startBtn, "▶", "Resume", false, false);
+        setButton(sumStartBtn, "▶", "Resume", false, false);
     } else {
-        startBtn.disabled = state.queue.length === 0;
-        startBtn.querySelector(".btn-icon").textContent = "▶";
-        startBtn.lastChild.textContent = " Start";
-        pauseBtn.disabled = true;
-        if (sumStartBtn) {
-            sumStartBtn.disabled = state.queue.length === 0;
-            sumStartBtn.querySelector(".btn-icon").textContent = "▶";
-            sumStartBtn.lastChild.textContent = " Start";
-        }
-        if (sumPauseBtn) sumPauseBtn.disabled = true;
+        setButton(startBtn, "▶", "Start", state.queue.length === 0, false);
+        setButton(sumStartBtn, "▶", "Start", state.queue.length === 0, false);
     }
 }
 
@@ -1491,15 +1489,13 @@ function initSummary() {
     const closeBtn = document.getElementById("summary-close");
     const resetBtn = document.getElementById("summary-reset");
     const startBtn = document.getElementById("summary-start");
-    const pauseBtn = document.getElementById("summary-pause");
     const overlay = document.getElementById("summary-overlay");
     const openBtn = document.getElementById("btn-summary");
 
     const instantBtn = document.getElementById("summary-instant");
 
     if (closeBtn) closeBtn.addEventListener("click", hideSummary);
-    if (startBtn) startBtn.addEventListener("click", doStart);
-    if (pauseBtn) pauseBtn.addEventListener("click", doPause);
+    if (startBtn) startBtn.addEventListener("click", toggleRun);
     if (resetBtn)
         resetBtn.addEventListener("click", () => {
             state._keepSummaryOpen = true;
@@ -2208,8 +2204,7 @@ function applyPreset(name) {
 
 function bindEvents() {
     // Simulation controls
-    document.getElementById("btn-start").addEventListener("click", doStart);
-    document.getElementById("btn-pause").addEventListener("click", doPause);
+    document.getElementById("btn-start").addEventListener("click", toggleRun);
     document.getElementById("btn-reset").addEventListener("click", doReset);
 
     function toggleStepMode() {
@@ -2360,11 +2355,7 @@ function bindEvents() {
         if (welcome && !welcome.hidden) return;
         if (e.code === "Space") {
             e.preventDefault();
-            state.stepWaiting
-                ? doStepContinue()
-                : !state.isRunning || state.isPaused
-                  ? doStart()
-                  : doPause();
+            state.stepWaiting ? doStepContinue() : toggleRun();
         }
         if (e.code === "Enter" && state.stepWaiting) {
             e.preventDefault();
