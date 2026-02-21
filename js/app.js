@@ -1620,21 +1620,15 @@ function getOptimalConcurrency() {
 
 // ── Optimal Chart ──────────────────────────────
 
-function updateChartEstimate() {
-    const wallEl = document.getElementById("est-wall-clock");
-    const costEl = document.getElementById("est-cost");
-    if (!wallEl || !costEl) return;
-    const b = config.buildConcurrency;
+function computeEstimateAtConcurrency(b) {
     const p = config.successRate / 100;
     const pb = Math.pow(p, b);
     let em = 0;
     for (let k = 0; k < b; k++) em += k * Math.pow(p, k) * (1 - p);
     em += b * pb;
-    // Items removed per cycle = merged + rejected (failed items also leave the queue)
     const removed = em + (1 - pb);
     const cycles = removed > 0.0001 ? config.totalCommits / removed : 9999;
     const wallMin = cycles * config.ciDuration;
-    // Last cycle is typically a partial run; subtract ~0.5 cycles for CI runs
     const totalRuns = Math.max(1, cycles - 0.5) * b;
     const runners = getCostRunners();
     const rate = getCostRate();
@@ -1649,8 +1643,24 @@ function updateChartEstimate() {
             : "~$" + totalCost.toFixed(2);
     const multiplier = Math.max(1, totalRuns / config.totalCommits);
     const multStr = multiplier < 10 ? multiplier.toFixed(1) : Math.round(multiplier).toString();
-    wallEl.textContent = wallStr;
-    costEl.textContent = costStr + " (" + multStr + "x)";
+    return { wallStr, costStr, multStr };
+}
+
+function updateChartEstimate() {
+    const wallEl = document.getElementById("est-wall-clock");
+    const costEl = document.getElementById("est-cost");
+    const wallOptEl = document.getElementById("est-wall-clock-at-optimal");
+    const costOptEl = document.getElementById("est-cost-at-optimal");
+    if (!wallEl || !costEl) return;
+
+    const current = computeEstimateAtConcurrency(config.buildConcurrency);
+    const optimal = computeEstimateAtConcurrency(getOptimalConcurrency());
+
+    wallEl.textContent = current.wallStr;
+    costEl.textContent = current.costStr + " (" + current.multStr + "x)";
+
+    if (wallOptEl) wallOptEl.textContent = optimal.wallStr;
+    if (costOptEl) costOptEl.textContent = optimal.costStr + " (" + optimal.multStr + "x)";
 }
 
 function renderOptimalChart() {
@@ -1890,11 +1900,16 @@ function initOptimalChart() {
 
     const tooltip = document.getElementById("optimal-chart-tooltip");
 
+    function clientXFromEvent(e) {
+        if (e.touches && e.touches.length > 0) return e.touches[0].clientX;
+        if (e.changedTouches && e.changedTouches.length > 0) return e.changedTouches[0].clientX;
+        return e.clientX;
+    }
     function concurrencyFromEvent(e) {
         const rect = canvas.getBoundingClientRect();
         const padL = 44, padR = 8;
         const plotW = rect.width - padL - padR;
-        const relX = e.clientX - rect.left - padL;
+        const relX = clientXFromEvent(e) - rect.left - padL;
         const ratio = Math.max(0, Math.min(1, relX / plotW));
         return Math.round(ratio * 49) + 1; // 1-50
     }
@@ -1920,6 +1935,27 @@ function initOptimalChart() {
     });
 
     window.addEventListener("mouseup", () => {
+        dragging = false;
+    });
+
+    canvas.addEventListener("touchstart", (e) => {
+        dragging = true;
+        applyConcurrency(e);
+        e.preventDefault();
+    }, { passive: false });
+
+    window.addEventListener("touchmove", (e) => {
+        if (dragging) {
+            applyConcurrency(e);
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    window.addEventListener("touchend", () => {
+        dragging = false;
+    });
+
+    window.addEventListener("touchcancel", () => {
         dragging = false;
     });
 
@@ -2003,7 +2039,7 @@ function initOptimalChart() {
             "Wall clock: ~" +
             wallStr +
             "<br>" +
-            "Est. cost: ~" +
+            "Cost: ~" +
             costStr +
             " (" + multStr + "x)";
 

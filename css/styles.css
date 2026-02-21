@@ -802,26 +802,121 @@ button.optimal-legend-item.optimal-legend-item--active {
 
 .optimal-estimate-row {
     display: flex;
-    align-items: baseline;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px 12px;
+    border-radius: var(--radius);
+    border-left: 3px solid transparent;
+}
+
+.optimal-estimate-main {
+    display: flex;
+    align-items: center;
     justify-content: space-between;
     gap: 8px;
+}
+
+.optimal-estimate-subrow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 10px;
+    margin-left: 8px;
+}
+
+.optimal-estimate-sublabel {
+    color: var(--text-muted);
+}
+
+.optimal-estimate-subvalue {
+    font-family: var(--font-mono);
+    color: var(--text-secondary);
+}
+
+.optimal-estimate-row--wall .optimal-estimate-subvalue {
+    color: rgba(163, 113, 247, 0.85);
+}
+
+.optimal-estimate-row--cost .optimal-estimate-subvalue {
+    color: rgba(248, 81, 73, 0.85);
+}
+
+[data-theme="light"] .optimal-estimate-row--wall .optimal-estimate-subvalue {
+    color: rgba(130, 80, 223, 0.9);
+}
+
+[data-theme="light"] .optimal-estimate-row--cost .optimal-estimate-subvalue {
+    color: rgba(207, 34, 46, 0.85);
+}
+
+.optimal-estimate-row--wall {
+    background: rgba(163, 113, 247, 0.08);
+    border-left-color: rgba(163, 113, 247, 0.6);
+}
+
+.optimal-estimate-row--cost {
+    background: rgba(248, 81, 73, 0.08);
+    border-left-color: rgba(248, 81, 73, 0.6);
+}
+
+[data-theme="light"] .optimal-estimate-row--wall {
+    background: rgba(130, 80, 223, 0.14);
+    border-left-color: var(--purple);
+}
+
+[data-theme="light"] .optimal-estimate-row--cost {
+    background: rgba(207, 34, 46, 0.1);
+    border-left-color: var(--red);
 }
 
 .optimal-estimate-label {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    font-size: 11px;
-    color: var(--text-muted);
+    font-size: 10px;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.05em;
+}
+
+.optimal-estimate-row--wall .optimal-estimate-label {
+    color: rgba(163, 113, 247, 0.9);
+}
+
+.optimal-estimate-row--cost .optimal-estimate-label {
+    color: rgba(248, 81, 73, 0.9);
+}
+
+[data-theme="light"] .optimal-estimate-row--wall .optimal-estimate-label {
+    color: var(--purple);
+}
+
+[data-theme="light"] .optimal-estimate-row--cost .optimal-estimate-label {
+    color: var(--red);
 }
 
 .optimal-estimate-value {
     font-size: 14px;
     font-weight: 600;
     font-family: var(--font-mono);
-    color: var(--text-primary);
+    letter-spacing: 0.02em;
+}
+
+.optimal-estimate-row--wall .optimal-estimate-value {
+    color: rgba(163, 113, 247, 0.95);
+}
+
+.optimal-estimate-row--cost .optimal-estimate-value {
+    color: rgba(248, 81, 73, 0.95);
+}
+
+[data-theme="light"] .optimal-estimate-row--wall .optimal-estimate-value {
+    color: var(--purple);
+}
+
+[data-theme="light"] .optimal-estimate-row--cost .optimal-estimate-value {
+    color: var(--red);
 }
 
 /* Toggle switch */
@@ -3186,10 +3281,10 @@ button.optimal-legend-item.optimal-legend-item--active {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 36px;
-        height: 36px;
+        width: 30px;
+        height: 30px;
         padding: 0;
-        font-size: 18px;
+        font-size: 14px;
         color: var(--text-muted);
         background: var(--bg-card);
         border: 1px solid var(--border);

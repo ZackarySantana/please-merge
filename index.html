@@ -19,15 +19,7 @@
                         height="22"
                         alt="Merge Queue Simulator"
                     />
-                    <h2>MQ Simulator</h2>
-                    <button
-                        class="sidebar-close mobile-only"
-                        id="btn-sidebar-close"
-                        title="Close menu"
-                        aria-label="Close menu"
-                    >
-                        &#10005;
-                    </button>
+                    <h2>Merge Queue Simulator</h2>
                     <button
                         class="theme-toggle"
                         id="btn-theme"
@@ -55,6 +47,14 @@
                                 d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278"
                             />
                         </svg>
+                    </button>
+                    <button
+                        class="sidebar-close mobile-only"
+                        id="btn-sidebar-close"
+                        title="Close menu"
+                        aria-label="Close menu"
+                    >
+                        &#10005;
                     </button>
                 </div>
                 <div class="sidebar-body">
@@ -104,7 +104,7 @@
                                             class="optimal-legend-item optimal-legend-cost optimal-legend-item--active"
                                             data-series="cost"
                                             title="How much more CI you pay as concurrency grows (1x = run one commit at a time)"
-                                            >Est. Cost</button
+                                            >Cost</button
                                         >
                                         <button
                                             class="optimal-legend-item optimal-legend-wall"
@@ -116,7 +116,7 @@
                                     <div class="optimal-chart-desc">
                                         <div class="optimal-desc-row">
                                             <span class="optimal-desc-dot" style="background: var(--red)"></span>
-                                            <span><strong>Est. Cost</strong> How much more CI you pay as concurrency grows (1x = run one commit at a time)</span>
+                                            <span><strong>Cost</strong> How much more CI you pay as concurrency grows (1x = run one commit at a time)</span>
                                         </div>
                                         <div class="optimal-desc-row">
                                             <span class="optimal-desc-dot" style="background: var(--purple)"></span>
@@ -156,35 +156,47 @@
                                             class="optimal-chart-estimates"
                                             id="optimal-chart-estimates"
                                         >
-                                            <div class="optimal-estimate-row">
-                                                <span class="optimal-estimate-label"
-                                                    >Wall Clock
+                                            <div class="optimal-estimate-row optimal-estimate-row--wall">
+                                                <div class="optimal-estimate-main">
+                                                    <span class="optimal-estimate-label"
+                                                        >Wall Clock
+                                                        <span
+                                                            class="optimal-info"
+                                                            title="Lower-bound estimate. Actual wall clock may be slightly higher due to CI jitter and queue dynamics."
+                                                            >?</span
+                                                        ></span
+                                                    >
                                                     <span
-                                                        class="optimal-info"
-                                                        title="Lower-bound estimate. Actual wall clock may be slightly higher due to CI jitter and queue dynamics."
-                                                        >?</span
-                                                    ></span
-                                                >
-                                                <span
-                                                    class="optimal-estimate-value"
-                                                    id="est-wall-clock"
-                                                    >--</span
-                                                >
+                                                        class="optimal-estimate-value"
+                                                        id="est-wall-clock"
+                                                        >--</span
+                                                    >
+                                                </div>
+                                                <div class="optimal-estimate-subrow">
+                                                    <span class="optimal-estimate-sublabel">At optimal build concurrency</span>
+                                                    <span class="optimal-estimate-subvalue" id="est-wall-clock-at-optimal">--</span>
+                                                </div>
                                             </div>
-                                            <div class="optimal-estimate-row">
-                                                <span class="optimal-estimate-label"
-                                                    >Est. Cost
+                                            <div class="optimal-estimate-row optimal-estimate-row--cost">
+                                                <div class="optimal-estimate-main">
+                                                    <span class="optimal-estimate-label"
+                                                        >Cost
+                                                        <span
+                                                            class="optimal-info"
+                                                            title="Upper-bound estimate. Actual cost may be slightly lower due to partial final concurrent runs and queue efficiency."
+                                                            >?</span
+                                                        ></span
+                                                    >
                                                     <span
-                                                        class="optimal-info"
-                                                        title="Upper-bound estimate. Actual cost may be slightly lower due to partial final concurrent runs and queue efficiency."
-                                                        >?</span
-                                                    ></span
-                                                >
-                                                <span
-                                                    class="optimal-estimate-value"
-                                                    id="est-cost"
-                                                    >--</span
-                                                >
+                                                        class="optimal-estimate-value"
+                                                        id="est-cost"
+                                                        >--</span
+                                                    >
+                                                </div>
+                                                <div class="optimal-estimate-subrow">
+                                                    <span class="optimal-estimate-sublabel">At optimal build concurrency</span>
+                                                    <span class="optimal-estimate-subvalue" id="est-cost-at-optimal">--</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -473,7 +485,7 @@
                             </svg>
                         </button>
                         <img class="topbar-mobile-logo" src="imgs/logo.svg" width="24" height="24" alt="" />
-                        <h1 class="topbar-mobile-title">MQ Simulator</h1>
+                        <h1 class="topbar-mobile-title">MQ SIM</h1>
                     </div>
                     <div class="topbar-center">
                         <button id="btn-start" class="btn btn-primary">
@@ -1501,7 +1513,7 @@
                                     >C</span
                                 >
                                 <p>
-                                    <strong>Est. Cost</strong> (red) shows how
+                                    <strong>Cost</strong> (red) shows how
                                     much more CI you pay as concurrency grows.
                                     1x means running one commit at a time. As
                                     success rate drops, higher concurrency wastes
@@ -1531,7 +1543,7 @@
                         >
                             <strong>Click or drag</strong> on the chart to set
                             your build concurrency. The <strong>Wall Clock</strong> and
-                            <strong>Est. Cost</strong> values below it update in
+                            <strong>Cost</strong> values below it update in
                             real time based on your settings.
                         </p>
                     </div>
