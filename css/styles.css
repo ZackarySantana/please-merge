@@ -3100,4 +3100,36 @@ button.optimal-legend-item.optimal-legend-item--active {
     .sidebar-close:hover {
         color: var(--text-primary);
     }
+
+    /* Step banner: more in-your-face on mobile */
+    .step-banner {
+        padding: 20px 16px 24px;
+        border-top-width: 2px;
+        box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.3);
+    }
+    .step-banner-inner {
+        max-width: none;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+    .step-banner-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 24px;
+    }
+    .step-banner-title {
+        font-size: 16px;
+    }
+    .step-banner-desc {
+        font-size: 13px;
+        white-space: normal;
+        margin-top: 4px;
+    }
+    .step-banner-btn {
+        width: 100%;
+        min-height: 48px;
+        padding: 12px 24px;
+        font-size: 15px;
+        justify-content: center;
+    }
 }
