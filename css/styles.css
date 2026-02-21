@@ -3275,6 +3275,11 @@ button.optimal-legend-item.optimal-legend-item--active {
         grid-template-columns: 1fr 1fr;
         gap: 8px;
     }
+    #btn-step-mode-sidebar,
+    #btn-speed-sidebar {
+        padding-top: 14px;
+        padding-bottom: 14px;
+    }
     .sidebar-footer {
         display: grid;
         grid-template-columns: 1fr 1fr;
