@@ -156,13 +156,7 @@ body {
     cursor: pointer;
     flex-shrink: 0;
     transition: color var(--duration), background var(--duration), border-color var(--duration);
-}
-
-@media (hover: hover) {
-.theme-toggle:hover {
-    color: var(--yellow);
-    background: var(--bg-card-hover);
-    border-color: var(--yellow);
+    touch-action: manipulation;
 }
 
 /* Show sun in dark mode, moon in light mode */
@@ -175,6 +169,12 @@ body {
     color: var(--blue);
 }
 
+@media (hover: hover) {
+.theme-toggle:hover {
+    color: var(--yellow);
+    background: var(--bg-card-hover);
+    border-color: var(--yellow);
+}
 [data-theme="light"] .theme-toggle:hover {
     color: var(--blue);
     border-color: var(--blue);
