@@ -348,6 +348,15 @@ body {
     border-color: var(--text-muted);
 }
 
+.sidebar-summary-btn {
+    color: var(--blue);
+}
+
+.sidebar-summary-btn:hover {
+    color: var(--blue);
+    border-color: var(--blue);
+}
+
 /* ─── Controls ─── */
 .sidebar-divider {
     border: none;
@@ -1088,10 +1097,15 @@ button.optimal-legend-item.optimal-legend-item--active {
 }
 .btn-icon {
     font-size: 11px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
 }
 
 .btn-icon-only {
     padding: 6px 10px;
+    justify-content: center;
 }
 
 .btn-primary {
@@ -1130,7 +1144,7 @@ button.optimal-legend-item.optimal-legend-item--active {
 }
 
 #btn-start {
-    min-width: 90px;
+    min-width: 100px;
     justify-content: center;
 }
 
@@ -2901,6 +2915,11 @@ button.optimal-legend-item.optimal-legend-item--active {
     border-top: 1px solid var(--border);
 }
 
+/* Mobile utility classes */
+.mobile-only {
+    display: none;
+}
+
 /* ─── Responsive tweaks ─── */
 @media (max-width: 1650px) {
     .stat--compact-hide {
@@ -2935,11 +2954,150 @@ button.optimal-legend-item.optimal-legend-item--active {
     }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1000px) {
     .app {
         grid-template-columns: 1fr;
     }
+
+    .mobile-only {
+        display: flex;
+    }
+
+    /* Mobile topbar: sleek layout with title */
+    .topbar {
+        flex-wrap: nowrap;
+        padding: 0 12px;
+        gap: 12px;
+        min-height: var(--topbar-height);
+        height: auto;
+    }
+    .topbar-mobile-header {
+        flex: 1;
+        min-width: 0;
+        align-items: center;
+        gap: 10px;
+    }
+    .topbar-menu-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        margin: 0 -6px 0 0;
+        border: none;
+        background: transparent;
+        color: var(--text-secondary);
+        border-radius: var(--radius);
+        cursor: pointer;
+        transition: color var(--duration) var(--ease-out), background var(--duration) var(--ease-out);
+    }
+    .topbar-menu-btn:hover {
+        color: var(--text-primary);
+        background: var(--bg-card);
+    }
+    .topbar-menu-btn svg {
+        flex-shrink: 0;
+    }
+    .topbar-mobile-logo {
+        opacity: 0.9;
+        flex-shrink: 0;
+    }
+    .topbar-mobile-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0;
+        letter-spacing: -0.02em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .topbar-center {
+        gap: 6px;
+    }
+    .topbar-center .btn {
+        padding: 8px 10px;
+        min-width: 40px;
+    }
+    .topbar-center .btn:not(.btn-icon-only) {
+        padding: 8px 12px;
+    }
+    #btn-start {
+        min-width: 100px;
+    }
+    .topbar-instant-label {
+        display: none;
+    }
+    .topbar-center .btn-icon-only,
+    #btn-instant {
+        padding: 8px 10px;
+        justify-content: center;
+    }
+    .topbar-right {
+        display: none;
+    }
+    .mobile-only.control-group {
+        display: flex;
+    }
+    .topbar-mobile-hide {
+        display: none !important;
+    }
+
     .sidebar {
-        display: none; /* Could add a toggle for mobile */
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: min(85vw, 400px);
+        z-index: 900;
+        transform: translateX(-100%);
+        transition: transform 0.3s var(--ease-out);
+        box-shadow: none;
+        border-right: 1px solid var(--border);
+    }
+    .sidebar.sidebar--open {
+        transform: translateX(0);
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .sidebar-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 899;
+        background: rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s var(--ease-out), visibility 0.3s var(--ease-out);
+    }
+    .sidebar-backdrop.sidebar-backdrop--visible {
+        opacity: 1;
+        visibility: visible;
+    }
+    .sidebar-backdrop[hidden] {
+        display: none !important;
+    }
+
+    .sidebar-divider.mobile-only {
+        display: block;
+    }
+
+    .sidebar-close {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        font-size: 18px;
+        color: var(--text-muted);
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        cursor: pointer;
+        transition: color var(--duration) var(--ease-out);
+    }
+    .sidebar-close:hover {
+        color: var(--text-primary);
     }
 }

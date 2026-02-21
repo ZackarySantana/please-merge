@@ -1518,6 +1518,13 @@ function initSummary() {
             state._keepSummaryOpen = false;
         });
     if (openBtn) openBtn.addEventListener("click", showSummary);
+    const summarySidebar = document.getElementById("btn-summary-sidebar");
+    if (summarySidebar) {
+        summarySidebar.addEventListener("click", () => {
+            showSummary();
+            closeSidebar();
+        });
+    }
     // Close on backdrop click
     if (overlay)
         overlay.addEventListener("click", (e) => {
@@ -2043,10 +2050,49 @@ const SPEED_OPTIONS = [
 ];
 
 function syncSpeedTopbar() {
-    const el = document.getElementById("val-speed-topbar");
-    if (!el) return;
-    const opt = SPEED_OPTIONS.find((o) => o.speed === config.speed);
-    el.textContent = opt ? opt.label : "Normal";
+    const label = SPEED_OPTIONS.find((o) => o.speed === config.speed)?.label ?? "Normal";
+    const topbar = document.getElementById("val-speed-topbar");
+    const sidebar = document.getElementById("val-speed-sidebar");
+    if (topbar) topbar.textContent = label;
+    if (sidebar) sidebar.textContent = label;
+}
+
+function syncStepModeButtons() {
+    const html = '<span class="btn-icon">⏭</span> Step: ' + (config.stepMode ? "On" : "Off");
+    const topbar = document.getElementById("btn-step-mode");
+    const sidebar = document.getElementById("btn-step-mode-sidebar");
+    if (topbar) {
+        topbar.classList.toggle("btn-step-active", config.stepMode);
+        topbar.classList.toggle("btn-ghost", !config.stepMode);
+        topbar.innerHTML = html;
+    }
+    if (sidebar) {
+        sidebar.classList.toggle("btn-step-active", config.stepMode);
+        sidebar.classList.toggle("btn-ghost", !config.stepMode);
+        sidebar.innerHTML = html;
+    }
+}
+
+function openSidebar() {
+    const sidebar = document.querySelector(".sidebar");
+    const backdrop = document.getElementById("sidebar-backdrop");
+    if (sidebar) sidebar.classList.add("sidebar--open");
+    if (backdrop) {
+        backdrop.hidden = false;
+        backdrop.classList.add("sidebar-backdrop--visible");
+    }
+    document.body.style.overflow = "hidden";
+}
+
+function closeSidebar() {
+    const sidebar = document.querySelector(".sidebar");
+    const backdrop = document.getElementById("sidebar-backdrop");
+    if (sidebar) sidebar.classList.remove("sidebar--open");
+    if (backdrop) {
+        backdrop.classList.remove("sidebar-backdrop--visible");
+        backdrop.hidden = true;
+    }
+    document.body.style.overflow = "";
 }
 
 function syncSpeedButtons() {
@@ -2132,36 +2178,49 @@ function bindEvents() {
     document.getElementById("btn-pause").addEventListener("click", doPause);
     document.getElementById("btn-reset").addEventListener("click", doReset);
 
-    // Step mode toggle button
-    document.getElementById("btn-step-mode").addEventListener("click", () => {
+    function toggleStepMode() {
         config.stepMode = !config.stepMode;
-        const btn = document.getElementById("btn-step-mode");
-        btn.classList.toggle("btn-step-active", config.stepMode);
-        btn.classList.toggle("btn-ghost", !config.stepMode);
-        btn.innerHTML = '<span class="btn-icon">⏭</span> Step: ' + (config.stepMode ? "On" : "Off");
+        syncStepModeButtons();
         saveConfig();
-        // If step mode is turned off while waiting, execute the pending evaluation instantly
         if (!config.stepMode && state.stepWaiting && !state.animating) {
             hideStepBanner();
             state.stepWaiting = false;
             evaluateQueue();
             lastTimestamp = 0;
         }
-    });
+    }
 
-    // Topbar speed cycle button
-    document.getElementById("btn-speed-topbar").addEventListener("click", () => {
+    function cycleSpeed() {
         const idx = SPEED_OPTIONS.findIndex((o) => o.speed === config.speed);
         const next = SPEED_OPTIONS[(idx + 1) % SPEED_OPTIONS.length];
         config.speed = next.speed;
         syncSpeedButtons();
         saveConfig();
         updatePresetButtonStates();
-    });
+    }
+
+    document.getElementById("btn-step-mode").addEventListener("click", toggleStepMode);
+    const stepSidebar = document.getElementById("btn-step-mode-sidebar");
+    if (stepSidebar) stepSidebar.addEventListener("click", toggleStepMode);
+
+    document.getElementById("btn-speed-topbar").addEventListener("click", cycleSpeed);
+    const speedSidebar = document.getElementById("btn-speed-sidebar");
+    if (speedSidebar) speedSidebar.addEventListener("click", cycleSpeed);
 
     document
         .getElementById("btn-step-continue")
         .addEventListener("click", doStepContinue);
+
+    // Mobile sidebar
+    const menuBtn = document.getElementById("btn-menu");
+    if (menuBtn) menuBtn.addEventListener("click", openSidebar);
+    const sidebarClose = document.getElementById("btn-sidebar-close");
+    if (sidebarClose) sidebarClose.addEventListener("click", closeSidebar);
+    const sidebarBackdrop = document.getElementById("sidebar-backdrop");
+    if (sidebarBackdrop) sidebarBackdrop.addEventListener("click", closeSidebar);
+    window.addEventListener("resize", () => {
+        if (window.innerWidth >= 1000) closeSidebar();
+    });
 
     // Instant mode button
     document.getElementById("btn-instant").addEventListener("click", () => {
@@ -2248,6 +2307,15 @@ function bindEvents() {
     // Keyboard shortcuts
     document.addEventListener("keydown", (e) => {
         if (e.target.tagName === "INPUT") return;
+        // Close sidebar on Escape
+        if (e.code === "Escape") {
+            const sidebar = document.querySelector(".sidebar");
+            if (sidebar?.classList.contains("sidebar--open")) {
+                closeSidebar();
+                e.preventDefault();
+                return;
+            }
+        }
         // Don't handle shortcuts while welcome dialog is open
         const welcome = document.getElementById("welcome-overlay");
         if (welcome && !welcome.hidden) return;
@@ -2579,11 +2647,7 @@ function init() {
     initTheme();
     loadConfig();
     writeConfigToUI();
-    // Sync step mode button with loaded config
-    const stepBtn = document.getElementById("btn-step-mode");
-    stepBtn.classList.toggle("btn-step-active", config.stepMode);
-    stepBtn.classList.toggle("btn-ghost", !config.stepMode);
-    stepBtn.innerHTML = '<span class="btn-icon">⏭</span> Step: ' + (config.stepMode ? "On" : "Off");
+    syncStepModeButtons();
     bindEvents();
     initCollapsible();
     initSummary();

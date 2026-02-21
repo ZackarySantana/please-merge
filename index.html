@@ -21,6 +21,14 @@
                     />
                     <h2>MQ Simulator</h2>
                     <button
+                        class="sidebar-close mobile-only"
+                        id="btn-sidebar-close"
+                        title="Close menu"
+                        aria-label="Close menu"
+                    >
+                        &#10005;
+                    </button>
+                    <button
                         class="theme-toggle"
                         id="btn-theme"
                         title="Toggle light/dark mode"
@@ -50,6 +58,32 @@
                     </button>
                 </div>
                 <div class="sidebar-body">
+                    <!-- Simulation (mobile only) -->
+                    <div class="collapsible-section mobile-only" data-section="simulation">
+                        <button class="section-toggle">
+                            <span class="section-heading">Simulation</span>
+                            <span class="section-chevron"></span>
+                        </button>
+                        <div class="collapsible-body">
+                            <div class="control-group">
+                                <button
+                                    id="btn-step-mode-sidebar"
+                                    class="btn btn-ghost btn-step-active"
+                                    title="Pause before each merge/reject action"
+                                >
+                                    <span class="btn-icon">⏭</span> Step: On
+                                </button>
+                                <button
+                                    id="btn-speed-sidebar"
+                                    class="btn btn-ghost"
+                                    title="Click to cycle: Normal → Fast → Very Fast"
+                                >
+                                    <span class="btn-icon">⏱</span> Speed: <span id="val-speed-sidebar">Normal</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="sidebar-divider mobile-only" />
                     <!-- Build Concurrency Analysis -->
                     <div class="collapsible-section" data-section="analysis">
                         <button class="section-toggle">
@@ -337,6 +371,16 @@
                     </div>
                 </div>
                 <div class="sidebar-footer">
+                    <button
+                        class="sidebar-help-btn sidebar-summary-btn mobile-only"
+                        id="btn-summary-sidebar"
+                        title="Show simulation summary"
+                    >
+                        <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor">
+                            <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm-8 8A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm8 0A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3z"/>
+                        </svg>
+                        Summary
+                    </button>
                     <button class="sidebar-help-btn" id="btn-glossary">
                         <svg
                             viewBox="0 0 16 16"
@@ -409,11 +453,28 @@
                     </div>
                 </div>
             </aside>
+            <div class="sidebar-backdrop" id="sidebar-backdrop" hidden aria-hidden="true"></div>
 
             <!-- ─── Main Area ─── -->
             <main class="main">
                 <!-- Top bar -->
                 <header class="topbar">
+                    <div class="topbar-mobile-header mobile-only">
+                        <button
+                            id="btn-menu"
+                            class="topbar-menu-btn"
+                            title="Open menu"
+                            aria-label="Open menu"
+                        >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                                <line x1="3" y1="6" x2="21" y2="6"></line>
+                                <line x1="3" y1="12" x2="21" y2="12"></line>
+                                <line x1="3" y1="18" x2="21" y2="18"></line>
+                            </svg>
+                        </button>
+                        <img class="topbar-mobile-logo" src="imgs/logo.svg" width="24" height="24" alt="" />
+                        <h1 class="topbar-mobile-title">MQ Simulator</h1>
+                    </div>
                     <div class="topbar-center">
                         <button id="btn-start" class="btn btn-primary">
                             <span class="btn-icon">▶</span> Start
@@ -431,24 +492,24 @@
                         </button>
                         <button
                             id="btn-speed-topbar"
-                            class="btn btn-ghost"
+                            class="btn btn-ghost topbar-mobile-hide"
                             title="Click to cycle: Normal → Fast → Very Fast"
                         >
                             <span class="btn-icon">⏱</span> Speed: <span id="val-speed-topbar">Normal</span>
                         </button>
                         <button
                             id="btn-step-mode"
-                            class="btn btn-step-active"
+                            class="btn btn-step-active topbar-mobile-hide"
                             title="Pause before each merge/reject action"
                         >
                             <span class="btn-icon">⏭</span> Step: On
                         </button>
                         <button
                             id="btn-instant"
-                            class="btn btn-ghost"
+                            class="btn btn-ghost topbar-instant-btn"
                             title="Run the entire simulation instantly"
                         >
-                            <span class="btn-icon">⚡</span> Instant
+                            <span class="btn-icon">⚡</span><span class="topbar-instant-label"> Instant</span>
                         </button>
                     </div>
                     <div class="topbar-right">
@@ -553,7 +614,7 @@
                         </div>
                         <div class="stat-divider stat--small-hide"></div>
                         <button
-                            class="summary-trigger-btn"
+                            class="summary-trigger-btn topbar-mobile-hide"
                             id="btn-summary"
                             title="Show simulation summary"
                         >
