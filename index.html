@@ -1270,30 +1270,35 @@
                     </div>
                 </div>
 
-                <!-- Step Mode Banner -->
-                <div class="step-banner" id="step-banner" hidden>
-                    <div class="step-banner-inner">
-                        <div class="step-banner-icon" id="step-banner-icon">
-                            ⏸
-                        </div>
-                        <div class="step-banner-text">
-                            <div
-                                class="step-banner-title"
-                                id="step-banner-title"
-                            >
-                                Evaluation paused
+                <!-- Step Mode Overlay (desktop: centered modal; mobile: bottom bar) -->
+                <div class="step-overlay" id="step-overlay" hidden>
+                    <div class="step-banner" id="step-banner">
+                        <div class="step-banner-inner">
+                            <div class="step-banner-icon" id="step-banner-icon">
+                                ⏸
                             </div>
-                            <div
-                                class="step-banner-desc"
-                                id="step-banner-desc"
-                            ></div>
+                            <div class="step-banner-text">
+                                <div
+                                    class="step-banner-title"
+                                    id="step-banner-title"
+                                >
+                                    Evaluation paused
+                                </div>
+                                <div
+                                    class="step-banner-desc"
+                                    id="step-banner-desc"
+                                ></div>
+                                <div class="step-banner-hint desktop-only">
+                                    Click anywhere to continue
+                                </div>
+                            </div>
+                            <button
+                                class="btn btn-primary step-banner-btn"
+                                id="btn-step-continue"
+                            >
+                                Continue →
+                            </button>
                         </div>
-                        <button
-                            class="btn btn-primary step-banner-btn"
-                            id="btn-step-continue"
-                        >
-                            Continue →
-                        </button>
                     </div>
                 </div>
             </main>

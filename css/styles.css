@@ -1615,27 +1615,127 @@ button.optimal-legend-item.optimal-legend-item--active {
     animation: flash-red 0.6s var(--ease-out);
 }
 
-/* ─── Step Banner ─── */
+/* ─── Step Overlay & Banner ─── */
+.step-overlay[hidden] {
+    display: none;
+}
+
+/* Desktop: full overlay with centered card */
+@media (min-width: 1001px) {
+    .step-overlay {
+        position: absolute;
+        top: var(--topbar-height);
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 850;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.35);
+        backdrop-filter: blur(2px);
+        cursor: pointer;
+        animation: step-overlay-fade 0.25s var(--ease-out);
+    }
+    .step-banner {
+        cursor: default;
+        padding: 24px 28px;
+        max-width: 420px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+        animation: step-card-pop 0.3s var(--ease-out);
+    }
+    .step-banner-inner {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: 16px;
+    }
+    .step-banner-btn {
+        flex: 1 1 100%;
+    }
+    .step-banner-icon {
+        width: 44px;
+        height: 44px;
+        font-size: 22px;
+    }
+    .step-banner-title {
+        font-size: 15px;
+    }
+    .step-banner-desc {
+        font-size: 13px;
+        white-space: normal;
+    }
+    .step-banner-hint {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 8px;
+    }
+    .step-banner-btn {
+        width: 100%;
+        min-height: 44px;
+        padding: 12px 24px;
+        font-size: 14px;
+        justify-content: center;
+    }
+}
+
+@keyframes step-overlay-fade {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes step-card-pop {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Mobile: overlay at bottom, banner as full-width bar */
+@media (max-width: 1000px) {
+    .step-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        background: transparent;
+        cursor: default;
+        pointer-events: none;
+    }
+    .step-overlay .step-banner {
+        width: 100%;
+        align-self: stretch;
+        pointer-events: auto;
+        cursor: default;
+    }
+    .desktop-only {
+        display: none;
+    }
+}
+
 .step-banner {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 100;
-    padding: 12px 20px;
     background: linear-gradient(
         to top,
         rgba(13, 17, 23, 0.97),
         rgba(13, 17, 23, 0.92)
     );
-    backdrop-filter: blur(4px);
-    border-top: 1px solid var(--border);
     backdrop-filter: blur(8px);
+    border-top: 1px solid var(--border);
     animation: banner-slide-up 0.3s var(--ease-out);
-}
-
-.step-banner[hidden] {
-    display: none;
 }
 
 .step-banner-inner {

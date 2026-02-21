@@ -559,7 +559,6 @@ function previewEvaluation() {
 }
 
 function showStepBanner() {
-    const banner = document.getElementById("step-banner");
     const icon = document.getElementById("step-banner-icon");
     const title = document.getElementById("step-banner-title");
     const desc = document.getElementById("step-banner-desc");
@@ -595,12 +594,11 @@ function showStepBanner() {
             `<span class="step-banner-time step-banner-time--wasted">${timeTag}</span>`;
     }
 
-    banner.hidden = false;
+    document.getElementById("step-overlay").hidden = false;
 }
 
 function hideStepBanner() {
-    const banner = document.getElementById("step-banner");
-    banner.hidden = true;
+    document.getElementById("step-overlay").hidden = true;
 }
 
 function doStepContinue() {
@@ -2209,6 +2207,11 @@ function bindEvents() {
 
     document
         .getElementById("btn-step-continue")
+        .addEventListener("click", doStepContinue);
+
+    // Desktop: click anywhere on overlay to continue
+    document
+        .getElementById("step-overlay")
         .addEventListener("click", doStepContinue);
 
     // Mobile sidebar
