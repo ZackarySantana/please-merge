@@ -2854,6 +2854,7 @@ button.optimal-legend-item.optimal-legend-item--active {
     cursor: pointer;
     padding: 0;
     transition: all var(--duration) var(--ease-out);
+    touch-action: manipulation;
 }
 
 .welcome-dot-btn--active {
