@@ -215,12 +215,12 @@ function rand(min, max) {
     return min + Math.random() * (max - min);
 }
 
-// Compact time for commit cards (e.g. "4.2m", "12m", "1h 5m")
+// Compact time for commit cards (e.g. "4.2s", "12.0m", "1h 5m") - always 1 decimal to avoid layout shift
 function formatCardTime(ms) {
     const s = ms / 1000;
-    if (s < 60) return s.toFixed(0) + "s";
+    if (s < 60) return s.toFixed(1) + "s";
     const m = s / 60;
-    if (m < 60) return m.toFixed(1).replace(/\.0$/, "") + "m";
+    if (m < 60) return m.toFixed(1) + "m";
     const h = Math.floor(m / 60);
     const rem = Math.round(m % 60);
     return rem > 0 ? h + "h " + rem + "m" : h + "h";
@@ -993,9 +993,9 @@ function renderQueue() {
 
 function buildQueueCard(commit, isActive) {
     const n = commit.ciRuns - 1;
-    const runsTag =
+    const runsSubline =
         commit.ciRuns > 1
-            ? `<span class="card-reruns-badge" title="This commit had to rerun CI ${n} time(s) because earlier commits in the queue failed."><span class="card-reruns-badge-full">Restarted ${n}×</span><span class="card-reruns-badge-short">R${n}</span></span>`
+            ? `<div class="card-reruns-subline" title="This commit had to rerun CI ${n} time(s) because earlier commits in the queue failed.">Restarted ${n}×</div>`
             : "";
 
     if (!isActive) {
@@ -1003,8 +1003,8 @@ function buildQueueCard(commit, isActive) {
       <div class="card-row">
         <span class="card-dot"></span>
         <span class="card-name">${commit.name}</span>
-        ${runsTag}
       </div>
+      ${runsSubline}
     </div>`;
     }
 
@@ -1041,8 +1041,9 @@ function buildQueueCard(commit, isActive) {
     <div class="card-row">
       <span class="card-dot"></span>
       <span class="card-name">${commit.name}</span>
-      ${runsTag}${badge}${timeStr}
+      ${badge}${timeStr}
     </div>
+    ${runsSubline}
     <div class="card-progress"><div class="${fillClass}" style="width:${fillPct}%"></div></div>
   </div>`;
 }
@@ -1054,9 +1055,9 @@ function renderMergedIncremental() {
     for (let i = render.mergedCount; i < state.merged.length; i++) {
         const c = state.commits.get(state.merged[i]);
         const n = c.ciRuns - 1;
-        const runsTag =
+        const runsSubline =
             c.ciRuns > 1
-                ? `<span class="card-reruns-badge" title="This commit had to rerun CI ${n} time(s) because earlier commits in the queue failed."><span class="card-reruns-badge-full">Restarted ${n}×</span><span class="card-reruns-badge-short">R${n}</span></span>`
+                ? `<div class="card-reruns-subline" title="This commit had to rerun CI ${n} time(s) because earlier commits in the queue failed.">Restarted ${n}×</div>`
                 : "";
         const card = document.createElement("div");
         card.className = "card card--merged card--entering";
@@ -1065,9 +1066,9 @@ function renderMergedIncremental() {
       <div class="card-row">
         <span class="card-dot"></span>
         <span class="card-name">${c.name}</span>
-        ${runsTag}
         <span class="card-date">${formatTime(c.dateAdded)}</span>
-      </div>`;
+      </div>
+      ${runsSubline}`;
         // Prepend so newest is at top
         container.prepend(card);
     }
@@ -1079,9 +1080,9 @@ function renderRejectedIncremental() {
     for (let i = render.rejectedCount; i < state.rejected.length; i++) {
         const c = state.commits.get(state.rejected[i]);
         const n = c.ciRuns - 1;
-        const runsTag =
+        const runsSubline =
             c.ciRuns > 1
-                ? `<span class="card-reruns-badge" title="This commit had to rerun CI ${n} time(s) because earlier commits in the queue failed."><span class="card-reruns-badge-full">Restarted ${n}×</span><span class="card-reruns-badge-short">R${n}</span></span>`
+                ? `<div class="card-reruns-subline" title="This commit had to rerun CI ${n} time(s) because earlier commits in the queue failed.">Restarted ${n}×</div>`
                 : "";
         const card = document.createElement("div");
         card.className = "card card--rejected card--entering";
@@ -1090,9 +1091,9 @@ function renderRejectedIncremental() {
       <div class="card-row">
         <span class="card-dot"></span>
         <span class="card-name">${c.name}</span>
-        ${runsTag}
         <span class="card-date">${formatTime(c.dateAdded)}</span>
-      </div>`;
+      </div>
+      ${runsSubline}`;
         container.prepend(card);
     }
     document.getElementById("count-rejected").textContent =
@@ -1904,6 +1905,11 @@ function initOptimalChart() {
         if (e.changedTouches && e.changedTouches.length > 0) return e.changedTouches[0].clientX;
         return e.clientX;
     }
+    function clientYFromEvent(e) {
+        if (e.touches && e.touches.length > 0) return e.touches[0].clientY;
+        if (e.changedTouches && e.changedTouches.length > 0) return e.changedTouches[0].clientY;
+        return e.clientY;
+    }
     function concurrencyFromEvent(e) {
         const rect = canvas.getBoundingClientRect();
         const padL = 44, padR = 8;
@@ -1913,67 +1919,22 @@ function initOptimalChart() {
         return Math.round(ratio * 49) + 1; // 1-50
     }
 
-    let dragging = false;
-
-    function applyConcurrency(e) {
-        const n = concurrencyFromEvent(e);
-        document.getElementById("cfg-build-concurrency").value = n;
-        readConfigFromUI();
-        syncUIValues();
-        if (!state.isRunning) doReset();
-    }
-
-    canvas.addEventListener("mousedown", (e) => {
-        dragging = true;
-        applyConcurrency(e);
-        e.preventDefault();
-    });
-
-    window.addEventListener("mousemove", (e) => {
-        if (dragging) applyConcurrency(e);
-    });
-
-    window.addEventListener("mouseup", () => {
-        dragging = false;
-    });
-
-    canvas.addEventListener("touchstart", (e) => {
-        dragging = true;
-        applyConcurrency(e);
-        e.preventDefault();
-    }, { passive: false });
-
-    window.addEventListener("touchmove", (e) => {
-        if (dragging) {
-            applyConcurrency(e);
-            e.preventDefault();
-        }
-    }, { passive: false });
-
-    window.addEventListener("touchend", () => {
-        dragging = false;
-    });
-
-    window.addEventListener("touchcancel", () => {
-        dragging = false;
-    });
-
-    canvas.addEventListener("mousemove", (e) => {
+    function updateTooltipAt(clientX, clientY) {
         const rect = canvas.getBoundingClientRect();
-        const relCanvasX = e.clientX - rect.left;
-        const relCanvasY = e.clientY - rect.top;
+        const relCanvasX = clientX - rect.left;
+        const relCanvasY = clientY - rect.top;
         const padL = 44;
         const padBottom = 38;
         const inXAxisArea = relCanvasY > rect.height - padBottom;
 
         const wrapRect = canvas.parentElement.getBoundingClientRect();
-        const relY = e.clientY - wrapRect.top;
+        const relY = clientY - wrapRect.top;
         const tooltipAbove = relY > 50;
 
         // If hovering over the x-axis label area, show context tooltip
         if (inXAxisArea) {
             tooltip.innerHTML = "Number of commits processed<br>in parallel per CI cycle";
-            const relX = e.clientX - wrapRect.left;
+            const relX = clientX - wrapRect.left;
             tooltip.hidden = false;
             const tw = tooltip.offsetWidth;
             tooltip.style.left = Math.max(2, Math.min(relX - tw / 2, wrapRect.width - tw - 2)) + "px";
@@ -1997,7 +1958,7 @@ function initOptimalChart() {
             return;
         }
 
-        const n = concurrencyFromEvent(e);
+        const n = concurrencyFromEvent({ clientX, clientY });
         const p = config.successRate / 100;
         const pb = Math.pow(p, n);
 
@@ -2042,7 +2003,7 @@ function initOptimalChart() {
             costStr +
             " (" + multStr + "x)";
 
-        const relX = e.clientX - wrapRect.left;
+        const relX = clientX - wrapRect.left;
         const mainTooltipAbove = relY > 60;
         tooltip.hidden = false;
         const tw = tooltip.offsetWidth;
@@ -2053,6 +2014,62 @@ function initOptimalChart() {
         tooltip.style.left = left + "px";
         tooltip.style.top = (mainTooltipAbove ? relY - 52 : relY + 12) + "px";
         tooltip.style.transform = "";
+    }
+
+    let dragging = false;
+
+    function applyConcurrency(e) {
+        const n = concurrencyFromEvent(e);
+        document.getElementById("cfg-build-concurrency").value = n;
+        readConfigFromUI();
+        syncUIValues();
+        if (!state.isRunning) doReset();
+    }
+
+    canvas.addEventListener("mousedown", (e) => {
+        dragging = true;
+        applyConcurrency(e);
+        e.preventDefault();
+    });
+
+    window.addEventListener("mousemove", (e) => {
+        if (dragging) applyConcurrency(e);
+    });
+
+    window.addEventListener("mouseup", () => {
+        dragging = false;
+    });
+
+    canvas.addEventListener("touchstart", (e) => {
+        dragging = true;
+        tooltip.hidden = true;
+        applyConcurrency(e);
+        e.preventDefault();
+    }, { passive: false });
+
+    window.addEventListener("touchmove", (e) => {
+        if (dragging) {
+            applyConcurrency(e);
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    window.addEventListener("touchend", (e) => {
+        if (dragging && e.changedTouches && e.changedTouches.length > 0) {
+            updateTooltipAt(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+        }
+        dragging = false;
+    });
+
+    window.addEventListener("touchcancel", (e) => {
+        if (dragging && e.changedTouches && e.changedTouches.length > 0) {
+            updateTooltipAt(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+        }
+        dragging = false;
+    });
+
+    canvas.addEventListener("mousemove", (e) => {
+        updateTooltipAt(e.clientX, e.clientY);
     });
 
     canvas.addEventListener("mouseleave", () => {
