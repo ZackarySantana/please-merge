@@ -1501,17 +1501,22 @@ button.optimal-legend-item.optimal-legend-item--active {
     flex-shrink: 0;
 }
 
-.card-runs {
+.card-reruns-badge {
     font-size: 10px;
-    font-family: var(--font-mono);
     font-weight: 600;
-    color: var(--yellow);
-    background: var(--yellow-dim);
-    padding: 1px 5px;
-    border-radius: 8px;
+    font-family: var(--font-mono);
+    color: var(--text-secondary);
+    background: var(--bg-card);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
     flex-shrink: 0;
     white-space: nowrap;
-    letter-spacing: -0.02em;
+    border: 1px solid var(--border);
+    letter-spacing: 0.02em;
+}
+
+[data-theme="light"] .card-reruns-badge {
+    color: var(--text-secondary);
 }
 
 /* Progress bar: full width, always visible on active cards */

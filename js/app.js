@@ -996,7 +996,7 @@ function renderQueue() {
 function buildQueueCard(commit, isActive) {
     const runsTag =
         commit.ciRuns > 1
-            ? `<span class="card-runs" title="This commit has run CI ${commit.ciRuns} times. It was restarted ${commit.ciRuns - 1}x due to earlier failures in the queue.">⟳${commit.ciRuns}</span>`
+            ? `<span class="card-reruns-badge" title="This commit had to rerun CI ${commit.ciRuns - 1} time(s) because earlier commits in the queue failed.">Restarted ${commit.ciRuns - 1}×</span>`
             : "";
 
     if (!isActive) {
@@ -1056,7 +1056,7 @@ function renderMergedIncremental() {
         const c = state.commits.get(state.merged[i]);
         const runsTag =
             c.ciRuns > 1
-                ? `<span class="card-runs" title="This commit ran CI ${c.ciRuns} times. It was restarted ${c.ciRuns - 1}x due to earlier failures in the queue.">⟳${c.ciRuns}</span>`
+                ? `<span class="card-reruns-badge" title="This commit had to rerun CI ${c.ciRuns - 1} time(s) because earlier commits in the queue failed.">Restarted ${c.ciRuns - 1}×</span>`
                 : "";
         const card = document.createElement("div");
         card.className = "card card--merged card--entering";
@@ -1066,7 +1066,6 @@ function renderMergedIncremental() {
         <span class="card-dot"></span>
         <span class="card-name">${c.name}</span>
         ${runsTag}
-        <span class="card-badge">✓</span>
         <span class="card-date">${formatTime(c.dateAdded)}</span>
       </div>`;
         // Prepend so newest is at top
@@ -1081,7 +1080,7 @@ function renderRejectedIncremental() {
         const c = state.commits.get(state.rejected[i]);
         const runsTag =
             c.ciRuns > 1
-                ? `<span class="card-runs" title="This commit ran CI ${c.ciRuns} times. It was restarted ${c.ciRuns - 1}x due to earlier failures in the queue.">⟳${c.ciRuns}</span>`
+                ? `<span class="card-reruns-badge" title="This commit had to rerun CI ${c.ciRuns - 1} time(s) because earlier commits in the queue failed.">Restarted ${c.ciRuns - 1}×</span>`
                 : "";
         const card = document.createElement("div");
         card.className = "card card--rejected card--entering";
@@ -1091,7 +1090,6 @@ function renderRejectedIncremental() {
         <span class="card-dot"></span>
         <span class="card-name">${c.name}</span>
         ${runsTag}
-        <span class="card-badge">✕</span>
         <span class="card-date">${formatTime(c.dateAdded)}</span>
       </div>`;
         container.prepend(card);
