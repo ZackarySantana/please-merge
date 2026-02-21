@@ -1579,6 +1579,10 @@ button.optimal-legend-item.optimal-legend-item--active {
     letter-spacing: 0.02em;
 }
 
+.card-reruns-badge-short {
+    display: none;
+}
+
 [data-theme="light"] .card-reruns-badge {
     color: var(--text-secondary);
 }
@@ -3181,6 +3185,13 @@ button.optimal-legend-item.optimal-legend-item--active {
 
     .mobile-only {
         display: flex;
+    }
+
+    .card-reruns-badge-full {
+        display: none;
+    }
+    .card-reruns-badge-short {
+        display: inline;
     }
 
     /* Mobile topbar: sleek layout with title */

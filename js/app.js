@@ -992,9 +992,10 @@ function renderQueue() {
 }
 
 function buildQueueCard(commit, isActive) {
+    const n = commit.ciRuns - 1;
     const runsTag =
         commit.ciRuns > 1
-            ? `<span class="card-reruns-badge" title="This commit had to rerun CI ${commit.ciRuns - 1} time(s) because earlier commits in the queue failed.">Restarted ${commit.ciRuns - 1}×</span>`
+            ? `<span class="card-reruns-badge" title="This commit had to rerun CI ${n} time(s) because earlier commits in the queue failed."><span class="card-reruns-badge-full">Restarted ${n}×</span><span class="card-reruns-badge-short">R${n}</span></span>`
             : "";
 
     if (!isActive) {
@@ -1052,9 +1053,10 @@ function renderMergedIncremental() {
     const container = document.getElementById("lane-merged");
     for (let i = render.mergedCount; i < state.merged.length; i++) {
         const c = state.commits.get(state.merged[i]);
+        const n = c.ciRuns - 1;
         const runsTag =
             c.ciRuns > 1
-                ? `<span class="card-reruns-badge" title="This commit had to rerun CI ${c.ciRuns - 1} time(s) because earlier commits in the queue failed.">Restarted ${c.ciRuns - 1}×</span>`
+                ? `<span class="card-reruns-badge" title="This commit had to rerun CI ${n} time(s) because earlier commits in the queue failed."><span class="card-reruns-badge-full">Restarted ${n}×</span><span class="card-reruns-badge-short">R${n}</span></span>`
                 : "";
         const card = document.createElement("div");
         card.className = "card card--merged card--entering";
@@ -1076,9 +1078,10 @@ function renderRejectedIncremental() {
     const container = document.getElementById("lane-rejected");
     for (let i = render.rejectedCount; i < state.rejected.length; i++) {
         const c = state.commits.get(state.rejected[i]);
+        const n = c.ciRuns - 1;
         const runsTag =
             c.ciRuns > 1
-                ? `<span class="card-reruns-badge" title="This commit had to rerun CI ${c.ciRuns - 1} time(s) because earlier commits in the queue failed.">Restarted ${c.ciRuns - 1}×</span>`
+                ? `<span class="card-reruns-badge" title="This commit had to rerun CI ${n} time(s) because earlier commits in the queue failed."><span class="card-reruns-badge-full">Restarted ${n}×</span><span class="card-reruns-badge-short">R${n}</span></span>`
                 : "";
         const card = document.createElement("div");
         card.className = "card card--rejected card--entering";
