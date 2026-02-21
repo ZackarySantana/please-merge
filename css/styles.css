@@ -2376,6 +2376,18 @@ button.optimal-legend-item.optimal-legend-item--active {
     background: var(--blue-dim);
 }
 
+.glossary-nav-item--active:hover {
+    color: var(--blue);
+    background: var(--blue-dim);
+}
+
+.glossary-nav-item--selecting,
+.glossary-nav-item--selecting:hover {
+    color: var(--blue);
+    font-weight: 600;
+    background: var(--blue-dim);
+}
+
 .glossary-body {
     flex: 1;
     overflow-y: auto;

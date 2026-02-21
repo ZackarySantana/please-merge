@@ -2515,17 +2515,26 @@ function initGlossary() {
         });
     }
 
+    const SELECTING_DURATION_MS = 400;
+    let scrollUpdatesPausedUntil = 0;
+
     navItems.forEach((item) => {
         item.addEventListener("click", (e) => {
             e.preventDefault();
             const sectionId = item.getAttribute("data-section");
+            item.classList.add("glossary-nav-item--selecting");
             scrollToSection(sectionId);
             setActiveNav(sectionId);
+            scrollUpdatesPausedUntil = performance.now() + SELECTING_DURATION_MS;
+            setTimeout(() => {
+                item.classList.remove("glossary-nav-item--selecting");
+            }, SELECTING_DURATION_MS);
         });
     });
 
     if (body) {
         body.addEventListener("scroll", () => {
+            if (performance.now() < scrollUpdatesPausedUntil) return;
             const sections = body.querySelectorAll(".glossary-section-group:not(.glossary-section-group--hidden)");
             for (const section of sections) {
                 const rect = section.getBoundingClientRect();
