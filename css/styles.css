@@ -158,6 +158,7 @@ body {
     transition: color var(--duration), background var(--duration), border-color var(--duration);
 }
 
+@media (hover: hover) {
 .theme-toggle:hover {
     color: var(--yellow);
     background: var(--bg-card-hover);
@@ -177,6 +178,7 @@ body {
 [data-theme="light"] .theme-toggle:hover {
     color: var(--blue);
     border-color: var(--blue);
+}
 }
 
 
@@ -213,12 +215,14 @@ body {
     background: var(--border);
     border-radius: 3px;
 }
+@media (hover: hover) {
 .sidebar-body::-webkit-scrollbar-thumb:hover,
 .lane-body::-webkit-scrollbar-thumb:hover,
 .summary-body::-webkit-scrollbar-thumb:hover,
 .glossary-body::-webkit-scrollbar-thumb:hover,
 .welcome-presets-section::-webkit-scrollbar-thumb:hover {
     background: var(--text-muted);
+}
 }
 .summary-body::-webkit-scrollbar-track,
 .glossary-body::-webkit-scrollbar-track,
@@ -251,8 +255,10 @@ body {
     transition: color var(--duration) var(--ease-out);
 }
 
+@media (hover: hover) {
 .sidebar-link:hover {
     color: var(--text-primary);
+}
 }
 
 .sponsor-btn {
@@ -280,6 +286,7 @@ body {
     flex-shrink: 0;
 }
 
+@media (hover: hover) {
 .sponsor-btn:hover {
     background: #30363d;
     border-color: #f02eaa;
@@ -288,6 +295,7 @@ body {
 
 .sponsor-btn:hover svg {
     color: #f02eaa;
+}
 }
 
 [data-theme="light"] .card {
@@ -320,10 +328,12 @@ body {
     border-color: rgba(219, 97, 162, 0.5);
 }
 
+@media (hover: hover) {
 [data-theme="light"] .sponsor-btn:hover {
     background: #f3f4f6;
     border-color: #bf3989;
     color: #1f2328;
+}
 }
 
 .sidebar-help-btn {
@@ -342,19 +352,23 @@ body {
     transition: all var(--duration) var(--ease-out);
 }
 
+@media (hover: hover) {
 .sidebar-help-btn:hover {
     background: var(--bg-card);
     color: var(--text-secondary);
     border-color: var(--text-muted);
+}
 }
 
 .sidebar-summary-btn {
     color: var(--blue);
 }
 
+@media (hover: hover) {
 .sidebar-summary-btn:hover {
     color: var(--blue);
     border-color: var(--blue);
+}
 }
 
 /* ─── Controls ─── */
@@ -383,8 +397,10 @@ body {
     font: inherit;
 }
 
+@media (hover: hover) {
 .section-toggle:hover .section-heading {
     color: var(--blue);
+}
 }
 
 .section-chevron {
@@ -521,8 +537,10 @@ body {
     cursor: pointer;
     transition: box-shadow var(--duration) var(--ease-out);
 }
+@media (hover: hover) {
 .slider::-webkit-slider-thumb:hover {
     box-shadow: 0 0 0 4px var(--blue-dim);
+}
 }
 .slider::-moz-range-thumb {
     width: 14px;
@@ -561,9 +579,11 @@ body {
     transition: all 0.15s ease;
 }
 
+@media (hover: hover) {
 .speed-btn:hover {
     color: var(--text-primary);
     border-color: var(--text-muted);
+}
 }
 
 .speed-btn.speed-btn--active {
@@ -620,9 +640,11 @@ body {
     transition: all 0.15s ease;
 }
 
+@media (hover: hover) {
 .optimal-apply-btn:hover {
     background: var(--blue);
     color: #fff;
+}
 }
 
 .optimal-info {
@@ -707,10 +729,12 @@ button.optimal-legend-item {
     text-decoration-color: var(--text-muted);
 }
 
+@media (hover: hover) {
 button.optimal-legend-item:hover {
     opacity: 1;
     background: rgba(255, 255, 255, 0.06);
     text-decoration-color: var(--text);
+}
 }
 
 button.optimal-legend-item.optimal-legend-item--active {
@@ -720,8 +744,10 @@ button.optimal-legend-item.optimal-legend-item--active {
     text-decoration: none;
 }
 
+@media (hover: hover) {
 [data-theme="light"] button.optimal-legend-item:hover {
     background: rgba(0, 0, 0, 0.06);
+}
 }
 
 [data-theme="light"] button.optimal-legend-item.optimal-legend-item--active {
@@ -1008,9 +1034,11 @@ button.optimal-legend-item.optimal-legend-item--active {
     transition: all 0.2s ease;
 }
 
+@media (hover: hover) {
 .preset-btn:hover {
     color: var(--text-primary);
     background: var(--bg-card-hover);
+}
 }
 
 .preset-btn:active {
@@ -1066,48 +1094,62 @@ button.optimal-legend-item.optimal-legend-item--active {
 .preset-default {
     border-left: 3px solid var(--text-muted);
 }
-.preset-default:hover,
 .preset-btn--selected.preset-default {
     border-left-color: var(--text-primary);
 }
-
+@media (hover: hover) {
+.preset-default:hover {
+    border-left-color: var(--text-primary);
+}
+}
+@media (hover: hover) {
 [data-theme="light"] .preset-default:hover {
     background: rgba(0, 0, 0, 0.04);
+}
 }
 
 .preset-green {
     border-left: 3px solid var(--green);
 }
+@media (hover: hover) {
 .preset-green:hover {
     border-left-color: var(--green);
     background: rgba(63, 185, 80, 0.08);
+}
 }
 
 .preset-flaky {
     border-left: 3px solid var(--yellow);
 }
+@media (hover: hover) {
 .preset-flaky:hover {
     border-left-color: var(--yellow);
     background: rgba(210, 153, 34, 0.08);
+}
 }
 
 .preset-disaster {
     border-left: 3px solid var(--red);
 }
+@media (hover: hover) {
 .preset-disaster:hover {
     border-left-color: var(--red);
     background: rgba(248, 81, 73, 0.08);
+}
 }
 
 .preset-fast {
     border-left: 3px solid var(--blue);
 }
+@media (hover: hover) {
 .preset-fast:hover {
     border-left-color: var(--blue);
     background: rgba(56, 139, 253, 0.08);
 }
+}
 
 /* Light mode: stronger hover backgrounds */
+@media (hover: hover) {
 [data-theme="light"] .preset-green:hover {
     background: rgba(46, 160, 67, 0.12);
 }
@@ -1119,6 +1161,7 @@ button.optimal-legend-item.optimal-legend-item--active {
 }
 [data-theme="light"] .preset-fast:hover {
     background: rgba(9, 105, 218, 0.10);
+}
 }
 
 /* ─── Main Area ─── */
@@ -1199,9 +1242,11 @@ button.optimal-legend-item.optimal-legend-item--active {
     color: #fff;
     border-color: var(--green);
 }
+@media (hover: hover) {
 .btn-primary:hover:not(:disabled) {
     background: var(--green-bright);
     border-color: var(--green-bright);
+}
 }
 
 .btn-primary.btn--paused {
@@ -1209,10 +1254,12 @@ button.optimal-legend-item.optimal-legend-item--active {
     color: var(--text-primary);
     border-color: var(--yellow);
 }
+@media (hover: hover) {
 .btn-primary.btn--paused:hover:not(:disabled) {
     background: var(--yellow-dim);
     border-color: var(--yellow);
     color: var(--text-primary);
+}
 }
 
 .btn-secondary {
@@ -1220,9 +1267,11 @@ button.optimal-legend-item.optimal-legend-item--active {
     color: var(--text-primary);
     border-color: var(--border);
 }
+@media (hover: hover) {
 .btn-secondary:hover:not(:disabled) {
     background: var(--bg-card-hover);
     border-color: var(--text-muted);
+}
 }
 
 .btn-ghost {
@@ -1230,9 +1279,11 @@ button.optimal-legend-item.optimal-legend-item--active {
     color: var(--text-secondary);
     border-color: var(--border);
 }
+@media (hover: hover) {
 .btn-ghost:hover:not(:disabled) {
     background: var(--bg-card);
     color: var(--text-primary);
+}
 }
 
 #btn-speed-topbar {
@@ -1255,9 +1306,11 @@ button.optimal-legend-item.optimal-legend-item--active {
     color: var(--green-bright);
     border-color: var(--green);
 }
+@media (hover: hover) {
 .btn-step-active:hover {
     background: var(--green);
     color: #fff;
+}
 }
 
 /* Stats */
@@ -2014,8 +2067,10 @@ button.optimal-legend-item.optimal-legend-item--active {
     transition: color var(--duration) var(--ease-out);
 }
 
+@media (hover: hover) {
 .summary-close:hover {
     color: var(--text-primary);
+}
 }
 
 .summary-grid {
@@ -2230,6 +2285,10 @@ button.optimal-legend-item.optimal-legend-item--active {
     justify-content: center;
 }
 
+#summary-instant {
+    grid-column: 1 / -1;
+}
+
 /* ─── Glossary Dialog ─── */
 .glossary-overlay {
     position: fixed;
@@ -2307,8 +2366,10 @@ button.optimal-legend-item.optimal-legend-item--active {
     transition: color var(--duration) var(--ease-out);
 }
 
+@media (hover: hover) {
 .glossary-close:hover {
     color: var(--text-primary);
+}
 }
 
 .glossary-search-wrap {
@@ -2365,9 +2426,11 @@ button.optimal-legend-item.optimal-legend-item--active {
                 background var(--duration) var(--ease-out);
 }
 
+@media (hover: hover) {
 .glossary-nav-item:hover {
     color: var(--text-primary);
     background: var(--bg-card-hover);
+}
 }
 
 .glossary-nav-item--active {
@@ -2376,9 +2439,11 @@ button.optimal-legend-item.optimal-legend-item--active {
     background: var(--blue-dim);
 }
 
+@media (hover: hover) {
 .glossary-nav-item--active:hover {
     color: var(--blue);
     background: var(--blue-dim);
+}
 }
 
 .glossary-nav-item--selecting,
@@ -2862,8 +2927,10 @@ button.optimal-legend-item.optimal-legend-item--active {
     transform: scale(1.3);
 }
 
+@media (hover: hover) {
 .welcome-dot-btn:hover:not(.welcome-dot-btn--active) {
     background: var(--text-muted);
+}
 }
 
 .welcome-actions {
@@ -2910,10 +2977,12 @@ button.optimal-legend-item.optimal-legend-item--active {
     transition: all var(--duration) var(--ease-out);
 }
 
+@media (hover: hover) {
 .summary-trigger-btn:hover {
     background: var(--bg-card-hover);
     border-color: var(--blue);
     color: var(--blue);
+}
 }
 
 .cost-trigger-btn {
@@ -2931,10 +3000,12 @@ button.optimal-legend-item.optimal-legend-item--active {
     color: var(--text-secondary);
 }
 
+@media (hover: hover) {
 .cost-trigger-btn:hover {
     background: var(--bg-card-hover);
     border-color: var(--text-muted);
     color: var(--text-primary);
+}
 }
 
 .cost-trigger-icon {
@@ -3141,9 +3212,11 @@ button.optimal-legend-item.optimal-legend-item--active {
         cursor: pointer;
         transition: color var(--duration) var(--ease-out), background var(--duration) var(--ease-out);
     }
+    @media (hover: hover) {
     .topbar-menu-btn:hover {
         color: var(--text-primary);
         background: var(--bg-card);
+    }
     }
     .topbar-menu-btn svg {
         flex-shrink: 0;
@@ -3272,8 +3345,10 @@ button.optimal-legend-item.optimal-legend-item--active {
         cursor: pointer;
         transition: color var(--duration) var(--ease-out);
     }
+    @media (hover: hover) {
     .sidebar-close:hover {
         color: var(--text-primary);
+    }
     }
 
     /* Step banner: more in-your-face on mobile */
