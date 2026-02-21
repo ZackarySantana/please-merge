@@ -1504,8 +1504,10 @@ function initSummary() {
     if (pauseBtn) pauseBtn.addEventListener("click", doPause);
     if (resetBtn)
         resetBtn.addEventListener("click", () => {
-            hideSummary();
+            state._keepSummaryOpen = true;
             doReset();
+            state._keepSummaryOpen = false;
+            updateSummaryPanel();
         });
     if (instantBtn)
         instantBtn.addEventListener("click", () => {
