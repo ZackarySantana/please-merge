@@ -2504,7 +2504,9 @@ function initGlossary() {
         if (searchInput) {
             searchInput.value = "";
             filterGlossary();
-            searchInput.focus();
+            if (!window.matchMedia("(max-width: 1000px)").matches) {
+                searchInput.focus();
+            }
         }
         setActiveNav("section-github");
     }
@@ -2619,7 +2621,7 @@ function initWelcome() {
 
     overlay.addEventListener("click", (e) => {
         if (e.target === overlay) closeWelcome();
-        const presetCard = e.target.closest(".welcome-preset-card[data-preset]");
+        const presetCard = e.target.closest(".preset-btn[data-preset]");
         if (presetCard) {
             applyPreset(presetCard.dataset.preset);
             closeWelcome();
