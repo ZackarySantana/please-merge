@@ -573,25 +573,13 @@ function showStepBanner() {
                 ? "Ready to merge 1 commit"
                 : `Ready to merge ${preview.count} commits`;
         title.style.color = "var(--green-bright)";
-        const timeTag =
-            preview.usefulDelta > 0
-                ? `  ·  Useful CI: +${formatCITime(preview.usefulDelta)}`
-                : "";
-        desc.innerHTML =
-            preview.description +
-            `<span class="step-banner-time step-banner-time--useful">${timeTag}</span>`;
+        desc.innerHTML = `<span class="step-banner-desc-text">${preview.description}</span><span class="step-banner-time step-banner-time--useful">  ·  Useful CI: +${formatCITime(preview.usefulDelta || 0)}</span>`;
     } else if (preview.action === "reject") {
         icon.textContent = "✕";
         icon.className = "step-banner-icon step-banner-icon--reject";
         title.textContent = "Head commit failed. Reject & restart.";
         title.style.color = "var(--red)";
-        const timeTag =
-            preview.wastedDelta > 0
-                ? `  ·  Wasted CI: +${formatCITime(preview.wastedDelta)}`
-                : "";
-        desc.innerHTML =
-            preview.description +
-            `<span class="step-banner-time step-banner-time--wasted">${timeTag}</span>`;
+        desc.innerHTML = `<span class="step-banner-desc-text">${preview.description}</span><span class="step-banner-time step-banner-time--wasted">  ·  Wasted CI: +${formatCITime(preview.wastedDelta || 0)}</span>`;
     }
 
     document.getElementById("step-overlay").hidden = false;
